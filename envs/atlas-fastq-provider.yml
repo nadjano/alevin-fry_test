@@ -1,0 +1,3 @@
+name: atlas-fastq-provider
+dependencies:
+  - ebi-gene-expression-group::atlas-fastq-provider=0.4.0

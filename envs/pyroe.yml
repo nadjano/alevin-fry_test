@@ -1,0 +1,3 @@
+name: pyroe
+dependencies:
+   - bioconda::pyroe
