@@ -2,7 +2,8 @@
 
 sdrfFile = params.sdrf
 resultsRoot = params.resultsRoot
-referenceFasta = params.referenceFasta
+referenceGenome = params.referenceGenome
+referencecDNA = params.referencecDNA
 referenceGtf = params.referenceGtf
 protocol = params.protocol
 
@@ -17,27 +18,29 @@ if ( params.containsKey('fastqProviderConfig')){
 }
 
 // make splici transcript 
-process build_splici
+process build_splici {
    
-   conda "/nfs/production/irene/ma/users/nnolte/nfs/production/irene/ma/users/nnolte/conda3/envs/splic"
+   conda "${baseDir}/envs/pyroe.yml"
 
-   memory { 20.GB * task.attempt }
+   memory { 2.GB * task.attempt }
     cpus 12
 
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
 
     input:
-        referenceFasta, referenceGtf
+        file referenceGenome
+        file referenceGtf
 
     output:
-        splici_fasta, splici_t2g
+        file "splici.fasta"
+        file "splici_t2g"
 
     """
-    yroe make-splici  ${referenceFasta}   ${referenceGtf}  50 splici
+    yroe make-splici  ${referenceGenome}   ${referenceGtf}  50 splici
 
     """
-
+}
 // Read ENA_RUN column from an SDRF
 
 Channel
@@ -51,7 +54,6 @@ Channel
         SDRF_FOR_COUNT
     }
 
-TRANSCRIPT_TO_GENE = Channel.fromPath( transcriptToGene, checkIfExists: true ).first()
 
 // Read URIs from SDRF, generate target file names, and barcode locations
 
@@ -67,93 +69,3 @@ SDRF_FOR_FASTQS
 
 // Call the download script to retrieve run fastqs
 
-process download_fastqs {
-    
-    conda "${baseDir}/envs/atlas-fastq-provider.yml"
-    
-    maxForks params.maxConcurrentDownloads
-    time { 10.hour * task.attempt }
-    memory { 20.GB * task.attempt }
-
-    errorStrategy { task.attempt<=10 & task.exitStatus != 4 ? 'retry' : 'finish' } 
-    
-    input:
-        set runId, cdnaFastqURI, barcodesFastqURI, cdnaFastqFile, barcodesFastqFile, val(barcodeLength), val(umiLength), val(end), val(cellCount), val(controlledAccess) from FASTQ_RUNS
-
-    output:
-        set val(runId), file("${cdnaFastqFile}"), file("${barcodesFastqFile}"), val(barcodeLength), val(umiLength), val(end), val(cellCount) into DOWNLOADED_FASTQS
-
-    """
-        if [ -n "$manualDownloadFolder" ] && [ -e $manualDownloadFolder/${cdnaFastqFile} ] && [ -e $manualDownloadFolder/${barcodesFastqFile} ]; then
-           ln -s $manualDownloadFolder/${cdnaFastqFile} ${cdnaFastqFile}
-           ln -s $manualDownloadFolder/${barcodesFastqFile} ${barcodesFastqFile}
-        elif [ -n "$manualDownloadFolder" ] && [ -e $manualDownloadFolder/${cdnaFastqFile} ] && [ ! -e $manualDownloadFolder/${barcodesFastqFile} ]; then
-            echo 'cDNA file $cdnaFastqFile is available locally, but barcodes file $barcodesFastqFile is not 1>&2
-            exit 2    
-        elif [ -n "$manualDownloadFolder" ] && [ ! -e $manualDownloadFolder/${cdnaFastqFile} ] && [ -e $manualDownloadFolder/${barcodesFastqFile} ]; then
-            echo 'cDNA file $cdnaFastqFile is not available locally, but barcodes file $barcodesFastqFile is 1>&2
-            exit 3 
-        elif [ "$controlledAccess" = 'yes' ]; then
-            echo "One or both of ${cdnaFastqFile}, ${barcodesFastqFile} are not available at $manualDownloadFolder/ for this controlled access experiment" 1>&2
-            exit 4   
-        else
-            confPart=''
-            if [ -n "$fastqProviderConfig" ] && [ -e "$fastqProviderConfig" ]; then
-                confPart=" -c $fastqProviderConfig"
-            fi 
-            # Stop fastq downloader from testing different methods -assume the control workflow has done that 
-            export NOPROBE=1
-        
-            fetchFastq.sh -f ${cdnaFastqURI} -t ${cdnaFastqFile} -m ${params.downloadMethod} \$confPart
-            
-            # Allow for the first download also having produced the second output already
-            if [ ! -e ${barcodesFastqFile} ]; then
-                fetchFastq.sh -f ${barcodesFastqURI} -t ${barcodesFastqFile} -m ${params.downloadMethod} \$confPart
-            fi
-        fi
-    """
-}
-
-// Group read files by run name, or by technical replicate group if specified
-
-if ( params.fields.containsKey('techrep')){
-
-    // If technical replicates are present, create a channel containing that info 
-
-    SDRF_FOR_TECHREP
-        .map{ row-> tuple(row["${params.fields.run}"], row["${params.fields.techrep}"]) }
-        .groupTuple()
-        .map{ row-> tuple( row[0], row[1][0]) }
-        .set{ TECHREPS }
-
-    // The target set of results will now be the technical replicate group number
-
-    SDRF_FOR_COUNT
-        .map{ row-> tuple(row["${params.fields.techrep}"]) }
-        .unique()
-        .count()
-        .set { TARGET_RESULT_COUNT }
-    
-    // Now add the tech rep group to the run info, group by it, and create a
-    // tuple of files keyed by techrep group
-
-    TECHREPS.join( DOWNLOADED_FASTQS )
-        .groupTuple(by: 1)
-        .map{ row-> tuple( row[1], row[2].flatten(), row[3].flatten(), row[4][0], row[5][0], row[6][0], row[7][0]) }
-        .set{
-            FINAL_FASTQS
-        }
-}else{
-    DOWNLOADED_FASTQS.set{ FINAL_FASTQS }
-    
-    SDRF_FOR_COUNT
-      .map{ row-> tuple(row["${params.fields.run}"]) }
-      .unique()
-      .count()
-      .set { TARGET_RESULT_COUNT }
-}
-
-FINAL_FASTQS.into{
-    FINAL_FASTQS_FOR_CONFIG
-    FINAL_FASTQS_FOR_ALEVIN
-}
