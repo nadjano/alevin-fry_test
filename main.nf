@@ -29,17 +29,21 @@ process build_splici {
     maxRetries 10
 
     input:
-        file referenceGenome
-        file referenceGtf
+        path referenceGenome
+        path referenceGtf
 
     output:
-        file "splici.fasta"
-        file "splici_t2g"
+        set file("splici/*.fa"), file("splici/*.tsv") into SPLICI_REFERENCE
 
     """
     pyroe make-splici  ${referenceGenome}   ${referenceGtf}  50 splici
 
     """
+
+}
+
+process index_alevin{
+    
 }
 // Read ENA_RUN column from an SDRF
 
