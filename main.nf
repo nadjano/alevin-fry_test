@@ -3,7 +3,7 @@
 sdrfFile = params.sdrf
 resultsRoot = params.resultsRoot
 referenceFasta = params.referenceFasta
-transcriptomeIndex = params.transcriptomeIndex
+referenceGtf = params.referenceGtf
 protocol = params.protocol
 
 manualDownloadFolder =''
@@ -21,6 +21,22 @@ process build_splici
    
    conda "/nfs/production/irene/ma/users/nnolte/nfs/production/irene/ma/users/nnolte/conda3/envs/splic"
 
+   memory { 20.GB * task.attempt }
+    cpus 12
+
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
+
+    input:
+        referenceFasta, referenceGtf
+
+    output:
+        splici_fasta, splici_t2g
+
+    """
+    yroe make-splici  ${referenceFasta}   ${referenceGtf}  50 splici
+
+    """
 
 // Read ENA_RUN column from an SDRF
 
