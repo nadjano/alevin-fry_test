@@ -23,7 +23,7 @@ process build_splici {
    conda "${baseDir}/envs/pyroe.yml"
 
    memory { 2.GB * task.attempt }
-    cpus 12
+    cpus 4
 
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -37,7 +37,7 @@ process build_splici {
         file "splici_t2g"
 
     """
-    yroe make-splici  ${referenceGenome}   ${referenceGtf}  50 splici
+    pyroe make-splici  ${referenceGenome}   ${referenceGtf}  50 splici
 
     """
 }
