@@ -156,18 +156,17 @@ process build_splici {
 
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
-    
-    
+
+    output_dir = "splici"
 
     input:
         path referenceGenome
         path referenceGtf
-        
 
     output:
-        file("splici/*.tsv") into transcriptToGene_spliced
+        file("splici/splici_fl45.fa") 
         file("splici/*.fa") into referenceSpliced
-        val("splici") into referenceType
+        val("splici") into referenceType_splic
 
     """
     pyroe make-splici  ${referenceGenome}   ${referenceGtf}  50 splici
@@ -177,109 +176,109 @@ process build_splici {
 }
 
 
-REFERENCE = Channel.from(referenceType, transcriptToGene_spliced, referenceSpliced)
+REFERENCE = Channel.from(tuple('splici', file("splici/splici_fl45.fa"), referenceSpliced),tuple('cDNA', TRANSCRIPT_TO_GENE, referencecDNA))
 
 process index_alevin{
 
     conda "${baseDir}/envs/alevin.yml"
 
     input:
-        referenceType 
-        transcriptToGene_spliced
-        referenceSpliced 
+        set val(type), file("splici/splici_fl45.fa"), t2g from REFERENCE
     
     output:
         file("alevin_index_cDNA/*") into INDEX_ALEVIN_CDNA
 
     """
-    salmon index -t ${referencecDNA} -i "alevin_index_cDNA"
+    salmon index --transcript splici/splici_fl45.fa    -i alevin_index_${type}
     """
 
 }
-process alevin_config {
 
-    input:
-        set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount) from FINAL_FASTQS_FOR_CONFIG
 
-    output:
-        set val(runId), stdout into ALEVIN_CONFIG
+// process alevin_config {
+
+//     input:
+//         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount) from FINAL_FASTQS_FOR_CONFIG
+
+//     output:
+//         set val(runId), stdout into ALEVIN_CONFIG
     
-    script:
+//     script:
 
-        def barcodeConfig = ''
+//         def barcodeConfig = ''
 
-        if ( params.containsKey(protocol) ){
+//         if ( params.containsKey(protocol) ){
 
-            canonicalProtocol = params.get(protocol)
-            alevinType = canonicalProtocol.alevinType
+//             canonicalProtocol = params.get(protocol)
+//             alevinType = canonicalProtocol.alevinType
 
-            // Non-standard barcode config is supplied as a custom method
+//             // Non-standard barcode config is supplied as a custom method
 
-            if ( alevinType == 'custom' || "${canonicalProtocol.barcodeLength}" != barcodeLength || "${canonicalProtocol.umiLength}" != umiLength || "${canonicalProtocol.end}" != end ){
-                barcodeConfig = "--barcodeLength ${barcodeLength} --umiLength ${umiLength} --end ${end}" 
+//             if ( alevinType == 'custom' || "${canonicalProtocol.barcodeLength}" != barcodeLength || "${canonicalProtocol.umiLength}" != umiLength || "${canonicalProtocol.end}" != end ){
+//                 barcodeConfig = "--barcodeLength ${barcodeLength} --umiLength ${umiLength} --end ${end}" 
 
-            }else{
-                barcodeConfig = "--$alevinType"
-            }
-            barcodeConfig = "-l ${canonicalProtocol.libType} $barcodeConfig" 
-        }
+//             }else{
+//                 barcodeConfig = "--$alevinType"
+//             }
+//             barcodeConfig = "-l ${canonicalProtocol.libType} $barcodeConfig" 
+//         }
 
-        """
-        if [ -z "$barcodeConfig" ]; then
-            echo Input of $protocol results is misconfigured 1>&2
-            exit 1
-        fi
-        # Also check barcode read lengths and return non-0 if they're not what they should be
-        targetLen=\$(($umiLength + $barcodeLength))
-        barcodesGood=0
-        set +e
-        while read -r l; do
-            checkBarcodeRead.sh -r \$(readlink -f \$l) -b $barcodeLength -u $umiLength -n 1000000 1>&2
-            if [ \$? -ne 0 ]; then
-                barcodesGood=1
-            fi
-        done <<< "\$(ls barcodes*.fastq.gz)"
-        set -e
+//         """
+//         if [ -z "$barcodeConfig" ]; then
+//             echo Input of $protocol results is misconfigured 1>&2
+//             exit 1
+//         fi
+//         # Also check barcode read lengths and return non-0 if they're not what they should be
+//         targetLen=\$(($umiLength + $barcodeLength))
+//         barcodesGood=0
+//         set +e
+//         while read -r l; do
+//             checkBarcodeRead.sh -r \$(readlink -f \$l) -b $barcodeLength -u $umiLength -n 1000000 1>&2
+//             if [ \$? -ne 0 ]; then
+//                 barcodesGood=1
+//             fi
+//         done <<< "\$(ls barcodes*.fastq.gz)"
+//         set -e
         
-        echo -n "$barcodeConfig"
-        exit \$barcodesGood
-        """
-}
+//         echo -n "$barcodeConfig"
+//         exit \$barcodesGood
+//         """
+// }
 
-process alevin {
+// process alevin {
 
-    conda "${baseDir}/envs/alevin.yml"
+//     conda "${baseDir}/envs/alevin.yml"
     
-    cache 'deep'
+//     cache 'deep'
 
-    memory { 20.GB * task.attempt }
-    cpus 12
+//     memory { 20.GB * task.attempt }
+//     cpus 12
 
-    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
-    maxRetries 10
+//     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+//     maxRetries 10
 
-    input:
-        set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
-        file(transcriptToGene) from TRANSCRIPT_TO_GENE
+//     input:
+//         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
+//         file(transcriptToGene) from TRANSCRIPT_TO_GENE
 
-    output:
-        set val(runId), file("${runId}"),  file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
+//     output:
+//         set val(runId), file("${runId}"),  file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
 
-    """
-    salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
-        -i ${transcriptomeIndex} -p ${task.cpus} -o ${runId}_tmp --tgMap ${transcriptToGene} --dumpFeatures --keepCBFraction 1 \
-        --freqThreshold ${params.minCbFreq} --dumpMtx
-    min_mapping=\$(grep "percent_mapped" ${runId}_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
-    if [ "\${min_mapping%.*}" -lt "${params.minMappingRate}" ]; then
-        echo "Minimum mapping rate (\$min_mapping) is less than the specified threshold of ${params.minMappingRate}" 1>&2
-        exit 1 
-    fi
+//     """
+//     salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
+//         -i ${transcriptomeIndex} -p ${task.cpus} -o ${runId}_tmp --tgMap ${transcriptToGene} --dumpFeatures --keepCBFraction 1 \
+//         --freqThreshold ${params.minCbFreq} --dumpMtx
+//     min_mapping=\$(grep "percent_mapped" ${runId}_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
+//     if [ "\${min_mapping%.*}" -lt "${params.minMappingRate}" ]; then
+//         echo "Minimum mapping rate (\$min_mapping) is less than the specified threshold of ${params.minMappingRate}" 1>&2
+//         exit 1 
+//     fi
  
-    mv ${runId}_tmp ${runId}
-    """
-}
+//     mv ${runId}_tmp ${runId}
+//     """
+// }
 
 
 
-// Call the download script to retrieve run fastqs
+// // Call the download script to retrieve run fastqs
 
