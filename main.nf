@@ -319,5 +319,9 @@ process alevin {
 
 
 
+// index for STARSolo
+// environment STARsolo
+// STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles Drosophila_melanogaster.BDGP6.32.dna.toplevel.fa --sjdbGTFfile Drosophila_melanogaster.BDGP6.32.106.gtf --genomeSAindexNbases 12
+
 // // Call the download script to retrieve run fastqs
 
