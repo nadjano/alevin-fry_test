@@ -6,6 +6,13 @@ referenceGenome = params.referenceGenome
 referencecDNA = params.referencecDNA
 referenceGtf = params.referenceGtf
 protocol = params.protocol
+outdir = "out_dir"
+
+
+REFERENCE_GENOME = Channel.fromPath( referenceGenome, checkIfExists: true ).first()
+REFERENCE_GTF = Channel.fromPath( referenceGtf, checkIfExists: true ).first()
+REFERENCE_CDNA = Channel.fromPath( referencecDNA, checkIfExists: true ).first()
+
 
 manualDownloadFolder =''
 if ( params.containsKey('manualDownloadFolder')){
@@ -157,39 +164,39 @@ process build_splici {
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
 
-    output_dir = "splici"
-
     input:
-        path referenceGenome
-        path referenceGtf
+        file(referenceGenome) from REFERENCE_GENOME
+        file(referenceGtf) from REFERENCE_GTF
 
     output:
-        file("splici/splici_fl45.fa") 
-        file("splici/*.fa") into referenceSpliced
-        val("splici") into referenceType_splic
+        publishDir "${outdir}"
+        file("${outdir}/splici_fl45.fa") into SPLICI_REFERENCE
+        
 
     """
-    pyroe make-splici  ${referenceGenome}   ${referenceGtf}  50 splici
+    pyroe make-splici  ${referenceGenome}   ${referenceGtf}  50 ${outdir}
 
     """
 
 }
 
 
-REFERENCE = Channel.from(tuple('splici', file("splici/splici_fl45.fa"), referenceSpliced),tuple('cDNA', TRANSCRIPT_TO_GENE, referencecDNA))
+REFERENCE = Channel.from(tuple('splici', SPLICI_REFERENCE),tuple('cDNA', REFERENCE_CDNA))
 
 process index_alevin{
 
     conda "${baseDir}/envs/alevin.yml"
 
     input:
-        set val(type), file("splici/splici_fl45.fa"), t2g from REFERENCE
+        file("${outdir}/splici_fl45.fa") from SPLICI_REFERENCE
+        // file("${outdir}/splici_fl45.fa") from SPLICI_REFERENCE
+        // val(referenceType_splic)
     
     output:
-        file("alevin_index_cDNA/*") into INDEX_ALEVIN_CDNA
+        path("alevin_index_splici") into INDEX_ALEVIN
 
     """
-    salmon index --transcript splici/splici_fl45.fa    -i alevin_index_${type}
+    salmon index --transcript "${outdir}/splici_fl45.fa"   -i alevin_index_splici
     """
 
 }
