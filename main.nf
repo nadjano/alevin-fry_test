@@ -8,6 +8,7 @@ referenceGtf = params.referenceGtf
 protocol = params.protocol
 outdir = "out_dir"
 
+type = ('no_introns, introns')
 
 REFERENCE_GENOME = Channel.fromPath( referenceGenome, checkIfExists: true ).first()
 REFERENCE_GTF = Channel.fromPath( referenceGtf, checkIfExists: true ).first()
@@ -171,6 +172,7 @@ process build_splici {
     output:
         publishDir "${outdir}"
         file("${outdir}/splici_fl45.fa") into SPLICI_REFERENCE
+        file("${outdir}/splici_fl45*.tsv") into SPLICI_T2G_3
         
 
     """
@@ -183,7 +185,7 @@ process build_splici {
 
 REFERENCE = Channel.from(tuple('splici', SPLICI_REFERENCE),tuple('cDNA', REFERENCE_CDNA))
 
-process index_alevin{
+process splici_index_alevin{
 
     conda "${baseDir}/envs/alevin.yml"
 
@@ -193,7 +195,7 @@ process index_alevin{
         // val(referenceType_splic)
     
     output:
-        path("alevin_index_splici") into INDEX_ALEVIN
+        path("alevin_index_splici") into INDEX_ALEVIN_SPLICI
 
     """
     salmon index --transcript "${outdir}/splici_fl45.fa"   -i alevin_index_splici
@@ -201,91 +203,126 @@ process index_alevin{
 
 }
 
-
-// process alevin_config {
-
-//     input:
-//         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount) from FINAL_FASTQS_FOR_CONFIG
-
-//     output:
-//         set val(runId), stdout into ALEVIN_CONFIG
+process t2g_splici{
+    input:
+        file("${outdir}/splici_fl45*.tsv") from SPLICI_T2G_3
+      
     
-//     script:
+    output:
+        file("${outdir}/splici_t2g.tsv") into SPLICI_T2G
 
-//         def barcodeConfig = ''
+    """
+    cat "${outdir}/splici_fl45*.tsv" | awk  '{print\$1"\t"\$1}'  > "${outdir}/splici_t2g.tsv"
+    """
 
-//         if ( params.containsKey(protocol) ){
+}
 
-//             canonicalProtocol = params.get(protocol)
-//             alevinType = canonicalProtocol.alevinType
+process cDNA_index_alevin{
 
-//             // Non-standard barcode config is supplied as a custom method
+    conda "${baseDir}/envs/alevin.yml"
 
-//             if ( alevinType == 'custom' || "${canonicalProtocol.barcodeLength}" != barcodeLength || "${canonicalProtocol.umiLength}" != umiLength || "${canonicalProtocol.end}" != end ){
-//                 barcodeConfig = "--barcodeLength ${barcodeLength} --umiLength ${umiLength} --end ${end}" 
+    input:
+        file(referencecDNA) from REFERENCE_CDNA
+    
+    output:
+        path("alevin_index_cDNA") into INDEX_ALEVIN_CDNA
 
-//             }else{
-//                 barcodeConfig = "--$alevinType"
-//             }
-//             barcodeConfig = "-l ${canonicalProtocol.libType} $barcodeConfig" 
-//         }
+    """
+    salmon index --transcript ${referencecDNA}   -i alevin_index_cDNA
+    """
 
-//         """
-//         if [ -z "$barcodeConfig" ]; then
-//             echo Input of $protocol results is misconfigured 1>&2
-//             exit 1
-//         fi
-//         # Also check barcode read lengths and return non-0 if they're not what they should be
-//         targetLen=\$(($umiLength + $barcodeLength))
-//         barcodesGood=0
-//         set +e
-//         while read -r l; do
-//             checkBarcodeRead.sh -r \$(readlink -f \$l) -b $barcodeLength -u $umiLength -n 1000000 1>&2
-//             if [ \$? -ne 0 ]; then
-//                 barcodesGood=1
-//             fi
-//         done <<< "\$(ls barcodes*.fastq.gz)"
-//         set -e
+}
+
+ALEVIN_INDEX = Channel.from(INDEX_ALEVIN_SPLICI, INDEX_ALEVIN_CDNA)
+
+process alevin_config {
+
+    input:
+        set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount) from FINAL_FASTQS_FOR_CONFIG
+
+    output:
+        set val(runId), stdout into ALEVIN_CONFIG
+    
+    script:
+
+        def barcodeConfig = ''
+
+        if ( params.containsKey(protocol) ){
+
+            canonicalProtocol = params.get(protocol)
+            alevinType = canonicalProtocol.alevinType
+
+            // Non-standard barcode config is supplied as a custom method
+
+            if ( alevinType == 'custom' || "${canonicalProtocol.barcodeLength}" != barcodeLength || "${canonicalProtocol.umiLength}" != umiLength || "${canonicalProtocol.end}" != end ){
+                barcodeConfig = "--barcodeLength ${barcodeLength} --umiLength ${umiLength} --end ${end}" 
+
+            }else{
+                barcodeConfig = "--$alevinType"
+            }
+            barcodeConfig = "-l ${canonicalProtocol.libType} $barcodeConfig" 
+        }
+
+        """
+        if [ -z "$barcodeConfig" ]; then
+            echo Input of $protocol results is misconfigured 1>&2
+            exit 1
+        fi
+        # Also check barcode read lengths and return non-0 if they're not what they should be
+        targetLen=\$(($umiLength + $barcodeLength))
+        barcodesGood=0
+        set +e
+        while read -r l; do
+            checkBarcodeRead.sh -r \$(readlink -f \$l) -b $barcodeLength -u $umiLength -n 1000000 1>&2
+            if [ \$? -ne 0 ]; then
+                barcodesGood=1
+            fi
+        done <<< "\$(ls barcodes*.fastq.gz)"
+        set -e
         
-//         echo -n "$barcodeConfig"
-//         exit \$barcodesGood
-//         """
-// }
+        echo -n "$barcodeConfig"
+        exit \$barcodesGood
+        """
+}
 
-// process alevin {
 
-//     conda "${baseDir}/envs/alevin.yml"
+
+
+process alevin {
+
+    conda "${baseDir}/envs/alevin.yml"
     
-//     cache 'deep'
+    cache 'deep'
 
-//     memory { 20.GB * task.attempt }
-//     cpus 12
+    memory { 2.GB * task.attempt }
+    cpus 4
 
-//     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
-//     maxRetries 10
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
 
-//     input:
-//         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
-//         file(transcriptToGene) from TRANSCRIPT_TO_GENE
+    input:
+        set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
+        file("${outdir}/splici_t2g.tsv") from SPLICI_T2G
+        path("alevin_index_splici") from INDEX_ALEVIN_SPLICI
 
-//     output:
-//         set val(runId), file("${runId}"),  file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
+    output:
+        set val(runId), file("${runId}"),  file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
 
-//     """
-//     salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
-//         -i ${transcriptomeIndex} -p ${task.cpus} -o ${runId}_tmp --tgMap ${transcriptToGene} --dumpFeatures --keepCBFraction 1 \
-//         --freqThreshold ${params.minCbFreq} --dumpMtx
-//     min_mapping=\$(grep "percent_mapped" ${runId}_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
-//     if [ "\${min_mapping%.*}" -lt "${params.minMappingRate}" ]; then
-//         echo "Minimum mapping rate (\$min_mapping) is less than the specified threshold of ${params.minMappingRate}" 1>&2
-//         exit 1 
-//     fi
+    """
+    salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
+        -i ${"alevin_index_splici"} -p ${task.cpus} -o ${runId}_tmp --tgMap ${"alevin_index_splici"} --dumpFeatures --keepCBFraction 1 \
+        --freqThreshold ${params.minCbFreq} --dumpMtx
+    min_mapping=\$(grep "percent_mapped" ${runId}_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
+    if [ "\${min_mapping%.*}" -lt "${params.minMappingRate}" ]; then
+        echo "Minimum mapping rate (\$min_mapping) is less than the specified threshold of ${params.minMappingRate}" 1>&2
+        exit 1 
+    fi
  
-//     mv ${runId}_tmp ${runId}
-//     """
-// }
+    mv ${runId}_tmp ${runId}
+    """
+}
 
 
 
-// // Call the download script to retrieve run fastqs
+// Call the download script to retrieve run fastqs
 
