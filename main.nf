@@ -306,7 +306,7 @@ process alevin {
 
     output:
         // publishDir path "${runId}_ALEVIN"
-        set val(index_dir), val(runId), file("${runId}_ALEVIN")), val min_mapping, file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
+        set val(index_dir), val(runId), file("${runId}_ALEVIN"), val min_mapping, file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
 
 
     """
