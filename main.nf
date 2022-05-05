@@ -329,12 +329,14 @@ process index_star {
         path(referenceGtf) from REFERENCE_GTF
     output:
         path("STAR_index")
-        
-}
-"""
-STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles ${referenceGenome}  --sjdbGTFfile ${referenceGtf} --genomeSAindexNbases 12
+    
+    """
+    STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles ${referenceGenome}  --sjdbGTFfile ${referenceGtf} --genomeSAindexNbases 12
 
-"""
+    """
+
+}
+
 // run STARSolo 
 
 // process run_STARSolo {
