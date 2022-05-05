@@ -48,7 +48,7 @@ SDRF_FOR_FASTQS
 process make_t2g_file {
 
     input:
-        path referencecDNA
+        path reference from referencecDNA
 
     output:
         file("t2g_cDNA.txt")
@@ -317,7 +317,18 @@ process alevin {
     """
 }
 
+process index_star{
+    conda "${baseDir}/envs/star.yml"
 
+    input:
+        val genomeDir
+        path(referenceGenome) 
+        path(referenceGtf) 
+    output:
+        file("${genomeDir}")
+        
+
+}
 
 // index for STARSolo
 // environment STARsolo
