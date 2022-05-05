@@ -10,8 +10,8 @@ outdir = "out_dir"
 ref_type = ['splici', 'cDNA']
 
 
-REFERENCE_CDNA = Channel.fromPath( referencecDNA)
-REFERENCE_GTF = Channel.fromPath( referenceGtf)
+REFERENCE_CDNA = Channel.fromPath(referencecDNA,checkIfExists: true ).first()
+REFERENCE_GTF = Channel.fromPath( referenceGtf,checkIfExists: true ).first()
 
 
 manualDownloadFolder =''
