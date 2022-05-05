@@ -392,24 +392,24 @@ process index_kb_cDNA {
     """
 }  
 
-process index_kb_splici {
+// process index_kb_splici {
 
-    conda "${baseDir}/envs/kb-tools.yml"
+//     conda "${baseDir}/envs/kb-tools.yml"
     
-    input:
-        path(referenceGenome) from REFERENCE_GENOME
-        path(referenceGtf) from REFERENCE_GTF
+//     input:
+//         path(referenceGenome) from REFERENCE_GENOME
+//         path(referenceGtf) from REFERENCE_GTF
        
 
-    output:
-        set file("kb_index_splici"), file("t2g_kb_splici.txt") into KB_INDEX_SPLICI
+//     output:
+//         set file("kb_index_splici"), file("t2g_kb_splici.txt") into KB_INDEX_SPLICI
     
        
-    """
-    kb ref -i kb_index_splici -g t2g_kb_splici.txt -f1 cDNA.fa -f2 intron.fa ${referenceGenome} ${referenceGtf} 
-    --workflow nucleus
-    """
-}  
+//     """
+//     kb ref -i kb_index_splici -g t2g_kb_splici.txt -f1 cDNA.fa -f2 intron.fa ${referenceGenome} ${referenceGtf} 
+//     --workflow nucleus
+//     """
+// }  
 
 process kb_count_cDNA {
     conda "${baseDir}/envs/kb-tools.yml"
