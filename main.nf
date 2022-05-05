@@ -236,7 +236,8 @@ process alevin_config {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount) from FINAL_FASTQS_FOR_CONFIG
 
     output:
-        set {val(runId), stdout} into {ALEVIN_CONFIG, STAR_CONFIG}
+        set val(runId), stdout into {ALEVIN_CONFIG}
+        set val(runId), stdout into {STAR_CONFIG}
     
     script:
 
@@ -347,7 +348,7 @@ process run_STARSolo {
 
 
     input:
-    set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(ALEVIN_CONFIG)
+    set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(STAR_CONFIG)
     path("STAR_index") from STAR_INDEX
 
     """
