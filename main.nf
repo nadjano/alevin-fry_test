@@ -303,7 +303,7 @@ process alevin {
         path t2g from T2G
 
     output:
-        publishDir path "${runId}_ALEVIN"
+        // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}"),  file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
 
     """
