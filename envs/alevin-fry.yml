@@ -1,0 +1,3 @@
+name: alevin-fry
+dependecies:
+  - bioconda::alevin-fry
