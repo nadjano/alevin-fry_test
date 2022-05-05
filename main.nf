@@ -387,7 +387,7 @@ process index_kb_cDNA {
         set file("${kb_index_cDNA}"), file("${t2g_kb}") into KB_INDEX_CDNA
        
     """
-    kb ref -i kb_index_cDNA -g t2g_kb -f1 ${referenceGenome} ${referenceGtf} 
+    kb ref -i kb_index_cDNA -g t2g_kb -f1 cDNA.fa ${referenceGenome} ${referenceGtf} 
     """
 }  
 
