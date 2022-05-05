@@ -453,7 +453,7 @@ process kb_count_splici {
     """
     kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x DROPSEQ \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_splici" \
-    --workflow nucleus -c1 ${cDNA_kb.txt} -c2 ${intron_kb.txt}
+    --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt
 
 
     min_mapping=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
