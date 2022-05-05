@@ -306,17 +306,15 @@ process alevin {
 
     output:
         // publishDir path "${runId}_ALEVIN"
-        set val(runId), file("${runId}_ALEVIN"),  file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
+        set val(index_dir), val(runId), file("${runId}_ALEVIN"), val min_mapping, file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
+
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
         -i ${index_dir} -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap ${t2g.tsv} --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
-    min_mapping=\$(grep "percent_mapped" ${runId}_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
-    if [ "\${min_mapping%.*}" -lt "${params.minMappingRate}" ]; then
-        echo "Minimum mapping rate (\$min_mapping) is less than the specified threshold of ${params.minMappingRate}" 1>&2
-        exit 1 
-    fi
+    min_mapping=\$(grep "percent_mapped" ${runId}_ALEVIN_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
+    
  
     mv ${runId}_ALEVIN_tmp ${runId}_ALEVIN
     """
@@ -327,18 +325,16 @@ process alevin {
 // process ALEVIN_RESULTS {
 
 //     input:
-//         file("${runId}_ALEVIN") from ALEVIN_RESULTS
+//         file("${runId}_ALEVIN"), val(index_dir), val(runId) from ALEVIN_RESULTS
 
 //     output:
-            // val min_mapping into MAPPING
+            //val(runId),  val(index_dir), val min_mapping into MAPPING_RATE_ALEVIN
 
 //     """
 //     min_mapping=\$grep "percent_mapped" ${runId}_ALEVIN/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 )
 //     echo "Mapping rate for (${runId}) is (\$min_mapping)"
 //     """
 // }
-
-
 
 // build index to runSTARSolo
 process index_star {
@@ -373,11 +369,36 @@ process run_STARSolo {
     set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(STAR_CONFIG)
     path("STAR_index") from STAR_INDEX
 
+    output:
+    min_mapping
+
+
     """
 
     STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 8 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
+    in_mapping=\$(grep "Uniquely mapped reads %" ${runId}_STAR/Log.final.out | awk '{split($0, array, "|"); print array[2]}')
+    
     mv ${runId}_STAR_tmp ${runId}_STAR
+
     """
 }
 
+
+// get alevin mapping rate
+
+// process STAR_RESULTS {
+
+//     input:
+//         file("${runId}_ALEVIN"), val(index_dir), val(runId) from ALEVIN_RESULTS
+
+//     output:
+            //val(runId),  val(index_dir), val min_mapping into MAPPING_RATE_ALEVIN
+
+//     """
+//     min_mapping=\$grep "percent_mapped" ${runId}_ALEVIN/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 )
+//     echo "Mapping rate for (${runId}) is (\$min_mapping)"
+//     """
+// }
+
+grep "Uniquely mapped reads %" Log.final.out | awk '{split($0, array, "|"); print array[2]}' 
