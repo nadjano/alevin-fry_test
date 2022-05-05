@@ -314,7 +314,7 @@ process alevin {
         -i ${index_dir} -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap ${t2g.tsv} --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
     min_mapping=\$(grep "percent_mapped" ${runId}_ALEVIN_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
-    
+    echo "Minimum mapping rate (\$min_mapping)"
  
     mv ${runId}_ALEVIN_tmp ${runId}_ALEVIN
     """
@@ -378,8 +378,9 @@ process run_STARSolo {
     STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 8 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
     in_mapping=\$(grep "Uniquely mapped reads %" ${runId}_STAR/Log.final.out | awk '{split($0, array, "|"); print array[2]}')
-    
+    echo "Minimum mapping rate (\$min_mapping)"
     mv ${runId}_STAR_tmp ${runId}_STAR
+
 
     """
 }
@@ -396,9 +397,7 @@ process run_STARSolo {
             //val(runId),  val(index_dir), val min_mapping into MAPPING_RATE_ALEVIN
 
 //     """
-//     min_mapping=\$grep "percent_mapped" ${runId}_ALEVIN/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 )
+//     min_mapping=\$(grep "Uniquely mapped reads %" Log.final.out | awk '{split($0, array, "|"); print array[2]}')
 //     echo "Mapping rate for (${runId}) is (\$min_mapping)"
 //     """
 // }
-
-grep "Uniquely mapped reads %" Log.final.out | awk '{split($0, array, "|"); print array[2]}' 
