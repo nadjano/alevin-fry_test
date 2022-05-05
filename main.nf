@@ -324,12 +324,12 @@ process alevin {
 
 // get alevin mapping rate
 
-process ALEVIN_RESULTS {
+// process ALEVIN_RESULTS {
 
 
-    input:
-        file("${runId}_ALEVIN") from ALEVIN_RESULTS
-}
+//     input:
+//         file("${runId}_ALEVIN") from ALEVIN_RESULTS
+// }
 
 
 // build index to runSTARSolo
