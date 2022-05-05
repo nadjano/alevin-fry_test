@@ -392,11 +392,30 @@ process index_kb_cDNA {
     """
 }  
 
+process index_kb_splici {
+
+    conda "${baseDir}/envs/kb-tools.yml"
+    
+    input:
+        path(referenceGenome) from REFERENCE_GENOME
+        path(referenceGtf) from REFERENCE_GTF
+       
+
+    output:
+        set file("kb_index_splici"), file("t2g_kb_splici.txt") into KB_INDEX_SPLICI
+    
+       
+    """
+    kb ref -i kb_index_splici -g t2g_kb_splici.txt -f1 cDNA.fa -f2 intron.fa ${referenceGenome} ${referenceGtf} 
+    --workflow nucleus
+    """
+}  
+
 process kb_count_cDNA {
     conda "${baseDir}/envs/kb-tools.yml"
 
     input:
-        set file("${kb_index_cDNA}"), file("${t2g_kb}") from KB_INDEX_CDNA
+        set file("kb_index_cDNA"), file("t2g_kb") from KB_INDEX_CDNA
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
        
     """
