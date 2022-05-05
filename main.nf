@@ -322,17 +322,17 @@ process alevin {
     """
 }
 
-get alevin mapping rate
+// get alevin mapping rate
 
-process ALEVIN_RESULTS {
+// process ALEVIN_RESULTS {
 
-    input:
-        file("${runId}_ALEVIN") from ALEVIN_RESULTS
+//     input:
+//         file("${runId}_ALEVIN") from ALEVIN_RESULTS
 
 
-    /
-    min_mapping=\$(grep "percent_mapped" ${runId}_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
-}
+//     /
+//     min_mapping=\$(grep "percent_mapped" ${runId}_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
+// }
 
 
 // build index to runSTARSolo
