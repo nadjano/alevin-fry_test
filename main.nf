@@ -318,18 +318,19 @@ process alevin {
     """
 }
 
-process index_star{
-    conda "${baseDir}/envs/star.yml"
+// process index_star {
 
-    input:
-        val genomeDir
-        path(referenceGenome) 
-        path(referenceGtf) 
-    output:
-        file("${genomeDir}")
+//     conda "${baseDir}/envs/star.yml"
+
+//     input:
+//         val genomeDir
+//         path(referenceGenome) 
+//         path(referenceGtf) 
+//     output:
+//         file("${genomeDir}")
         
 
-}
+// }
 
 // index for STARSolo
 // environment STARsolo
