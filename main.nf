@@ -396,7 +396,7 @@ process kb_count_cDNA {
 
     input:
         set file("${kb_index_cDNA}"), file("${t2g_kb}") from KB_INDEX_CDNA
-        set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(KB_CONFIG)
+        set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
        
     """
     kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x 10XV2 \
