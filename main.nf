@@ -417,7 +417,7 @@ process kb_count_cDNA {
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
 
 
-    min_mapping=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split($0, array, ":"); print array[2]}')
+    min_mapping=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
 
     echo "Minimum mapping rate (\$min_mapping)"
     """
@@ -456,7 +456,7 @@ process kb_count_splici {
     --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt 
 
 
-    min_mapping=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split($0, array, ":"); print array[2]}')
+    min_mapping=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
 
     echo "Minimum mapping rate (\$min_mapping)"
   
