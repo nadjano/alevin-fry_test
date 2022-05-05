@@ -167,7 +167,7 @@ process build_splici {
 
     input:
         path referenceGenome from REFERENCE_GENOME
-        path referenceGtf from REFERENCE_CDNA
+        path referenceGtf from REFERENCE_GTF
 
     output:
         // publishDir "${outdir}"
@@ -319,23 +319,33 @@ process alevin {
     """
 }
 
-// process index_star {
+// build index to runSTARSolo
+process index_star {
 
-//     conda "${baseDir}/envs/star.yml"
+    conda "${baseDir}/envs/star.yml"
 
-//     input:
-//         val genomeDir
-//         path(referenceGenome) 
-//         path(referenceGtf) 
-//     output:
-//         file("${genomeDir}")
+    input:
+        path(referenceGenome) from REFERENCE_GENOME
+        path(referenceGtf) from REFERENCE_GTF
+    output:
+        path("STAR_index")
         
+}
+"""
+STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles ${referenceGenome}  --sjdbGTFfile ${referenceGtf} --genomeSAindexNbases 12
+
+"""
+// run STARSolo 
+
+// process run_STARSolo {
+
 
 // }
 
-// index for STARSolo
-// environment STARsolo
-// STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles Drosophila_melanogaster.BDGP6.32.dna.toplevel.fa --sjdbGTFfile Drosophila_melanogaster.BDGP6.32.106.gtf --genomeSAindexNbases 12
-
-// // Call the download script to retrieve run fastqs
+// STAR --genomeDir STAR_index/ 
+// --readFilesIn SRR6327138_1.fastq  SRR6327138_2.fastq 
+// --soloBarcodeMate 0  
+// --soloType Droplet --soloCBwhitelist None  
+// --soloUMIlen 8 --soloCBlen 12 --soloUMIstart 13 
+// --soloCBstart 1 —runThreadN 8 —soloFeatures Gene GeneFull 
 
