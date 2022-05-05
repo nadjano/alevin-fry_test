@@ -12,6 +12,7 @@ ref_type = ['splici', 'cDNA']
 
 REFERENCE_CDNA = Channel.fromPath(referencecDNA,checkIfExists: true ).first()
 REFERENCE_GTF = Channel.fromPath( referenceGtf,checkIfExists: true ).first()
+REFERENCE_GENOME = Channel.fromPath( referenceGenome,checkIfExists: true ).first()
 
 
 manualDownloadFolder =''
@@ -165,8 +166,8 @@ process build_splici {
     maxRetries 10
 
     input:
-        path(referenceGenome) 
-        path(referenceGtf) 
+        path referenceGenome from REFERENCE_GENOME
+        path referenceGtf from REFERENCE_CDNA
 
     output:
         // publishDir "${outdir}"
