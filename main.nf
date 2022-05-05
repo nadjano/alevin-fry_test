@@ -352,7 +352,7 @@ process index_star {
 
 }
 
-run STARSolo 
+// run STARSolo 
 
 process run_STARSolo {
     cache 'deep'
