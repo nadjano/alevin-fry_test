@@ -304,11 +304,11 @@ process alevin {
     
     cache 'deep'
 
-    memory { 2.GB * task.attempt }
-    cpus 4
+    // memory { 2.GB * task.attempt }
+    // cpus 4
 
-    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
-    maxRetries 10
+    // errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    // maxRetries 10
 
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
