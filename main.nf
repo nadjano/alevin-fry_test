@@ -325,7 +325,7 @@ process alevin {
         -i ${index_dir} -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap ${t2g.tsv} --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
-    min_mapping=\$(grep "percent_mapped" ${runId}_ALEVIN_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
+    ${min_mapping}=\$(grep "percent_mapped" ${runId}_ALEVIN_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
     echo "Minimum mapping rate (\$min_mapping)"
  
     mv ${runId}_ALEVIN_tmp ${runId}_ALEVIN
@@ -417,7 +417,7 @@ process kb_count_cDNA {
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
 
 
-    min_mapping=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
+    ${min_mapping}=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
 
     echo "Minimum mapping rate (\$min_mapping)"
     """
@@ -456,9 +456,9 @@ process kb_count_splici {
     --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt 
 
 
-    min_mapping=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
+    ${min_mapping}=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
 
-    echo "Minimum mapping rate (\$min_mapping)"
+    echo "Minimum mapping rate ${min_mapping}
   
 
     """
