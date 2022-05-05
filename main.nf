@@ -158,7 +158,7 @@ process build_splici {
    
    conda "${baseDir}/envs/pyroe.yml"
 
-   memory { 2.GB * task.attempt }
+    memory { 2.GB * task.attempt }
     cpus 4
 
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
