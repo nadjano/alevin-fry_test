@@ -391,7 +391,7 @@ process index_kb_cDNA {
     """
 }  
 
-process {
+process kb_count_cDNA {
     conda "${baseDir}/envs/kb-tools.yml"
 
     input:
