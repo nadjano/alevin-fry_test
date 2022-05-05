@@ -352,36 +352,36 @@ process index_star {
 
 }
 
-// run STARSolo 
+run STARSolo 
 
-// process run_STARSolo {
-//     cache 'deep'
+process run_STARSolo {
+    cache 'deep'
 
-//     memory { 10.GB * task.attempt }
-//     cpus 4
+    memory { 10.GB * task.attempt }
+    cpus 4
 
-//     conda "${baseDir}/envs/star.yml"
-
-
-//     input:
-//     set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(STAR_CONFIG)
-//     path("STAR_index") from STAR_INDEX
-
-//     output:
-//     val(min_mapping)
+    conda "${baseDir}/envs/star.yml"
 
 
-//     """
+    input:
+    set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(STAR_CONFIG)
+    path("STAR_index") from STAR_INDEX
 
-//     STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 8 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
-
-//     min_mapping=\$(grep "Uniquely mapped reads %" ${runId}_STAR/Log.final.out | awk '{split(\$0, array, "|"); print array[2]}')
-//     echo "Minimum mapping rate (\$min_mapping)"
-//     mv ${runId}_STAR_tmp ${runId}_STAR
+    output:
+    val(min_mapping)
 
 
-//     """
-// }
+    """
+
+    STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 8 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
+
+    min_mapping=\$(grep "Uniquely mapped reads %" ${runId}_STAR/Log.final.out | awk '{split(\$0, array, "|"); print array[2]}')
+    echo "Minimum mapping rate (\$min_mapping)"
+    mv ${runId}_STAR_tmp ${runId}_STAR
+
+
+    """
+}
 
 // index kb tools 
 
