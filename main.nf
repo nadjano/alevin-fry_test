@@ -433,7 +433,7 @@ process index_kb_splici {
         path(referenceGtf) from REFERENCE_GTF
        
     output:
-        set file("kb_index_splici"), file("t2g_kb_splici.txt") into KB_INDEX_SPLICI
+        set file("kb_index_splici"), file("t2g_kb_splici.txt"), file("cDNA_kb.txt"), file("intron_kb.txt") into KB_INDEX_SPLICI
     
     """
     kb ref -i kb_index_splici -g t2g_kb_splici.txt -f1 cDNA.fa \
@@ -447,13 +447,13 @@ process kb_count_splici {
     conda "${baseDir}/envs/kb-tools.yml"
 
     input:
-        set file("kb_index_splici"), file("t2g_kb_splici") from KB_INDEX_SPLICI
+        set file("kb_index_splici"), file("t2g_kb_splici"),file("cDNA_kb.txt"), file("intron_kb.txt") from KB_INDEX_SPLICI
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS_SPLICI.join(KB_CONFIG_SPLICI)
        
     """
     kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x DROPSEQ \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_splici" \
-    --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt 
+    --workflow nucleus -c1 ${cDNA_kb.txt} -c2 ${intron_kb.txt}
 
 
     min_mapping=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
