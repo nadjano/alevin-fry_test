@@ -352,7 +352,7 @@ process run_STARSolo {
     path("STAR_index") from STAR_INDEX
 
     """
-    gunzip *.gz
+    gunzip -f *.gz
 
     STAR --genomeDir STAR_index/ 
     --readFilesIn   \$(ls barcodes*.fastq | tr '\\n' ' ') \$(ls cdna*.fastq | tr '\\n' ' ')//
