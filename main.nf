@@ -201,7 +201,7 @@ process index_alevin {
     conda "${baseDir}/envs/alevin.yml"
 
     input:
-        path reference from referencecDNA
+        path reference from REFERENCE_CDNA
         
     output:
         path("alevin_index_cDNA") 
