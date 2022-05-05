@@ -7,7 +7,7 @@ referencecDNA = params.referencecDNA
 referenceGtf = params.referenceGtf
 protocol = params.protocol
 outdir = "out_dir"
-ref_type = ['splici', 'cDNA']
+ref_type = ['cDNA', 'splici']
 
 
 REFERENCE_CDNA = Channel.fromPath(referencecDNA,checkIfExists: true ).first()
@@ -53,7 +53,7 @@ process make_t2g_file {
         path reference from REFERENCE_CDNA
 
     output:
-        file("t2g_cDNA.txt")
+        file("t2g_cDNA.txt") into T2G_CDNA
 
     """
     cat ${reference} | awk '{if(\$1~/>/)print \$1"\t"\$4"\t"}' \\
@@ -153,6 +153,7 @@ FINAL_FASTQS.into{
     FINAL_FASTQS_FOR_ALEVIN
     FINAL_FASTQS_FOR_STAR
     FINAL_FASTQS_FOR_KB_TOOLS
+    FINAL_FASTQS_FOR_KB_TOOLS_SPLICI
 }
 
 
@@ -183,7 +184,7 @@ process build_splici {
 }
 
 
-process index_alevin {
+process index_alevin_splici {
 
     conda "${baseDir}/envs/alevin.yml"
 
@@ -191,7 +192,7 @@ process index_alevin {
         path reference from splici_fasta
         
     output:
-        path("alevin_index_splici")
+        path("alevin_index_splici") into ALEVIN_INDEX_SPLICI
 
     """
     salmon index --transcript ${reference}   -i alevin_index_splici
@@ -207,7 +208,7 @@ process index_alevin {
         path reference from REFERENCE_CDNA
         
     output:
-        path("alevin_index_cDNA") 
+        path("alevin_index_cDNA") into ALEVIN_INDEX_CDNA
 
     """
     salmon index --transcript ${reference}   -i alevin_index_cDNA
@@ -221,7 +222,7 @@ process t2g_splici{
       
     
     output:
-        file("t2g_splici.txt") 
+        file("t2g_splici.txt") into T2G_SPLICI
 
     """
     cat "${outdir}/splici_fl45*.tsv" | awk  '{print\$1"\t"\$1}'  > "t2g_splici.txt"
@@ -240,6 +241,7 @@ process alevin_config {
         set val(runId), stdout into ALEVIN_CONFIG
         set val(runId), stdout into STAR_CONFIG
         set val(runId), stdout into KB_CONFIG
+        set val(runId), stdout into KB_CONFIG_SPLICI
     
     script:
 
@@ -283,9 +285,17 @@ process alevin_config {
         """
 }
 
+ALEVIN_INDEX_CDNA
+    .join(ALEVIN_INDEX_SPLICI)
+    .set{
+        ALEVIN_INDEX
+    }
 
-ALEVIN_INDEX = Channel.fromPath('alevin_index_*')
-T2G = Channel.fromPath('t2g_*')
+T2G_CDNA
+    .join(T2G_SPLICI)
+    .set{
+        T2G
+    }
 
 
 process alevin {
@@ -392,25 +402,6 @@ process index_kb_cDNA {
     """
 }  
 
-// process index_kb_splici {
-
-//     conda "${baseDir}/envs/kb-tools.yml"
-    
-//     input:
-//         path(referenceGenome) from REFERENCE_GENOME
-//         path(referenceGtf) from REFERENCE_GTF
-       
-
-//     output:
-//         set file("kb_index_splici"), file("t2g_kb_splici.txt") into KB_INDEX_SPLICI
-    
-       
-//     """
-//     kb ref -i kb_index_splici -g t2g_kb_splici.txt -f1 cDNA.fa -f2 intron.fa ${referenceGenome} ${referenceGtf} 
-//     --workflow nucleus
-//     """
-// }  
-
 process kb_count_cDNA {
     conda "${baseDir}/envs/kb-tools.yml"
 
@@ -419,8 +410,43 @@ process kb_count_cDNA {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
        
     """
-    kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x 10XV2 \
+    kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x DROPSEQ \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
+
+    """
+
+}
+
+// process index_kb_splici {
+
+//     conda "${baseDir}/envs/kb-tools.yml"
+    
+//     input:
+//         path(referenceGenome) from REFERENCE_GENOME
+//         path(referenceGtf) from REFERENCE_GTF
+       
+//     output:
+//         set file("kb_index_splici"), file("t2g_kb_splici.txt") into KB_INDEX_SPLICI
+    
+//     """
+//     kb ref -i kb_index_splici -g t2g_kb_splici.txt -f1 cDNA.fa \
+        -f2 intron.fa -c1 cDNA_kb.txt -c2  intron_kb.txt \
+         ${referenceGenome} ${referenceGtf}  --workflow nucleus
+
+//     """
+// }  
+
+process kb_count_splici {
+    conda "${baseDir}/envs/kb-tools.yml"
+
+    input:
+        set file("kb_index_splici"), file("t2g_kb_splici") from KB_INDEX_SPLICI
+        set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS_SPLICI.join(KB_CONFIG_SPLICI)
+       
+    """
+    kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x DROPSEQ \
+    -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_splici" \
+    --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt 
 
     """
 
