@@ -303,11 +303,12 @@ process alevin {
         path t2g from T2G
 
     output:
+        publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}"),  file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
-        -i ${index_dir} -p ${task.cpus} -o ${runId}_tmp --tgMap ${t2g.tsv} --dumpFeatures --keepCBFraction 1 \
+        -i ${index_dir} -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap ${t2g.tsv} --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
     min_mapping=\$(grep "percent_mapped" ${runId}_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
     if [ "\${min_mapping%.*}" -lt "${params.minMappingRate}" ]; then
@@ -315,7 +316,7 @@ process alevin {
         exit 1 
     fi
  
-    mv ${runId}_tmp ${runId}
+    mv ${runId}_ALEVIN_tmp ${runId}_ALEVIN
     """
 }
 
@@ -328,7 +329,7 @@ process index_star {
         path(referenceGenome) from REFERENCE_GENOME
         path(referenceGtf) from REFERENCE_GTF
     output:
-        path("STAR_index")
+        path("STAR_index") into STAR_INDEX
     
     """
     STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles ${referenceGenome}  --sjdbGTFfile ${referenceGtf} --genomeSAindexNbases 12
@@ -339,15 +340,25 @@ process index_star {
 
 // run STARSolo 
 
-// process run_STARSolo {
+process run_STARSolo {
+
+    conda "${baseDir}/envs/star.yml"
 
 
-// }
+    input:
+    set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
+    path("STAR_index") from STAR_INDEX
 
-// STAR --genomeDir STAR_index/ 
-// --readFilesIn SRR6327138_1.fastq  SRR6327138_2.fastq 
-// --soloBarcodeMate 0  
-// --soloType Droplet --soloCBwhitelist None  
-// --soloUMIlen 8 --soloCBlen 12 --soloUMIstart 13 
-// --soloCBstart 1 —runThreadN 8 —soloFeatures Gene GeneFull 
+    """
+    STAR --genomeDir STAR_index/ 
+    --readFilesIn   \$(ls barcodes*.fastq.gz | tr '\\n' ' ') \$(ls cdna*.fastq.gz | tr '\\n' ' ')//
+    --soloBarcodeMate 0  //
+    --soloType Droplet --soloCBwhitelist None  //
+    --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 //
+    --soloCBstart 1 —runThreadN 8 —soloFeatures Gene GeneFull //
+    --outFileNamePrefix ${runId}_STAR_tmp  //
+
+    mv ${runId}_STAR_tmp ${runId}_STAR
+    """
+}
 
