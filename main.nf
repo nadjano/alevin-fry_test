@@ -379,8 +379,8 @@ process index_kb_cDNA {
     input:
         path(referenceGenome) from REFERENCE_GENOME
         path(referenceGtf) from REFERENCE_GTF
-        path("kb_index_cDNA")
-        path("t2g_kb.txt")
+        path(kb_index_cDNA)
+        path(t2g_kb.txt)
 
     output:
         set file("${kb_index_cDNA}"), file("${t2g_kb.txt}") into KB_INDEX_CDNA
