@@ -384,7 +384,7 @@ process index_kb_cDNA {
        
 
     output:
-        set file("${kb_index_cDNA}"), file("${t2g_kb.txt}") into KB_INDEX_CDNA
+        set file("kb_index_cDNA"), file("t2g_kb.txt") into KB_INDEX_CDNA
     
        
     """
