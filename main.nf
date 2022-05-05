@@ -333,7 +333,7 @@ process alevin {
 //     """
 //     grep "percent_mapped" ${runId}_ALEVIN/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
 //     """
-}
+// }
 
 
 
