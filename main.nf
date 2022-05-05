@@ -11,6 +11,7 @@ ref_type = ['splici', 'cDNA']
 
 
 REFERENCE_CDNA = Channel.fromPath( referencecDNA)
+REFERENCE_GTF = Channel.fromPath( referenceGtf)
 
 
 manualDownloadFolder =''
@@ -48,13 +49,13 @@ SDRF_FOR_FASTQS
 process make_t2g_file {
 
     input:
-        path reference from referencecDNA
+        path reference from REFERENCE_CDNA
 
     output:
         file("t2g_cDNA.txt")
 
     """
-    cat Solanum_lycopersicum.SL3.0.cdna.all.fa.gz | awk '{if(\$1~/>/)print \$1"\t"\$4"\t"}' \\
+    cat ${reference} | awk '{if(\$1~/>/)print \$1"\t"\$4"\t"}' \\
      > t2g_cDNA.txt; sed -i 's/>//g' t2g_cDNA.txt; sed -i 's/gene://g' t2g_cDNA.txt; \\
      sed -i 's/gene_symbol://g' t2g_cDNA.txt
     """
