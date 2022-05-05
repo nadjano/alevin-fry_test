@@ -352,8 +352,10 @@ process run_STARSolo {
     path("STAR_index") from STAR_INDEX
 
     """
+    gunzip \$(ls barcodes*.fastq.gz | tr '\\n' ' ') \$(ls cdna*.fastq.gz | tr '\\n' ' ') 
+
     STAR --genomeDir STAR_index/ 
-    --readFilesIn   \$(ls barcodes*.fastq.gz | tr '\\n' ' ') \$(ls cdna*.fastq.gz | tr '\\n' ' ')//
+    --readFilesIn   \$(ls barcodes*.fastq | tr '\\n' ' ') \$(ls cdna*.fastq | tr '\\n' ' ')//
     --soloBarcodeMate 0  //
     --soloType Droplet --soloCBwhitelist None  //
     --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 //
