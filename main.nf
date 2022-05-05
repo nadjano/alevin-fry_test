@@ -377,7 +377,7 @@ process run_STARSolo {
 
     STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 8 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
-    in_mapping=\$(grep "Uniquely mapped reads %" ${runId}_STAR/Log.final.out | awk '{split($0, array, "|"); print array[2]}')
+    in_mapping=\$(grep "Uniquely mapped reads %" ${runId}_STAR/Log.final.out | awk '{split(\$0, array, "|"); print array[2]}')
     echo "Minimum mapping rate (\$min_mapping)"
     mv ${runId}_STAR_tmp ${runId}_STAR
 
