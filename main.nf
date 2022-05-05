@@ -306,7 +306,7 @@ process alevin {
 
     output:
         // publishDir path "${runId}_ALEVIN"
-        set val(runId), file("${runId}"),  file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
+        set val(runId), file("${runId}_ALEVIN"),  file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -321,6 +321,16 @@ process alevin {
     mv ${runId}_ALEVIN_tmp ${runId}_ALEVIN
     """
 }
+
+// get alevin mapping rate
+
+process ALEVIN_RESULTS {
+
+
+    input:
+        file("${runId}_ALEVIN") from ALEVIN_RESULTS
+}
+
 
 // build index to runSTARSolo
 process index_star {
@@ -355,7 +365,7 @@ process run_STARSolo {
     gunzip -f *.gz
 
     STAR --genomeDir STAR_index/ 
-    --readFilesIn   \$(ls barcodes*.fastq | tr '\\n' ' ') \$(ls cdna*.fastq | tr '\\n' ' ')//
+    --readFilesIn   barcodes.fastq cdna.fastq //
     --soloBarcodeMate 0  //
     --soloType Droplet --soloCBwhitelist None  //
     --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 //
