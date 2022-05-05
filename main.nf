@@ -381,6 +381,8 @@ process index_kb_cDNA {
     input:
         path(referenceGenome) from REFERENCE_GENOME
         path(referenceGtf) from REFERENCE_GTF
+        kb_index_cDNA
+        t2g_kb
       
 
     output:
