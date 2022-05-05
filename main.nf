@@ -468,6 +468,10 @@ process kb_count_splici {
 
 process index_alevin_fry{
     conda "${baseDir}/envs/alevin-fry.yml"
+
+    """
+    just testing the env
+    """
 }
 
 
