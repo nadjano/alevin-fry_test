@@ -1,5 +1,5 @@
 name: pyroe
 dependencies:
-   - bioconda::scanpy 
+   - conda-forge::scanpy 
    - bioconda::pyroe
   
