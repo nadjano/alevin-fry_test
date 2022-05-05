@@ -68,7 +68,7 @@ process download_fastqs {
     
     maxForks params.maxConcurrentDownloads
     time { 10.hour * task.attempt }
-    memory { 6.GB * task.attempt }
+    memory { 2.GB * task.attempt }
 
     errorStrategy { task.attempt<=10 & task.exitStatus != 4 ? 'retry' : 'finish' } 
     
