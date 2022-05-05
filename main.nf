@@ -151,6 +151,7 @@ if ( params.fields.containsKey('techrep')){
 FINAL_FASTQS.into{
     FINAL_FASTQS_FOR_CONFIG
     FINAL_FASTQS_FOR_ALEVIN
+    FINAL_FASTQS_FOR_STAR
 }
 
 
@@ -346,7 +347,7 @@ process run_STARSolo {
 
 
     input:
-    set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
+    set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(ALEVIN_CONFIG)
     path("STAR_index") from STAR_INDEX
 
     """
