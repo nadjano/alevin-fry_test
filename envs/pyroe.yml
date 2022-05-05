@@ -1,4 +1,5 @@
 name: pyroe
 dependencies:
-   - bioconda::pyroe
    - bioconda::scanpy 
+   - bioconda::pyroe
+  
