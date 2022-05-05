@@ -329,10 +329,12 @@ process alevin {
 //     input:
 //         file("${runId}_ALEVIN") from ALEVIN_RESULTS
 
-        output:
+//     output:
+            // val min_mapping into MAPPING
+
 //     """
 //     min_mapping=\$grep "percent_mapped" ${runId}_ALEVIN/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 )
-//     
+//     echo "Mapping rate for (${runId}) is (\$min_mapping)"
 //     """
 // }
 
@@ -372,9 +374,8 @@ process run_STARSolo {
     path("STAR_index") from STAR_INDEX
 
     """
-    gunzip -f *.gz
 
-    STAR --genomeDir STAR_index --readFilesIn barcodes.fastq cdna.fastq --soloBarcodeMate 0 --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 8 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp
+    STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 8 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
     mv ${runId}_STAR_tmp ${runId}_STAR
     """
