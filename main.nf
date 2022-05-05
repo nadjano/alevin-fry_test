@@ -10,7 +10,7 @@ outdir = "out_dir"
 ref_type = ['splici', 'cDNA']
 
 
-// REFERENCE_CDNA = Channel.fromPath(referencecDNA,checkIfExists: true ).first()
+REFERENCE_CDNA = Channel.fromPath(referencecDNA,checkIfExists: true ).first()
 REFERENCE_GTF = Channel.fromPath( referenceGtf,checkIfExists: true ).first()
 
 
@@ -191,7 +191,7 @@ process index_alevin {
         path("alevin_index_splici")
 
     """
-    salmon index --transcript $reference   -i alevin_index_splici
+    salmon index --transcript ${reference}   -i alevin_index_splici
     """
 
  }
@@ -201,13 +201,13 @@ process index_alevin {
     conda "${baseDir}/envs/alevin.yml"
 
     input:
-        path reference from referencecDNA
+        path reference from REFERENCE_CDNA
         
     output:
         path("alevin_index_cDNA") 
 
     """
-    salmon index --transcript $reference   -i alevin_index_cDNA
+    salmon index --transcript ${reference}   -i alevin_index_cDNA
     """
 
  }
