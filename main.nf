@@ -152,6 +152,7 @@ FINAL_FASTQS.into{
     FINAL_FASTQS_FOR_CONFIG
     FINAL_FASTQS_FOR_ALEVIN
     FINAL_FASTQS_FOR_STAR
+    FINAL_FASTQS_FOR_KB_TOOLS
 }
 
 
@@ -238,6 +239,7 @@ process alevin_config {
     output:
         set val(runId), stdout into ALEVIN_CONFIG
         set val(runId), stdout into STAR_CONFIG
+        set val(runId), stdout into KB_CONFIG
     
     script:
 
@@ -382,12 +384,28 @@ process index_kb_cDNA {
       
 
     output:
-        set file("${kb_index_cDNA}"), file("${t2g_kb.txt}") into KB_INDEX_CDNA
+        set file("${kb_index_cDNA}"), file("${t2g_kb}") into KB_INDEX_CDNA
        
     """
-    kb ref -i kb_index_cDNA -g t2g_kb.txt -f1 ${referenceGenome} ${referenceGtf} 
+    kb ref -i kb_index_cDNA -g t2g_kb -f1 ${referenceGenome} ${referenceGtf} 
     """
 }  
+
+process {
+    conda "${baseDir}/envs/kb-tools.yml"
+
+    input:
+        set file("${kb_index_cDNA}"), file("${t2g_kb}") from KB_INDEX_CDNA
+        set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(KB_CONFIG)
+       
+    """
+    kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x 10XV2 \
+    -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
+
+    """
+
+}
+
 
 // process
 // COUNT CDNA KB
