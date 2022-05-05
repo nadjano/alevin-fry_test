@@ -331,7 +331,8 @@ process alevin {
 
         output:
 //     """
-//     grep "percent_mapped" ${runId}_ALEVIN/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
+//     min_mapping=\$grep "percent_mapped" ${runId}_ALEVIN/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 )
+//     
 //     """
 // }
 
@@ -358,6 +359,10 @@ process index_star {
 // run STARSolo 
 
 process run_STARSolo {
+    cache 'deep'
+
+    memory { 10.GB * task.attempt }
+    cpus 4
 
     conda "${baseDir}/envs/star.yml"
 
@@ -369,7 +374,7 @@ process run_STARSolo {
     """
     gunzip -f *.gz
 
-    STAR --genomeDir STAR_index --readFilesIn barcodes.fastq cdna.fastq --soloBarcodeMate 0 --soloType Droplet --soloCBwhitelist None -soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —runThreadN 8 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp
+    STAR --genomeDir STAR_index --readFilesIn barcodes.fastq cdna.fastq --soloBarcodeMate 0 --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 8 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp
 
     mv ${runId}_STAR_tmp ${runId}_STAR
     """
