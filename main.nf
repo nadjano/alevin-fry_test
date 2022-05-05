@@ -282,7 +282,6 @@ process alevin_config {
 }
 
 
-
 ALEVIN_INDEX = Channel.fromPath('alevin_index_*')
 T2G = Channel.fromPath('t2g_*')
 
@@ -320,21 +319,7 @@ process alevin {
     """
 }
 
-// get alevin mapping rate
 
-// process ALEVIN_RESULTS {
-
-//     input:
-//         file("${runId}_ALEVIN"), val(index_dir), val(runId) from ALEVIN_RESULTS
-
-//     output:
-            //val(runId),  val(index_dir), val min_mapping into MAPPING_RATE_ALEVIN
-
-//     """
-//     min_mapping=\$grep "percent_mapped" ${runId}_ALEVIN/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 )
-//     echo "Mapping rate for (${runId}) is (\$min_mapping)"
-//     """
-// }
 
 // build index to runSTARSolo
 process index_star {
@@ -385,19 +370,33 @@ process run_STARSolo {
     """
 }
 
+// index kb tools 
 
-// get alevin mapping rate
+process index_kb_cDNA {
 
-// process STAR_RESULTS {
+    conda "${baseDir}/envs/kb-tools.yml"
+    
+    input:
+        path(referenceGenome) from REFERENCE_GENOME
+        path(referenceGtf) from REFERENCE_GTF
 
-//     input:
-//         file("${runId}_ALEVIN"), val(index_dir), val(runId) from ALEVIN_RESULTS
+    output:
+        file("${kb_index_cDNA}"), file("${t2g_kb.txt}") into KB_INDEX_CDNA
+       
+    """
+    kb ref -i ${kb_index_cDNA} -g ${t2g_kb.txt} -f1 ${referenceGenome} ${referenceGtf} 
+    """
+}  
 
-//     output:
-            //val(runId),  val(index_dir), val min_mapping into MAPPING_RATE_ALEVIN
+// process
+// COUNT CDNA KB
+//     kb count -i index_kb -t 2 -g t2g_kb.txt -x 10XV2 -c1 cDNA.fa /homes/nnolte/E-ENAD_53/work_cDNA/b5/152bed24016381e4ed8555bb64dba1/barcodes.fastq.gz /homes/nnolte/E-ENAD_53/work_cDNA/b5/152bed24016381e4ed8555bb64dba1/cdna.fastq.gz
 
-//     """
-//     min_mapping=\$(grep "Uniquely mapped reads %" Log.final.out | awk '{split($0, array, "|"); print array[2]}')
-//     echo "Mapping rate for (${runId}) is (\$min_mapping)"
-//     """
+//    kb ref --workflow nucleus -i index_splic_kb -g t2g_kb.txt -f1 cDNA.fa.gz \
+//    -f2 introns.fa.gz -c1 cDNA_ttc.txt -c2 intron_ttc.txt Solanum_lycopersicum.SL3.0.dna.toplevel.fa.gz \
+//    Solanum_lycopersicum.SL3.0.53.gtf.gz
+ 
 // }
+
+
+// kb ref --workflow nucleus -i index_splic_kb -g t2g_kb.txt -f1 cDNA.fa.gz -f2 introns.fa.gz -c1 cDNA_ttc.txt -c2 intron_ttc.txt Solanum_lycopersicum.SL3.0.dna.toplevel.fa.gz Solanum_lycopersicum.SL3.0.53.gtf.gz
