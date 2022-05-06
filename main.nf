@@ -319,7 +319,7 @@ process alevin_splici {
 
     output:
         // publishDir path "${runId}_ALEVIN"
-        set stdout, val(runId), file("${runId}_splici_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS_SPLICI 
+        set stdout, val(runId), file("${runId}_splici_ALEVIN") into ALEVIN_RESULTS_SPLICI 
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
@@ -352,7 +352,7 @@ process alevin_cDNA {
 
     output:
         // publishDir path "${runId}_ALEVIN"
-        set stdout, val(runId), file("${runId}_cdna_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS_CDNA
+        set stdout, val(runId), file("${runId}_cdna_ALEVIN") into ALEVIN_RESULTS_CDNA
 
 
     """
