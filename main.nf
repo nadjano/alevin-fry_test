@@ -508,7 +508,7 @@ process kb_count_splici {
 KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
 process index_alevin_fry{
-    conda "${baseDir}/envs/alevin-fry.yml"
+    conda "${baseDir}/envs/alevin-fry_2.yml"
 
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
