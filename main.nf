@@ -293,6 +293,8 @@ process alevin_config {
 // T2G_FOR_ALEVIN = T2G_CDNA.join(T2G_SPLICI)
 // T2G_FOR_ALEVIN_FRY = T2G_CDNA.join(T2G_SPLICI)
 
+T2G = Channel.fromPATH("t2g*.txt")
+
 process alevin {
 
     conda "${baseDir}/envs/alevin.yml"
@@ -308,7 +310,7 @@ process alevin {
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
         path index_dir from ALEVIN_INDEX_SPLICI
-        path "t2g_splici.txt" from t2g_splici
+        path "t2g_splici.txt" from T2G
 
     output:
         // publishDir path "${runId}_ALEVIN"
