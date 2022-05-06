@@ -179,6 +179,7 @@ process build_splici {
         // publishDir "${outdir}"
         path("${outdir}/splici_fl45.fa") into splici_fasta
         path("${outdir}/splici_fl45*.tsv") into T2G_3
+        path("${outdir}/splici_fl45*.tsv") into T2G_3_FORFRY
         
     """
     pyroe make-splici  ${referenceGenome} ${referenceGtf}  50 ${outdir}
@@ -196,6 +197,7 @@ process index_alevin_splici {
         
     output:
         path "alevin_index_splici" into ALEVIN_INDEX_SPLICI
+        path "alevin_index_splici" into ALEVIN__FRY_INDEX_SPLICI
 
     """
     salmon index --transcript ${reference}   -i alevin_index_splici
@@ -505,30 +507,30 @@ process kb_count_splici {
 
 KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
-// process index_alevin_fry{
-//     conda "${baseDir}/envs/alevin-fry.yml"
+process index_alevin_fry{
+    conda "${baseDir}/envs/alevin-fry.yml"
 
-//     input:
-//         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
-//         path index_dir from ALEVIN_FRY_INDEX
-//         path t2g from T2G_FOR_ALEVIN_FRY
+    input:
+        set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
+        path "alevin_index_splici" from ALEVIN__FRY_INDEX_SPLICI
+        path("${outdir}/splici_fl45*.tsv") from T2G_3_FORFRY
 
-//     output:
-//         // publishDir path "${runId}_ALEVIN"
-//         set val(index_dir), val(runId), file("${runId}_ALEVIN_fry"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_FRY_RESULTS
-//         stdout into KB_ALEVIN_FRY_MAPPING
+    output:
+        // publishDir path "${runId}_ALEVIN"
+        set val(index_dir), val(runId), file("${runId}_ALEVIN_fry"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_FRY_RESULTS
+        stdout into KB_ALEVIN_FRY_MAPPING
 
-//     """
-//     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
-//         -i ${index_dir} -p ${task.cpus} -o ${runId}_ALEVIN_fry_tmp --tgMap ${t2g.tsv} --dumpFeatures --keepCBFraction 1 \
-//         --freqThreshold ${params.minCbFreq} --dumpMtx 
+    """
+    salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
+        -i alevin_index_splici -p ${task.cpus} -o ${runId}_ALEVIN_fry_tmp --tgMap "${outdir}/splici_fl45*.tsv" --dumpFeatures --keepCBFraction 1 \
+        --freqThreshold ${params.minCbFreq} --dumpMtx 
 
-//     grep "percent_mapped" ${runId}_ALEVIN__fry_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
+    grep "percent_mapped" ${runId}_ALEVIN__fry_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
     
  
-//     mv ${runId}_ALEVIN_fry_tmp ${runId}_ALEVIN_fry
-//     """
-// }
+    mv ${runId}_ALEVIN_fry_tmp ${runId}_ALEVIN_fry
+    """
+}
 
 
 
