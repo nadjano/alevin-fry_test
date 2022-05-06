@@ -1,4 +1,4 @@
-name: alevin-fry
+name: alevin-fry_2
 dependecies:
   - bioconda::salmon
   - bioconda::alevin-fry
