@@ -1,0 +1,4 @@
+name: alevin-fry-new
+dependecies:
+  - bioconda::salmon
+  - bioconda::alevin-fry
