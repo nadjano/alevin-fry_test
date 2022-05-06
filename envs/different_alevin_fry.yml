@@ -1,4 +1,4 @@
 name: different-alevin-fry
 dependencies:
-  - bioconda::salmon=1.8.0
   - bioconda::alevin-fry
+  - bioconda::salmon=1.8.0
