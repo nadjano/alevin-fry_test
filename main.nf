@@ -53,12 +53,12 @@ process make_t2g_file {
         path reference from REFERENCE_CDNA
 
     output:
-        path "t2g_cDNA.txt" into T2G_CDNA
+        path "t2g_cDNA.txt" into t2g_cdna
 
     """
     cat ${reference} | awk '{if(\$1~/>/)print \$1"\t"\$4"\t"}' \\
      > t2g_cDNA.txt; sed -i 's/>//g' t2g_cDNA.txt; sed -i 's/gene://g' t2g_cDNA.txt; \\
-     sed -i 's/gene_symbol://g' ${t2g_cDNA.txt}
+     sed -i 's/gene_symbol://g' t2g_cDNA.txt
     """
 }
  
@@ -293,7 +293,7 @@ process alevin_config {
 // T2G_FOR_ALEVIN = T2G_CDNA.join(T2G_SPLICI)
 // T2G_FOR_ALEVIN_FRY = T2G_CDNA.join(T2G_SPLICI)
 
-INDEX = Channel.from([t2g_splici,ALEVIN_INDEX_CDNA ], [T2G_CDNA,ALEVIN_INDEX_CDNA ])
+INDEX = Channel.from([t2g_splici,ALEVIN_INDEX_CDNA ], [t2g_cdna,ALEVIN_INDEX_CDNA ])
 
 process alevin {
 
