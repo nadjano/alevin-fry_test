@@ -287,11 +287,11 @@ process alevin_config {
         """
 }
 // collect index for alevin
-ALEVIN_INDEX = ALEVIN_INDEX_CDNA.join(ALEVIN_INDEX_SPLICI)
-ALEVIN_FRY_INDEX = ALEVIN_INDEX_CDNA.join(ALEVIN_INDEX_SPLICI)
+// ALEVIN_INDEX = ALEVIN_INDEX_CDNA.join(ALEVIN_INDEX_SPLICI)
+// ALEVIN_FRY_INDEX = ALEVIN_INDEX_CDNA.join(ALEVIN_INDEX_SPLICI)
 
-T2G_FOR_ALEVIN = T2G_CDNA.join(T2G_SPLICI)
-T2G_FOR_ALEVIN_FRY = T2G_CDNA.join(T2G_SPLICI)
+// T2G_FOR_ALEVIN = T2G_CDNA.join(T2G_SPLICI)
+// T2G_FOR_ALEVIN_FRY = T2G_CDNA.join(T2G_SPLICI)
 
 process alevin {
 
@@ -307,8 +307,8 @@ process alevin {
 
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
-        path index_dir from ALEVIN_INDEX
-        path t2g from T2G_FOR_ALEVIN
+        path index_dir from ALEVIN_INDEX_SPLICI
+        path t2g from T2G_SPLICI
 
     output:
         // publishDir path "${runId}_ALEVIN"
