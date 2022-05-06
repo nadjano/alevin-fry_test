@@ -195,7 +195,7 @@ process index_alevin_splici {
         path reference from splici_fasta
         
     output:
-        path "alevin_index_splici"
+        path "alevin_index_cDNA" into ALEVIN_INDEX_CDNA
 
     """
     salmon index --transcript ${reference}   -i alevin_index_splici
@@ -211,7 +211,7 @@ process index_alevin_splici {
         path reference from REFERENCE_CDNA
         
     output:
-        path "alevin_index_cDNA" 
+        path "alevin_index_cDNA" into ALEVIN_INDEX_CDNA
 
     """
     salmon index --transcript ${reference}   -i alevin_index_cDNA
@@ -312,7 +312,7 @@ process alevin_splici {
 
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_SPLICI.join(ALEVIN_CONFIG_SPLICI)
-        path index_dir from "alevin_index_splici" 
+        path "alevin_index_splici" from ALEVIN_INDEX_CDNA
         path t2g from "t2g_splici.txt" 
 
     output:
@@ -345,7 +345,7 @@ process alevin_cDNA {
 
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_CDNA.join(ALEVIN_CONFIG_CDNA)
-        path index_dir from "alevin_index_cDNA" 
+        path "alevin_index_cDNA" from ALEVIN_INDEX_CDNA
         path t2g from "t2g_cDNA.txt" 
 
     output:
