@@ -354,34 +354,36 @@ process index_star {
 
 // run STARSolo 
 
-process run_STARSolo {
-    cache 'deep'
+// process run_STARSolo {
+//     cache 'deep'
 
-    memory { 10.GB * task.attempt }
-    cpus 4
+//     memory { 10.GB * task.attempt }
+//     cpus 4
 
-    conda "${baseDir}/envs/star.yml"
-
-
-    input:
-    set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(STAR_CONFIG)
-    path("STAR_index") from STAR_INDEX
-
-    output:
-    val(min_mapping)
+//     conda "${baseDir}/envs/star.yml"
 
 
-    """
+//     input:
+//     set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(STAR_CONFIG)
+//     path("STAR_index") from STAR_INDEX
 
-    STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 8 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
-
-    min_mapping=\$(grep "Uniquely mapped reads %" ${runId}_STAR/Log.final.out | awk '{split(\$0, array, "|"); print array[2]}')
-    echo "Minimum mapping rate (\$min_mapping)"
-    mv ${runId}_STAR_tmp ${runId}_STAR
+//     output:
+//     set val(runId), stdout ch into STAR
 
 
-    """
-}
+//     """
+
+//     STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 8 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
+
+//     grep "Uniquely mapped reads %" ${runId}_STAR/Log.final.out | awk '{split(\$0, array, "|"); print array[2]}'
+    
+//     mv ${runId}_STAR_tmp ${runId}_STAR
+
+
+//     """
+// }
+
+ch.view { print "mapping rate is $it" }
 
 // index kb tools 
 
@@ -410,8 +412,7 @@ process kb_count_cDNA {
         set file("kb_index_cDNA"), file("t2g_kb") from KB_INDEX_CDNA
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
     output:
-        val(runId) into KB_CDNA_MAPPING
-        stdout ch
+        set val(runId), stdout ch into KB_CDNA_MAPPING
 
 
     """
@@ -453,22 +454,23 @@ process kb_count_splici {
     input:
         set file("kb_index_splici"), file("t2g_kb_splici"),file("cDNA_kb.txt"), file("intron_kb.txt") from KB_INDEX_SPLICI
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS_SPLICI.join(KB_CONFIG_SPLICI)
-       
+
+    output:
+        set val(runId), stout ch into  KB_SPLICI_MAPPING
     """
     kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x DROPSEQ \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_splici" \
     --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt
 
 
-    min_mapping=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
+    grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}'
 
-    echo "Minimum mapping rate (\$min_mapping)"
   
 
     """
 
 }
-
+ch.view { print "mapping rate is $it" }
 
 process index_alevin_fry{
     conda "${baseDir}/envs/alevin-fry.yml"
