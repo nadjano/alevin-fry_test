@@ -321,7 +321,7 @@ process alevin_splici {
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
-        -i ${index_dir} -p ${task.cpus} -o ${runId}_splici_ALEVIN_tmp --tgMap $t2g --dumpFeatures --keepCBFraction 1 \
+        -i alevin_index_splici -p ${task.cpus} -o ${runId}_splici_ALEVIN_tmp --tgMap t2g_splici.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
     grep "percent_mapped" ${runId}_ALEVIN_splici_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
@@ -355,7 +355,7 @@ process alevin_cDNA {
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
-        -i $index_dir -p ${task.cpus} -o ${runId}_cdna_ALEVIN_tmp --tgMap $t2g --dumpFeatures --keepCBFraction 1 \
+        -i alevin_index_cDNA -p ${task.cpus} -o ${runId}_cdna_ALEVIN_tmp --tgMap t2g_cDNA.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
     grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
