@@ -211,7 +211,7 @@ process index_alevin_splici {
         path reference from REFERENCE_CDNA
         
     output:
-        path("alevin_index_cDNA") 
+        path "alevin_index_cDNA" 
 
     """
     salmon index --transcript ${reference}   -i alevin_index_cDNA
