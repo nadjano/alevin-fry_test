@@ -53,7 +53,7 @@ process make_t2g_file {
         path reference from REFERENCE_CDNA
 
     output:
-        path "t2g_cDNA.txt" into t2g_cdna
+        path "t2g_cDNA.txt" 
 
 
     """
