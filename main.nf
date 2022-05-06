@@ -302,7 +302,7 @@ process alevin {
 
     conda "${baseDir}/envs/alevin.yml"
     
-    cache 'deep'
+    // cache 'deep'
 
     // memory { 2.GB * task.attempt }
     // cpus 4
@@ -318,15 +318,15 @@ process alevin {
     output:
         // publishDir path "${runId}_ALEVIN"
         set val(index_dir), val(runId), file("${runId}_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
-        set  val(runId), val(index_dir) into KB_ALEVIN_MAPPING
+        stout into KB_ALEVIN_MAPPING
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i ${index_dir} -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap ${t2g.tsv} --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
-    min_mapping=\$(grep "percent_mapped" ${runId}_ALEVIN_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
-    echo "Minimum mapping rate (\$min_mapping)"
+    grep "percent_mapped" ${runId}_ALEVIN_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
+    
  
     mv ${runId}_ALEVIN_tmp ${runId}_ALEVIN
     """
@@ -413,7 +413,7 @@ process kb_count_cDNA {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
         val protocol
     output:
-        tuple stdout, val(runID) into KB_CDNA_MAPPING
+        stdout into KB_CDNA_MAPPING
 
 
     """
@@ -422,6 +422,7 @@ process kb_count_cDNA {
 
 
     grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' 
+    echo $runID
     """
 
 }
@@ -455,7 +456,7 @@ process kb_count_splici {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS_SPLICI.join(KB_CONFIG_SPLICI)
         val protocol
     output:
-        stdout ch2 into KB_SPLICI_MAPPING
+        stdout into KB_SPLICI_MAPPING
     """
     kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x $protocol \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_splici" \
