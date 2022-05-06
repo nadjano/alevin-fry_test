@@ -402,7 +402,7 @@ process run_STARSolo {
     path("STAR_index") from STAR_INDEX
 
     output:
-    set val(runId), stdout ch into STAR
+    stdout into STAR
 
 
     """
@@ -410,7 +410,7 @@ process run_STARSolo {
     STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 12 —soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
     grep "Uniquely mapped reads %" ${runId}_STAR/Log.final.out | awk '{split(\$0, array, "|"); print array[2]}'
-    
+    echo ${runId}
     mv ${runId}_STAR_tmp ${runId}_STAR
 
 
