@@ -411,6 +411,8 @@ process kb_count_cDNA {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
     output:
         val(runId) into KB_CDNA_MAPPING
+        path 'result.txt' into numbers
+
 
     """
     kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x DROPSEQ \
@@ -419,12 +421,15 @@ process kb_count_cDNA {
 
     min_mapping=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
 
-    echo "Minimum mapping rate (\$min_mapping)"
+    echo "Minimum mapping rate (\$min_mapping)" > results.txt
     """
 
 }
 
+numbers.subscribe { println "Received: " + it.text }
+
 process index_kb_splici {
+
 
     conda "${baseDir}/envs/kb-tools.yml"
     
