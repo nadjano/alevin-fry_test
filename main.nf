@@ -419,7 +419,7 @@ process run_STARSolo {
 
 // ch.view { print "mapping rate is $it" }
 
-index kb tools 
+// index kb tools 
 
 process index_kb_cDNA {
 
