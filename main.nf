@@ -195,7 +195,7 @@ process index_alevin_splici {
         path reference from splici_fasta
         
     output:
-        path("alevin_index_splici") into ALEVIN_INDEX_SPLICI
+        path "alevin_index_splici"
 
     """
     salmon index --transcript ${reference}   -i alevin_index_splici
