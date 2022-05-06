@@ -411,12 +411,13 @@ process kb_count_cDNA {
     input:
         set file("kb_index_cDNA"), file("t2g_kb") from KB_INDEX_CDNA
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
+        val protocol
     output:
         tuple stdout, val(runID) into KB_CDNA_MAPPING
 
 
     """
-    kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x DROPSEQ \
+    kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x $protocol \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
 
 
@@ -452,11 +453,11 @@ process kb_count_splici {
     input:
         set file("kb_index_splici"), file("t2g_kb_splici"),file("cDNA_kb.txt"), file("intron_kb.txt") from KB_INDEX_SPLICI
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS_SPLICI.join(KB_CONFIG_SPLICI)
-
+        val protocol
     output:
         stdout ch2 into KB_SPLICI_MAPPING
     """
-    kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x DROPSEQ \
+    kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x $protocol \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_splici" \
     --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt
 
