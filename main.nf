@@ -226,7 +226,7 @@ process t2g_splici{
         file("t2g_splici.txt") into T2G_SPLICI
 
     """
-    cat "${outdir}/splici_fl45*.tsv" | awk  '{print\$1"\t"\$1}'  > "t2g_splici.txt"
+    cat "${outdir}/splici_fl45*.tsv" | awk  '{print\$1"\t"\$1}'  > t2g_splici.txt
     """
 
 }
