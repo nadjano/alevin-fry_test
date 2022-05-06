@@ -293,7 +293,7 @@ process alevin_config {
 // T2G_FOR_ALEVIN = T2G_CDNA.join(T2G_SPLICI)
 // T2G_FOR_ALEVIN_FRY = T2G_CDNA.join(T2G_SPLICI)
 
-INDEX = Channel.from([t2g_splici,ALEVIN_INDEX_CDNA ], [t2g_cdna,ALEVIN_INDEX_CDNA ])
+INDEX = Channel.from([path(t2g_splici),ALEVIN_INDEX_CDNA ], [path(t2g_cdna),ALEVIN_INDEX_CDNA ])
 
 process alevin {
 
