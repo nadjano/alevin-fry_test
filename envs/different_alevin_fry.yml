@@ -1,4 +1,4 @@
 name: different-alevin-fry
-dependecies:
+dependencies:
   - bioconda::salmon
   - bioconda::alevin-fry
