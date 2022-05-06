@@ -412,7 +412,7 @@ process kb_count_cDNA {
         set file("kb_index_cDNA"), file("t2g_kb") from KB_INDEX_CDNA
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
     output:
-        stdout ch1 
+        tuple stdout(ch1), val(runID) into KB_CDNA_MAPPING
 
 
     """
@@ -421,8 +421,6 @@ process kb_count_cDNA {
 
 
     grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' 
-
-
     """
 
 }
