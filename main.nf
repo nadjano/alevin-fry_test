@@ -350,7 +350,7 @@ process alevin_cDNA {
 
     output:
         // publishDir path "${runId}_ALEVIN"
-        set stdout val(index_dir), val(runId), file("${runId}_cdna_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS_CDNA
+        set stdout, val(index_dir), val(runId), file("${runId}_cdna_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS_CDNA
 
 
     """
