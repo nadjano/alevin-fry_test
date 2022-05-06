@@ -290,16 +290,12 @@ process alevin_config {
 ALEVIN_INDEX_CDNA
     .join(ALEVIN_INDEX_SPLICI)
     .into{
-        ALEVIN_INDEX,
-        ALEVIN_FRY_INDEX
-    }
+        ALEVIN_INDEX, ALEVIN_FRY_INDEX }
 
 T2G_CDNA
     .join(T2G_SPLICI)
     .into{
-        T2G_FOR_ALEVIN,
-        T2G_FOR_ALEVIN_FRY
-    }
+        T2G_FOR_ALEVIN, T2G_FOR_ALEVIN_FRY }
 
 
 process alevin {
