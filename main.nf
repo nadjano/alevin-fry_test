@@ -154,6 +154,7 @@ FINAL_FASTQS.into{
     FINAL_FASTQS_FOR_STAR
     FINAL_FASTQS_FOR_KB_TOOLS
     FINAL_FASTQS_FOR_KB_TOOLS_SPLICI
+    FINAL_FASTQS_FOR_ALEVIN_FRY
 }
 
 
@@ -242,6 +243,7 @@ process alevin_config {
         set val(runId), stdout into STAR_CONFIG
         set val(runId), stdout into KB_CONFIG
         set val(runId), stdout into KB_CONFIG_SPLICI
+        set val(runId), stdout into ALEVIN_FRY_CONFIG
     
     script:
 
@@ -287,14 +289,16 @@ process alevin_config {
 // collect index for alevin
 ALEVIN_INDEX_CDNA
     .join(ALEVIN_INDEX_SPLICI)
-    .set{
-        ALEVIN_INDEX
+    .into{
+        ALEVIN_INDEX,
+        ALEVIN_FRY_INDEX
     }
 
 T2G_CDNA
     .join(T2G_SPLICI)
-    .set{
-        T2G
+    .into{
+        T2G_FOR_ALEVIN,
+        T2G_FOR_ALEVIN_FRY
     }
 
 
@@ -313,7 +317,7 @@ process alevin {
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
         path index_dir from ALEVIN_INDEX
-        path t2g from T2G
+        path t2g from T2G_FOR_ALEVIN
 
     output:
         // publishDir path "${runId}_ALEVIN"
@@ -476,10 +480,31 @@ KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 process index_alevin_fry{
     conda "${baseDir}/envs/alevin-fry.yml"
 
+    input:
+        set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
+        path index_dir from ALEVIN_FRY_INDEX
+        path t2g from T2G_FOR_ALEVIN_FRY
+
+    output:
+        // publishDir path "${runId}_ALEVIN"
+        set val(index_dir), val(runId), file("${runId}_ALEVIN_fry"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_FRY_RESULTS
+        stdout into KB_ALEVIN_FRY_MAPPING
+
     """
-    echo "just testing the env"
+    salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
+        -i ${index_dir} -p ${task.cpus} -o ${runId}_ALEVIN_fry_tmp --tgMap ${t2g.tsv} --dumpFeatures --keepCBFraction 1 \
+        --freqThreshold ${params.minCbFreq} --dumpMtx 
+
+    grep "percent_mapped" ${runId}_ALEVIN__fry_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
+    
+ 
+    mv ${runId}_ALEVIN_fry_tmp ${runId}_ALEVIN_fry
     """
 }
+
+
+
+
 
 
 // process
