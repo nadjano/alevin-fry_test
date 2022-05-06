@@ -318,7 +318,7 @@ process alevin {
     output:
         // publishDir path "${runId}_ALEVIN"
         set val(index_dir), val(runId), file("${runId}_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
-        stout into KB_ALEVIN_MAPPING
+        stdout into KB_ALEVIN_MAPPING
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
