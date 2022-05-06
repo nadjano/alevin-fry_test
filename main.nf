@@ -181,7 +181,7 @@ process build_splici {
         path("${outdir}/splici_fl45*.tsv") into T2G_3
         
     """
-    pyroe make-splici  ${referenceGenome}   ${referenceGtf}  50 ${outdir}
+    pyroe make-splici  ${referenceGenome} ${referenceGtf}  50 ${outdir}
 
     """
 }
@@ -321,8 +321,7 @@ process alevin_splici {
 
     output:
         // publishDir path "${runId}_ALEVIN"
-        set val(index_dir), val(runId), file("${runId}_splici_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
-        stdout into KB_ALEVIN_MAPPING
+        set stdout, val(index_dir), val(runId), file("${runId}_splici_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS_SPLICI 
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
@@ -355,8 +354,8 @@ process alevin_cDNA {
 
     output:
         // publishDir path "${runId}_ALEVIN"
-        set val(index_dir), val(runId), file("${runId}_cdna_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
-        stdout into KB_ALEVIN_MAPPING
+        set stdout val(index_dir), val(runId), file("${runId}_cdna_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS_CDNA
+
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
