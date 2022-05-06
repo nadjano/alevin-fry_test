@@ -287,10 +287,7 @@ process alevin_config {
         """
 }
 // collect index for alevin
-ALEVIN_INDEX_CDNA
-    .join(ALEVIN_INDEX_SPLICI)
-    .into{
-        ALEVIN_INDEX, ALEVIN_FRY_INDEX }
+ALEVIN_INDEX_CDNA.join(ALEVIN_INDEX_SPLICI).set{ ALEVIN_INDEX, ALEVIN_FRY_INDEX }
 
 T2G_CDNA
     .join(T2G_SPLICI)
