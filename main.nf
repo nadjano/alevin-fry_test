@@ -422,7 +422,7 @@ process kb_count_cDNA {
 
 
     grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' 
-    echo $runID
+    echo ${runID}
     """
 
 }
