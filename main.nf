@@ -55,6 +55,7 @@ process make_t2g_file {
     output:
         path "t2g_cDNA.txt" into t2g_cdna
 
+
     """
     cat ${reference} | awk '{if(\$1~/>/)print \$1"\t"\$4"\t"}' \\
      > t2g_cDNA.txt; sed -i 's/>//g' t2g_cDNA.txt; sed -i 's/gene://g' t2g_cDNA.txt; \\
@@ -295,7 +296,7 @@ process alevin_config {
 
 // INDEX = Channel.from([path(t2g_splici),ALEVIN_INDEX_CDNA ], [path(t2g_cdna),ALEVIN_INDEX_CDNA ])
 
-process alevin {
+process combined_alevin {
 
     conda "${baseDir}/envs/alevin.yml"
     
@@ -309,8 +310,8 @@ process alevin {
 
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
-        path index_dir from ALEVIN_INDEX_SPLICI
-        path t2g from t2g_splici
+        path index_dir from ALEVIN_INDEX_SPLICI.join(ALEVIN_INDEX_CDNA)
+        path t2g from t2g_splici.join(t2g_cdna)
 
     output:
         // publishDir path "${runId}_ALEVIN"
@@ -328,6 +329,41 @@ process alevin {
     mv ${runId}_ALEVIN_tmp ${runId}_ALEVIN
     """
 }
+
+
+// process alevin {
+
+//     conda "${baseDir}/envs/alevin.yml"
+    
+//     // cache 'deep'
+
+//     // memory { 2.GB * task.attempt }
+//     // cpus 4
+
+//     // errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+//     // maxRetries 10
+
+//     input:
+//         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
+//         path index_dir from ALEVIN_INDEX_SPLICI
+//         path t2g from t2g_splici
+
+//     output:
+//         // publishDir path "${runId}_ALEVIN"
+//         set val(index_dir), val(runId), file("${runId}_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
+//         stdout into KB_ALEVIN_MAPPING
+
+//     """
+//     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
+//         -i ${index_dir} -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap $t2g --dumpFeatures --keepCBFraction 1 \
+//         --freqThreshold ${params.minCbFreq} --dumpMtx
+
+//     grep "percent_mapped" ${runId}_ALEVIN_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
+    
+ 
+//     mv ${runId}_ALEVIN_tmp ${runId}_ALEVIN
+//     """
+// }
 
 
 
