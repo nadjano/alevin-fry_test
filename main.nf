@@ -310,8 +310,8 @@ process combined_alevin {
 
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
-        path index_dir from ALEVIN_INDEX_SPLICI.join(ALEVIN_INDEX_CDNA)
-        path t2g from t2g_splici.join(t2g_cdna)
+        each path index_dir from ALEVIN_INDEX_SPLICI.join(ALEVIN_INDEX_CDNA)
+        each path t2g from t2g_splici.join(t2g_cdna)
 
     output:
         // publishDir path "${runId}_ALEVIN"
