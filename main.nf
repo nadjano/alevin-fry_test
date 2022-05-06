@@ -456,7 +456,7 @@ process kb_count_splici {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS_SPLICI.join(KB_CONFIG_SPLICI)
 
     output:
-        stout ch
+        stdout ch
     """
     kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x DROPSEQ \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_splici" \
