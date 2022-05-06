@@ -151,7 +151,8 @@ if ( params.fields.containsKey('techrep')){
 
 FINAL_FASTQS.into{
     FINAL_FASTQS_FOR_CONFIG
-    FINAL_FASTQS_FOR_ALEVIN
+    FINAL_FASTQS_FOR_ALEVIN_SPLICI
+    FINAL_FASTQS_FOR_ALEVIN_CDNA
     FINAL_FASTQS_FOR_STAR
     FINAL_FASTQS_FOR_KB_TOOLS
     FINAL_FASTQS_FOR_KB_TOOLS_SPLICI
@@ -241,6 +242,8 @@ process alevin_config {
 
     output:
         set val(runId), stdout into ALEVIN_CONFIG
+        set val(runId), stdout into ALEVIN_CONFIG_SPLICI
+        set val(runId), stdout into ALEVIN_CONFIG_CDNA
         set val(runId), stdout into STAR_CONFIG
         set val(runId), stdout into KB_CONFIG
         set val(runId), stdout into KB_CONFIG_SPLICI
@@ -312,7 +315,7 @@ process alevin_splici {
     // maxRetries 10
 
     input:
-        set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
+        set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_SPLICI.join(ALEVIN_CONFIG_SPLICI)
         path index_dir from ALEVIN_INDEX_SPLICI
         path t2g from t2g_splici
 
@@ -346,7 +349,7 @@ process alevin_cDNA {
     // maxRetries 10
 
     input:
-        set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
+        set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_CDNA.join(ALEVIN_CONFIG_CDNA)
         path index_dir from ALEVIN_INDEX_CDNA
         path t2g from t2g_cDNA
 
