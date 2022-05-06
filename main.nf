@@ -57,7 +57,7 @@ process make_t2g_file {
 
 
     """
-    cat ${reference} | awk '{if(\$1~/>/)print \$1"\t"\$4"\t"}' \\
+    zcat ${reference} | awk '{if(\$1~/>/)print \$1"\t"\$4"\t"}' \\
      > t2g_cDNA.txt; sed -i 's/>//g' t2g_cDNA.txt; sed -i 's/gene://g' t2g_cDNA.txt; \\
      sed -i 's/gene_symbol://g' t2g_cDNA.txt
     """
