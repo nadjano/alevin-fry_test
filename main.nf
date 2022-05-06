@@ -293,7 +293,7 @@ process alevin_config {
 // T2G_FOR_ALEVIN = T2G_CDNA.join(T2G_SPLICI)
 // T2G_FOR_ALEVIN_FRY = T2G_CDNA.join(T2G_SPLICI)
 
-T2G = Channel.fromPATH("t2g*.txt")
+T2G = Channel.fromPath"t2g*.txt")
 
 process alevin {
 
