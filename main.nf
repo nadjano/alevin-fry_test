@@ -383,7 +383,7 @@ process index_star {
 //     """
 // }
 
-ch.view { print "mapping rate is $it" }
+// ch.view { print "mapping rate is $it" }
 
 // index kb tools 
 
