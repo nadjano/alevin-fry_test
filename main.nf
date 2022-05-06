@@ -296,7 +296,10 @@ process alevin_config {
 
 // INDEX = Channel.from([path(t2g_splici),ALEVIN_INDEX_CDNA ], [path(t2g_cdna),ALEVIN_INDEX_CDNA ])
 
-process combined_alevin {
+
+
+
+process alevin_splici {
 
     conda "${baseDir}/envs/alevin.yml"
     
@@ -310,61 +313,59 @@ process combined_alevin {
 
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
-        each index_dir from ALEVIN_INDEX_SPLICI.join(ALEVIN_INDEX_CDNA)
-        each t2g from t2g_splici.join(t2g_cdna)
+        path index_dir from ALEVIN_INDEX_SPLICI
+        path t2g from t2g_splici
 
     output:
         // publishDir path "${runId}_ALEVIN"
-        set val(index_dir), val(runId), file("${runId}_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
+        set val(index_dir), val(runId), file("${runId}_splici_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
         stdout into KB_ALEVIN_MAPPING
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
-        -i ${index_dir} -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap $t2g --dumpFeatures --keepCBFraction 1 \
+        -i ${index_dir} -p ${task.cpus} -o ${runId}_splici_ALEVIN_tmp --tgMap $t2g --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
-    grep "percent_mapped" ${runId}_ALEVIN_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
+    grep "percent_mapped" ${runId}_ALEVIN_splici_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
     
  
-    mv ${runId}_ALEVIN_tmp ${runId}_ALEVIN
+    mv ${runId}_splici_ALEVIN_tmp ${runId}_splici_ALEVIN
     """
 }
 
+process alevin_cDNA {
 
-// process alevin {
-
-//     conda "${baseDir}/envs/alevin.yml"
+    conda "${baseDir}/envs/alevin.yml"
     
-//     // cache 'deep'
+    // cache 'deep'
 
-//     // memory { 2.GB * task.attempt }
-//     // cpus 4
+    // memory { 2.GB * task.attempt }
+    // cpus 4
 
-//     // errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
-//     // maxRetries 10
+    // errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    // maxRetries 10
 
-//     input:
-//         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
-//         path index_dir from ALEVIN_INDEX_SPLICI
-//         path t2g from t2g_splici
+    input:
+        set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
+        path index_dir from ALEVIN_INDEX_CDNA
+        path t2g from t2g_cDNA
 
-//     output:
-//         // publishDir path "${runId}_ALEVIN"
-//         set val(index_dir), val(runId), file("${runId}_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
-//         stdout into KB_ALEVIN_MAPPING
+    output:
+        // publishDir path "${runId}_ALEVIN"
+        set val(index_dir), val(runId), file("${runId}_cdna_ALEVIN"), file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
+        stdout into KB_ALEVIN_MAPPING
 
-//     """
-//     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
-//         -i ${index_dir} -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap $t2g --dumpFeatures --keepCBFraction 1 \
-//         --freqThreshold ${params.minCbFreq} --dumpMtx
+    """
+    salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
+        -i ${index_dir} -p ${task.cpus} -o ${runId}_cdna_ALEVIN_tmp --tgMap $t2g --dumpFeatures --keepCBFraction 1 \
+        --freqThreshold ${params.minCbFreq} --dumpMtx
 
-//     grep "percent_mapped" ${runId}_ALEVIN_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
+    grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
     
  
-//     mv ${runId}_ALEVIN_tmp ${runId}_ALEVIN
-//     """
-// }
-
+    mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
+    """
+}
 
 
 // build index to runSTARSolo
