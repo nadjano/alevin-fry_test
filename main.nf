@@ -425,7 +425,7 @@ process kb_count_cDNA {
 
 }
 
-ch1.view { print "mapping rate is $it" }
+// ch.view { print "mapping rate is $it" }
 process index_kb_splici {
 
 
