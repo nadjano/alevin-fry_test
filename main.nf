@@ -320,7 +320,7 @@ process alevin_splici {
     output:
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_splici_ALEVIN") into ALEVIN_RESULTS_SPLICI 
-        val(runId), val(mapping_rate) into ALEVIN_SPLICI_MAPPING
+        val(runId), stdout into ALEVIN_SPLICI_MAPPING
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_splici -p ${task.cpus} -o ${runId}_splici_ALEVIN_tmp --tgMap t2g_splici.txt --dumpFeatures --keepCBFraction 1 \
@@ -353,7 +353,7 @@ process alevin_cDNA {
     output:
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_cdna_ALEVIN") into ALEVIN_RESULTS_CDNA
-        val(runId), val(mapping_rate) into ALEVIN_CDNA_MAPPING
+        val(runId), stdout into ALEVIN_CDNA_MAPPING
 
 
     """
@@ -362,7 +362,7 @@ process alevin_cDNA {
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
     mapping_rate = "\$(grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)"
-    
+    echo  "\${mapping_rate}
  
     mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
     """
@@ -403,15 +403,15 @@ process run_STARSolo {
     path("STAR_index") from STAR_INDEX
 
     output:
-    set val(runId), val(mapping_rate) into STAR
+    set val(runId), stdout into STAR
 
 
     """
 
     STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 —-runThreadN 12 —-soloFeatures Velocyto GeneFull Gene --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
-    // mapping_rate = "\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | awk '{split(\$0, array, "|"); print array[2]}')"
-    
+    mapping_rate = "\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | awk '{split(\$0, array, "|"); print array[2]}')"
+    echo  "\${mapping_rate}
     """
 }
 
@@ -445,7 +445,7 @@ process kb_count_cDNA {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
         val protocol
     output:
-        set val(runId), val(mapping_rate) into KB_CDNA_MAPPING
+        set val(runId), stdout into KB_CDNA_MAPPING
 
 
     """
@@ -453,7 +453,7 @@ process kb_count_cDNA {
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
 
     mapping_rate = "\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')" 
-    
+    echo  "\${mapping_rate}
     """
 
 }
@@ -494,7 +494,7 @@ process kb_count_splici {
 
     mapping_rate = "\$(rep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
     
-  
+    echo  "\${mapping_rate}
     """
 
 }
