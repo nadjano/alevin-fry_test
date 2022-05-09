@@ -499,7 +499,7 @@ Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDN
 Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
 
 
-procces wirte_table {
+proccess wirte_table {
 
     input:
     set val(one), val(two), val(three), val(four) from MAPPING
