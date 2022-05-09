@@ -394,7 +394,8 @@ process run_STARSolo {
     path("STAR_index") from STAR_INDEX
 
     output:
-    set val(runId), stdout into STAR
+    path("${runId}_STAR_tmp") into STAR_RESULTS
+    set val(runId), stdout into STAR_MAPPING_RATE
 
 
     """
@@ -509,10 +510,12 @@ MAPPING.view()
 // process write_table {
 
 //     input:
-//     set val(one), val(two), val(three), val(four) from MAPPING
+//     set val(key) and val(vlaues) from MAPPING
+//     set val(one), val(two), val(three), val(four) from values
 
 //     """
-//     echo "\tMPR1\tMPR2\tMPR3\n /
+    // echo "${key}\n
+//          \tMPR1\tMPR2\tMPR3\n 
 //         Alevin\t${one}\t${two}\tNA\n
 //         Alevin-fry\tNA\tNA\tNA\n
 //         kbtoolst${three}\tNA\t${four}\n
