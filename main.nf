@@ -327,9 +327,9 @@ process alevin_splici {
         -i alevin_index_splici -p ${task.cpus} -o ${runId}_splici_ALEVIN_tmp --tgMap t2g_splici.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
-    mapping_rate = "\$(grep "percent_mapped" ${runId}_ALEVIN_splici_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)"
+    mapping_rate = \$(grep "percent_mapped" ${runId}_ALEVIN_splici_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
     
-    echo  "\${mapping_rate}
+    echo  "(\$mapping_rate)"
     mv ${runId}_splici_ALEVIN_tmp ${runId}_splici_ALEVIN
     """
 }
@@ -362,8 +362,8 @@ process alevin_cDNA {
         -i alevin_index_cDNA -p ${task.cpus} -o ${runId}_cdna_ALEVIN_tmp --tgMap t2g_cDNA.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
-    mapping_rate = "\$(grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)"
-    echo  "\${mapping_rate}
+    mapping_rate = \$(grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
+    echo  "(\$mapping_rate)"
  
     mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
     """
@@ -411,8 +411,8 @@ process run_STARSolo {
 
     STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 —-runThreadN 12 —-soloFeatures Velocyto GeneFull Gene --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
-    mapping_rate = "\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | awk '{split(\$0, array, "|"); print array[2]}')"
-    echo  "\${mapping_rate}
+    mapping_rate = \$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | awk '{split(\$0, array, "|"); print array[2]}')
+    echo  "\${mapping_rate}"
     """
 }
 
@@ -453,8 +453,8 @@ process kb_count_cDNA {
     kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x $protocol \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
 
-    mapping_rate = "\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')" 
-    echo  "\${mapping_rate}"
+    mapping_rate = \$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}') 
+    echo  "(\$mapping_rate)"
     """
 
 }
@@ -493,9 +493,9 @@ process kb_count_splici {
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_splici" \
     --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt
 
-    mapping_rate = "\$(rep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
+    mapping_rate = \$(rep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
     
-    echo  "\${mapping_rate}"
+    echo  "(\$mapping_rate)"
     """
 
 }
