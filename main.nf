@@ -290,14 +290,6 @@ process alevin_config {
         exit \$barcodesGood
         """
 }
-// collect index for alevin
-// ALEVIN_INDEX = ALEVIN_INDEX_CDNA.join(ALEVIN_INDEX_SPLICI)
-// ALEVIN_FRY_INDEX = ALEVIN_INDEX_CDNA.join(ALEVIN_INDEX_SPLICI)
-
-// T2G_FOR_ALEVIN = T2G_CDNA.join(T2G_SPLICI)
-// T2G_FOR_ALEVIN_FRY = T2G_CDNA.join(T2G_SPLICI)
-
-// INDEX = Channel.from([path(t2g_splici),ALEVIN_INDEX_CDNA ], [path(t2g_cdna),ALEVIN_INDEX_CDNA ])
 
 
 process alevin_splici {
@@ -328,7 +320,6 @@ process alevin_splici {
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
     mapping_rate = \$(grep "percent_mapped" ${runId}_ALEVIN_splici_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
-    
     echo  "(\$mapping_rate)"
     mv ${runId}_splici_ALEVIN_tmp ${runId}_splici_ALEVIN
     """
@@ -453,7 +444,7 @@ process kb_count_cDNA {
     kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x $protocol \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
 
-    mapping_rate = \$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}') 
+    mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}') 
     echo  "(\$mapping_rate)"
     """
 
