@@ -517,7 +517,7 @@ process alevin_fry {
         // publishDir path "${runId}_ALEVIN"
         set val(index_dir), val(runId), file("${runId}_ALEVIN_fry") into ALEVIN_FRY_RESULTS
         stdout into KB_ALEVIN_FRY_MAPPING
-    """
+    '''
     singularity exec --cleanenv \
     --bind workdir \
     --pwd /usefulaf/bash usefulaf.sif \
@@ -535,7 +535,7 @@ process alevin_fry {
 
     mv ${runId}_ALEVIN_fry_tmp ${runId}_ALEVIN_fry
 
-    """
+    '''
 }
 
 
