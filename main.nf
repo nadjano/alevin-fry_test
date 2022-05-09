@@ -502,18 +502,7 @@ process kb_count_splici {
 }
 
 
-process make_table {
-
-    input:
-        stdout from KB_CDNA_MAPPING
-
-    """
-    echo stdout 
-    """
-    
-
-}
-
+KB_SPLICI_MAPPING.subscribe {println it}
 // KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
 // process alevin_fry {
