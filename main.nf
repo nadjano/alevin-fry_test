@@ -509,46 +509,46 @@ ALEVIN_CDNA_MAPPING.subscribe {println it}
 ALEVIN_SPLICI_MAPPING.subscribe {println it}
 // KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
-process alevin_fry {
-    // container "usefulaf_latest.sif"
-    container "docker://combinelab/usefulaf:latest"
-    containerOptions '--volume /nfs/production/irene/ma/users/nnolte/'
-    // libraryDir = "/nfs/production/irene/ma/users/nnolte/"
-    // cacheDir = "/nfs/production/irene/ma/users/nnolte/"
+// process alevin_fry {
+//     // container "usefulaf_latest.sif"
+//     container "docker://combinelab/usefulaf:latest"
+//     containerOptions '--volume /nfs/production/irene/ma/users/nnolte/'
+//     // libraryDir = "/nfs/production/irene/ma/users/nnolte/"
+//     // cacheDir = "/nfs/production/irene/ma/users/nnolte/"
     
-    // // singularity.enabled = true
-    // singularity.cacheDir = "$PWD"
-    // // 
+//     // // singularity.enabled = true
+//     // singularity.cacheDir = "$PWD"
+//     // // 
 
-    input:
-        set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
-        path "alevin_index_splici" from ALEVIN_FRY_INDEX_SPLICI
-        path("${outdir}/splici_fl45*.tsv") from T2G_3_FOR_FRY
+//     input:
+//         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
+//         path "alevin_index_splici" from ALEVIN_FRY_INDEX_SPLICI
+//         path("${outdir}/splici_fl45*.tsv") from T2G_3_FOR_FRY
 
-    output:
-        // publishDir path "${runId}_ALEVIN"
-        set val(index_dir), val(runId), file("${runId}_ALEVIN_fry") into ALEVIN_FRY_RESULTS
-        stdout into KB_ALEVIN_FRY_MAPPING
+//     output:
+//         // publishDir path "${runId}_ALEVIN"
+//         set val(index_dir), val(runId), file("${runId}_ALEVIN_fry") into ALEVIN_FRY_RESULTS
+//         stdout into KB_ALEVIN_FRY_MAPPING
     
-    """
-    singularity exec --cleanenv --bind /nfs/production/irene/ma/users/nnolte \
-    --pwd /usefulaf/bash /nfs/production/irene/ma/users/nnolte  \
-    ./simpleaf quant  \
-    -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ')     \
-    -2 \$(ls cdna.fastq.gz | tr '\\n' ' ')    \
-    -i alevin_index_splici  \
-    ${barcodeConfig}  \
-    -o ${runId}_ALEVIN_tmp  \
-    -m "${outdir}/splici_fl45*.tsv"  \
-    -t 16
+//     """
+//     singularity exec --cleanenv --bind /nfs/production/irene/ma/users/nnolte \
+//     --pwd /usefulaf/bash /nfs/production/irene/ma/users/nnolte  \
+//     ./simpleaf quant  \
+//     -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ')     \
+//     -2 \$(ls cdna.fastq.gz | tr '\\n' ' ')    \
+//     -i alevin_index_splici  \
+//     ${barcodeConfig}  \
+//     -o ${runId}_ALEVIN_tmp  \
+//     -m "${outdir}/splici_fl45*.tsv"  \
+//     -t 16
 
-    grep "percent_mapped" AF_SAMPLE_DIR/quants/${runId}_ALEVIN_tmp/quant/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
-    echo ${runId}
+//     grep "percent_mapped" AF_SAMPLE_DIR/quants/${runId}_ALEVIN_tmp/quant/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
+//     echo ${runId}
 
-    mv ${runId}_ALEVIN_fry_tmp ${runId}_ALEVIN_fry
+//     mv ${runId}_ALEVIN_fry_tmp ${runId}_ALEVIN_fry
 
-    """
-}
+//     """
+// }
 
 
 
