@@ -454,7 +454,7 @@ process kb_count_cDNA {
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
 
     mapping_rate = "\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')" 
-    echo  "\${mapping_rate}
+    echo  "\${mapping_rate}"
     """
 
 }
@@ -495,7 +495,7 @@ process kb_count_splici {
 
     mapping_rate = "\$(rep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
     
-    echo  "\${mapping_rate}
+    echo  "\${mapping_rate}"
     """
 
 }
