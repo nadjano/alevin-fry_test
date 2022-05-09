@@ -317,10 +317,9 @@ process alevin_splici {
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_splici -p ${task.cpus} -o ${runId}_splici_ALEVIN_tmp --tgMap t2g_splici.txt --dumpFeatures --keepCBFraction 1 \
-        --freqThreshold ${params.minCbFreq} --dumpMtx
-
+        --freqThreshold ${params.minCbFreq} --dumpMtx > /dev/null
     mapping_rate=\$(grep "percent_mapped" ${runId}_ALEVIN_splici_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
-    echo  "(\$mapping_rate)"
+    echo -n  "(\$mapping_rate)"
     mv ${runId}_splici_ALEVIN_tmp ${runId}_splici_ALEVIN
     """
 }
@@ -352,11 +351,9 @@ process alevin_cDNA {
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_cDNA -p ${task.cpus} -o ${runId}_cdna_ALEVIN_tmp --tgMap t2g_cDNA.txt --dumpFeatures --keepCBFraction 1 \
-        --freqThreshold ${params.minCbFreq} --dumpMtx
-
+        --freqThreshold ${params.minCbFreq} --dumpMtx > /dev/null
     mapping_rate=\$(grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
-    echo  "(\$mapping_rate)" 
- 
+    echo -n "(\$mapping_rate)" 
     mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
     """
 }
@@ -438,7 +435,7 @@ process kb_count_cDNA {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
         val protocol
     output:
-        set val(runId), val("rate.txt") into KB_CDNA_MAPPING
+        set val(runId), stdout into KB_CDNA_MAPPING
 
 
     """
@@ -446,7 +443,7 @@ process kb_count_cDNA {
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
 
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}') 
-    echo  "(\$mapping_rate)" > rate.txt
+    echo  "(\$mapping_rate)"
     """
 
 }
@@ -491,8 +488,6 @@ process kb_count_splici {
     """
 
 }
-
-KB_CDNA_MAPPING.view()
 ALEVIN_CDNA_MAPPING.view()
 
 // MAPPING = ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_SPLICI_MAPPING).join(KB_CDNA_MAPPING)
