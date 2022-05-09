@@ -499,22 +499,22 @@ ALEVIN_CDNA_MAPPING.view()
 // Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
 
 
-process write_table {
+// process write_table {
 
-    input:
-    set val(one), val(two), val(three), val(four) from MAPPING
+//     input:
+//     set val(one), val(two), val(three), val(four) from MAPPING
 
-    """
-    echo "\tMPR1\tMPR2\tMPR3\n /
-        Alevin\t${one}\t${two}\tNA\n
-        Alevin-fry\tNA\tNA\tNA\n
-        kbtoolst${three}\tNA\t${four}\n
-        STARSolo\tNA\tNA\tNA\n
+//     """
+//     echo "\tMPR1\tMPR2\tMPR3\n /
+//         Alevin\t${one}\t${two}\tNA\n
+//         Alevin-fry\tNA\tNA\tNA\n
+//         kbtoolst${three}\tNA\t${four}\n
+//         STARSolo\tNA\tNA\tNA\n
          
-    """
+//     """
 
 
-}
+// }
 
 
 // KB_SPLICI_MAPPING.subscribe {println it}
