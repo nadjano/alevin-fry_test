@@ -505,32 +505,40 @@ process kb_count_splici {
 
 KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
-// process alevin_fry{
-//     conda "${baseDir}/envs/different_alevin_fry.yml"
-//     input:
-//         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
-//         path "alevin_index_splici" from ALEVIN_FRY_INDEX_SPLICI
-//         path("${outdir}/splici_fl45*.tsv") from T2G_3_FORFRY
+process alevin_fry{
+    container 'usefulaf_latest.sif'
+    input:
+        set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
+        path "alevin_index_splici" from ALEVIN_FRY_INDEX_SPLICI
+        path("${outdir}/splici_fl45*.tsv") from T2G_3_FORFRY
 
-//     output:
-//         // publishDir path "${runId}_ALEVIN"
-//         set val(index_dir), val(runId), file("${runId}_ALEVIN_fry") into ALEVIN_FRY_RESULTS
-//         stdout into KB_ALEVIN_FRY_MAPPING
+    output:
+        // publishDir path "${runId}_ALEVIN"
+        set val(index_dir), val(runId), file("${runId}_ALEVIN_fry") into ALEVIN_FRY_RESULTS
+        stdout into KB_ALEVIN_FRY_MAPPING
 
-//     """
-//     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
-//         -i alevin_index_splici -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap "${outdir}/splici_fl45*.tsv" --dumpFeatures --keepCBFraction 1 \
-//         --freqThreshold ${params.minCbFreq} --dumpMtx 
+    """
 
-//     alevin-fry generate-permit-list --input ${runId}_ALEVIN_tmp --expected-ori fw --output-dir ${runId}_ALEVIN_fry_tmp -k
+    singularity exec --cleanenv \
+    --bind $AF_SAMPLE_DIR:/workdir \
+    --pwd /usefulaf/bash usefulaf.sif \
+        ./simpleaf quant \
+    -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ')  \  
+    -2 \$(ls cdna.fastq.gz | tr '\\n' ' ')   \
+    -i alevin_index_splici \
+    ${barcodeConfig} \
+    -o ${runId}_ALEVIN_tmp \
+    -m /"${outdir}/splici_fl45*.tsv" \
+    -t 16
 
-//     alevin-fry collate -i {runId}_ALEVIN_fry_tmp -r ${runId}_ALEVIN_tmp -t 4
+    AF_SAMPLE_DIR/quants/${runId}_ALEVIN_tmp/quant/
+    
+    grep "percent_mapped"  AF_SAMPLE_DIR/quants/${runId}_ALEVIN_tmp/quant/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
+    echo ${runId}
 
-//     alevin-fry quant -i {runId}_ALEVIN_fry_tmp -m "${outdir}/splici_fl45*.tsv" -t 4 -r cr-like -o ${runId}_ALEVIN_fry_tmp
-
-//     mv ${runId}_ALEVIN_fry_tmp ${runId}_ALEVIN_fry
-//     """
-// }
+    mv ${runId}_ALEVIN_fry_tmp ${runId}_ALEVIN_fry
+    """
+}
 
 
 
