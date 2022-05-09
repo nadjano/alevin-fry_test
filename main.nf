@@ -505,7 +505,7 @@ process kb_count_splici {
 
 KB_SPLICI_MAPPING.subscribe {println it}
 KB_CDNA_MAPPING.subscribe {println it}
-ALEVIN_C .subscribe {println it}
+ALEVIN_CDNA_MAPPING.subscribe {println it}
 ALEVIN_SPLICI_MAPPING.subscribe {println it}
 // KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
