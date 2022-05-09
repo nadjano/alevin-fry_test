@@ -505,10 +505,10 @@ process kb_count_splici {
 process make_table {
 
     input:
-    stdout from KB_CDNA_MAPPING
+        stdout from KB_CDNA_MAPPING
 
     """
-    cat stdout 
+    echo stdout 
     """
     
 
