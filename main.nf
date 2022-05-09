@@ -430,6 +430,7 @@ process index_kb_cDNA {
 process kb_count_cDNA {
     conda "${baseDir}/envs/kb-tools.yml"
 
+
     input:
         set file("kb_index_cDNA"), file("t2g_kb") from KB_INDEX_CDNA
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
@@ -443,7 +444,7 @@ process kb_count_cDNA {
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
 
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}') 
-    echo  "(\$mapping_rate)"
+    echo -n "(\$mapping_rate)"
     """
 
 }
@@ -482,9 +483,9 @@ process kb_count_splici {
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_splici" \
     --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt
 
-    mapping_rate=\$(rep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
+    mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
     
-    echo  "(\$mapping_rate)"
+    echo -n  "(\$mapping_rate)"
     """
 
 }
