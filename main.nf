@@ -179,7 +179,7 @@ process build_splici {
         // publishDir "${outdir}"
         path("${outdir}/splici_fl45.fa") into splici_fasta
         path("${outdir}/splici_fl45*.tsv") into T2G_3
-        path("${outdir}/splici_fl45*.tsv") into T2G_3_FORFRY
+        path("${outdir}/splici_fl45*.tsv") into T2G_3_FOR_FRY
         
     """
     pyroe make-splici  ${referenceGenome} ${referenceGtf}  50 ${outdir}
@@ -503,14 +503,14 @@ process kb_count_splici {
 
 }
 
-KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
+// KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
 process alevin_fry{
     container 'usefulaf_latest.sif'
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
         path "alevin_index_splici" from ALEVIN_FRY_INDEX_SPLICI
-        path("${outdir}/splici_fl45*.tsv") from T2G_3_FORFRY
+        path("${outdir}/splici_fl45*.tsv") from T2G_3_FOR_FRY
 
     output:
         // publishDir path "${runId}_ALEVIN"
@@ -518,7 +518,6 @@ process alevin_fry{
         stdout into KB_ALEVIN_FRY_MAPPING
 
     """
-
     singularity exec --cleanenv \
     --bind workdir \
     --pwd /usefulaf/bash usefulaf.sif \
