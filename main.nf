@@ -499,7 +499,7 @@ process kb_count_splici {
     """
 
 }
-A
+
 
 MAPPING = LEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_SPLICI_MAPPING).join(KB_CDNA_MAPPING)
 
