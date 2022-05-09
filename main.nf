@@ -326,7 +326,7 @@ process alevin_splici {
         -i alevin_index_splici -p ${task.cpus} -o ${runId}_splici_ALEVIN_tmp --tgMap t2g_splici.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
-    grep "percent_mapped" ${runId}_ALEVIN_splici_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
+    mapping_rate = "$(grep "percent_mapped" ${runId}_ALEVIN_splici_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)"
     
     echo  ${runId}
     mv ${runId}_splici_ALEVIN_tmp ${runId}_splici_ALEVIN
@@ -361,8 +361,8 @@ process alevin_cDNA {
         -i alevin_index_cDNA -p ${task.cpus} -o ${runId}_cdna_ALEVIN_tmp --tgMap t2g_cDNA.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
-    grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
-    echo ${runId}
+    mapping_rate = "$(grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)"
+    
  
     mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
     """
@@ -403,18 +403,15 @@ process run_STARSolo {
     path("STAR_index") from STAR_INDEX
 
     output:
-    stdout into STAR
+    set val(runId), val(mapping_rate) into STAR
 
 
     """
 
-    STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart 13 --soloCBstart 1 —-runThreadN 12 —-soloFeatures Velocyto GeneFull Gene --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
+    STAR --genomeDir STAR_index --readFilesIn cdna.fastq.gz barcodes.fastq.gz --soloType Droplet --soloCBwhitelist None --soloUMIlen $umiLength --soloCBlen $barcodeLength --soloUMIstart echo $(($barcodeLength+1)) --soloCBstart 1 —-runThreadN 12 —-soloFeatures Velocyto GeneFull Gene --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
-    grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | awk '{split(\$0, array, "|"); print array[2]}'
-    echo ${runId}
+    mapping_rate = "$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | awk '{split(\$0, array, "|"); print array[2]}')"
     
-
-
     """
 }
 
@@ -448,15 +445,15 @@ process kb_count_cDNA {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
         val protocol
     output:
-        stdout into KB_CDNA_MAPPING
+        set val(runId), val(mapping_rate) into KB_CDNA_MAPPING
 
 
     """
     kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x $protocol \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
 
-    grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' 
-    echo ${runId}
+    mapping_rate = "$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')" 
+    
     """
 
 }
@@ -489,24 +486,27 @@ process kb_count_splici {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS_SPLICI.join(KB_CONFIG_SPLICI)
         val protocol
     output:
-        stdout into KB_SPLICI_MAPPING
+        set val(runId), stdout into KB_SPLICI_MAPPING
     """
     kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x $protocol \
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_splici" \
     --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt
 
     grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}'
-    echo ${runId}
+    
   
     """
 
 }
+A
+
+MAPPING = LEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_SPLICI_MAPPING).join(KB_CDNA_MAPPING)
 
 
-KB_SPLICI_MAPPING.subscribe {println it}
-KB_CDNA_MAPPING.subscribe {println it}
-ALEVIN_CDNA_MAPPING.subscribe {println it}
-ALEVIN_SPLICI_MAPPING.subscribe {println it}
+// KB_SPLICI_MAPPING.subscribe {println it}
+// KB_CDNA_MAPPING.subscribe {println it}
+// ALEVIN_CDNA_MAPPING.subscribe {println it}
+MAPPING.subscribe {println it}
 // KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
 // process alevin_fry {
