@@ -320,7 +320,7 @@ process alevin_splici {
     output:
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_splici_ALEVIN") into ALEVIN_RESULTS_SPLICI 
-        val(runId), ${mapping_rate} into ALEVIN_SPLICI_MAPPING
+        val(runId), mapping_rate into ALEVIN_SPLICI_MAPPING
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_splici -p ${task.cpus} -o ${runId}_splici_ALEVIN_tmp --tgMap t2g_splici.txt --dumpFeatures --keepCBFraction 1 \
