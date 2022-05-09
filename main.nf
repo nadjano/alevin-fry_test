@@ -520,7 +520,7 @@ process alevin_fry{
     """
 
     singularity exec --cleanenv \
-    --bind $AF_SAMPLE_DIR:/workdir \
+    --bind workdir \
     --pwd /usefulaf/bash usefulaf.sif \
         ./simpleaf quant \
     -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ')  \  
