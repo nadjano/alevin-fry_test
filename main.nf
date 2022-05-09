@@ -507,7 +507,10 @@ process kb_count_splici {
 
 process alevin_fry {
     // container "usefulaf_latest.sif"
-    container "docker://combinelab/usefulaf:latest"
+    process.container = 'docker://combinelab/usefulaf:latest'
+    singularity.enabled = true
+    singularity.cacheDir = "$PWD"
+    \container "docker://combinelab/usefulaf:latest"
 
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
