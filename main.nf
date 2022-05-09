@@ -438,7 +438,7 @@ process kb_count_cDNA {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
         val protocol
     output:
-        set val(runId), file("rate.txt") into KB_CDNA_MAPPING
+        set val(runId), val("rate.txt") into KB_CDNA_MAPPING
 
 
     """
