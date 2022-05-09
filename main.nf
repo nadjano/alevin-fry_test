@@ -325,6 +325,7 @@ process alevin_splici {
     """
 }
 
+
 process alevin_cDNA {
 
     conda "${baseDir}/envs/alevin.yml"
@@ -492,13 +493,34 @@ process kb_count_splici {
 }
 
 
-MAPPING = ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_SPLICI_MAPPING).join(KB_CDNA_MAPPING)
+// MAPPING = ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_SPLICI_MAPPING).join(KB_CDNA_MAPPING)
+
+Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().view()
+Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
+
+
+prcces wirte_table {
+
+    input:
+    set val(one), val(two), val(three), val(four) from MAPPING
+
+    """
+    echo "\tMPR1\tMPR2\tMPR3\n /
+        Alevin\t${one}\t${two}\tNA\n
+        Alevin-fry\tNA\tNA\tNA\n
+        kbtoolst${three}\tNA\t${four}\n
+        STARSolo\tNA\tNA\tNA\n
+         
+    """
+
+
+}
 
 
 // KB_SPLICI_MAPPING.subscribe {println it}
 // KB_CDNA_MAPPING.subscribe {println it}
 // ALEVIN_CDNA_MAPPING.subscribe {println it}
-MAPPING.subscribe {println it}
+// MAPPING.subscribe {println it}
 // KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
 // process alevin_fry {
