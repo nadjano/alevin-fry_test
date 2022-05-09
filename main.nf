@@ -509,6 +509,8 @@ process alevin_fry {
     // container "usefulaf_latest.sif"
     container 'combinelab-usefulaf-latest.img'
     libraryDir = "/nfs/production/irene/ma/users/nnolte/"
+    cacheDir = "/nfs/production/irene/ma/users/nnolte/"
+    
     // singularity.enabled = true
     // singularity.cacheDir = "$PWD"
     // // container "docker://combinelab/usefulaf:latest"
