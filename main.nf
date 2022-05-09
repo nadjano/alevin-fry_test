@@ -506,7 +506,8 @@ process kb_count_splici {
 // KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
 process alevin_fry{
-    container 'usefulaf_latest.sif'
+    container "usefulaf_latest.sif"
+
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
         path "alevin_index_splici" from ALEVIN_FRY_INDEX_SPLICI
@@ -530,8 +531,6 @@ process alevin_fry{
     -m /"${outdir}/splici_fl45*.tsv" \
     -t 16
 
-    AF_SAMPLE_DIR/quants/${runId}_ALEVIN_tmp/quant/
-    
     grep "percent_mapped"  AF_SAMPLE_DIR/quants/${runId}_ALEVIN_tmp/quant/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
     echo ${runId}
 
