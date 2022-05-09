@@ -355,7 +355,7 @@ process alevin_cDNA {
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
     mapping_rate=\$(grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
-    echo  "(\$mapping_rate)"
+    echo  "(\$mapping_rate)" 
  
     mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
     """
@@ -438,7 +438,7 @@ process kb_count_cDNA {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS.join(KB_CONFIG)
         val protocol
     output:
-        set val(runId), stdout into KB_CDNA_MAPPING
+        set val(runId), file("rate.txt") into KB_CDNA_MAPPING
 
 
     """
@@ -446,7 +446,7 @@ process kb_count_cDNA {
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
 
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}') 
-    echo  "(\$mapping_rate)"
+    echo  "(\$mapping_rate)" > rate.txt
     """
 
 }
@@ -491,6 +491,8 @@ process kb_count_splici {
     """
 
 }
+
+KB_CDNA_MAPPING.view()
 ALEVIN_CDNA_MAPPING.view()
 
 // MAPPING = ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_SPLICI_MAPPING).join(KB_CDNA_MAPPING)
