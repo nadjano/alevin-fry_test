@@ -362,7 +362,7 @@ process alevin_cDNA {
         -i alevin_index_cDNA -p ${task.cpus} -o ${runId}_cdna_ALEVIN_tmp --tgMap t2g_cDNA.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
-    mapping_rate = \$(grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
+    mapping_rate=\$(grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
     echo  "(\$mapping_rate)"
  
     mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
