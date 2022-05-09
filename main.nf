@@ -508,8 +508,8 @@ process kb_count_splici {
 process alevin_fry {
     // container "usefulaf_latest.sif"
     container 'docker://combinelab/usefulaf:latest'
-    // singularity.enabled = true
-    // singularity.cacheDir = "$PWD"
+    singularity.enabled = true
+    singularity.cacheDir = "$PWD"
     // // container "docker://combinelab/usefulaf:latest"
 
     input:
