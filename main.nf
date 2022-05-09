@@ -524,7 +524,7 @@ process alevin_fry {
     
     """
     singularity exec --cleanenv --bind workdir  \
-    --pwd /usefulaf/bash /nfs/production/irene/ma/users/nnolte/usefulaf.sif  \
+    --pwd /usefulaf/bash /nfs/production/irene/ma/users/nnolte/usefulaf_latest.sif  \
     ./simpleaf quant  \
     -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ')     \
     -2 \$(ls cdna.fastq.gz | tr '\\n' ' ')    \
