@@ -318,7 +318,7 @@ process alevin_splici {
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_splici -p ${task.cpus} -o ${runId}_splici_ALEVIN_tmp --tgMap t2g_splici.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx > /dev/null
-    mapping_rate=\$(grep "percent_mapped" ${runId}_ALEVIN_splici_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
+    mapping_rate=\$(grep "mapping_rate" ${runId}_ALEVIN_splici_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
     echo -n  "(\$mapping_rate)"
     mv ${runId}_splici_ALEVIN_tmp ${runId}_splici_ALEVIN
     """
@@ -352,7 +352,7 @@ process alevin_cDNA {
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_cDNA -p ${task.cpus} -o ${runId}_cdna_ALEVIN_tmp --tgMap t2g_cDNA.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx > /dev/null
-    mapping_rate=\$(grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
+    mapping_rate=\$(grep "mapping_rate" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
     echo -n "(\$mapping_rate)" 
     mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
     """
@@ -484,7 +484,7 @@ process kb_count_splici {
     --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt
 
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}')
-    
+
     echo -n  "(\$mapping_rate)"
     """
 
@@ -495,9 +495,13 @@ KB_CDNA_MAPPING.view()
 KB_SPLICI_MAPPING.view()
 
 
-// MAPPING = ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_SPLICI_MAPPING).join(KB_CDNA_MAPPING)
+MAPPING = ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_SPLICI_MAPPING).join(KB_CDNA_MAPPING)
 
-// Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().view()
+MAPPING.view()
+
+MAPPING_GROUP = Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple()
+
+MAPPING_GROUP.view()
 // Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
 
 
