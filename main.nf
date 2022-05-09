@@ -495,7 +495,6 @@ process kb_count_splici {
     -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_splici" \
     --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt
 
-
     grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}'
     echo ${runId}
   
@@ -526,7 +525,7 @@ process alevin_fry {
         stdout into KB_ALEVIN_FRY_MAPPING
     
     """
-    singularity exec --cleanenv --bind workdir  \
+    singularity exec --cleanenv --bind /nfs/production/irene/ma/users/nnolte  \
     --pwd /usefulaf/bash /nfs/production/irene/ma/users/nnolte  \
     ./simpleaf quant  \
     -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ')     \
