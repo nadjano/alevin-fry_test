@@ -505,7 +505,7 @@ process kb_count_splici {
 
 // KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
-process alevin_fry{
+process alevin_fry {
     container "usefulaf_latest.sif"
 
     input:
@@ -517,7 +517,6 @@ process alevin_fry{
         // publishDir path "${runId}_ALEVIN"
         set val(index_dir), val(runId), file("${runId}_ALEVIN_fry") into ALEVIN_FRY_RESULTS
         stdout into KB_ALEVIN_FRY_MAPPING
-
     """
     singularity exec --cleanenv \
     --bind workdir \
@@ -528,7 +527,7 @@ process alevin_fry{
     -i alevin_index_splici \
     ${barcodeConfig} \
     -o ${runId}_ALEVIN_tmp \
-    -m /"${outdir}/splici_fl45*.tsv" \
+    -m "${outdir}/splici_fl45*.tsv" \
     -t 16
 
     grep "percent_mapped"  AF_SAMPLE_DIR/quants/${runId}_ALEVIN_tmp/quant/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
