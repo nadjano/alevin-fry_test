@@ -507,7 +507,7 @@ process kb_count_splici {
 
 process alevin_fry {
     // container "usefulaf_latest.sif"
-    container 'docker://combinelab/usefulaf:latest'
+    container 'combinelab-usefulaf-latest.img'
     // singularity.enabled = true
     // singularity.cacheDir = "$PWD"
     // // container "docker://combinelab/usefulaf:latest"
@@ -524,7 +524,7 @@ process alevin_fry {
     
     """
     singularity exec --cleanenv --bind workdir  \
-    --pwd /usefulaf/bash /nfs/production/irene/ma/users/nnolte/usefulaf_latest.sif  \
+    --pwd /usefulaf/bash /nfs/production/irene/ma/users/nnolte  \
     ./simpleaf quant  \
     -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ')     \
     -2 \$(ls cdna.fastq.gz | tr '\\n' ' ')    \
