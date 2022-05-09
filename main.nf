@@ -353,6 +353,7 @@ process alevin_cDNA {
     output:
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_cdna_ALEVIN") into ALEVIN_RESULTS_CDNA
+        stdout into ALEVIN_CDNA_MAPPING
 
 
     """
@@ -361,7 +362,7 @@ process alevin_cDNA {
         --freqThreshold ${params.minCbFreq} --dumpMtx
 
     grep "percent_mapped" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
-    
+    echo ${runId}
  
     mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
     """
@@ -504,7 +505,7 @@ process kb_count_splici {
 
 KB_SPLICI_MAPPING.subscribe {println it}
 KB_CDNA_MAPPING.subscribe {println it}
-ALEVIN_CDNA_MAPPING.subscribe {println it}
+ALEVIN_C .subscribe {println it}
 ALEVIN_SPLICI_MAPPING.subscribe {println it}
 // KB_SPLICI_MAPPING.view { print "mapping rate is $it" }
 
