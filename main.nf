@@ -375,7 +375,6 @@ process index_star {
     STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles \$(gunzip -c ${referenceGenome})  --sjdbGTFfile \$(gunzip -c ${referenceGtf})  --genomeSAindexNbases 12 
 
     """
-
 }
 
 // run STARSolo 
