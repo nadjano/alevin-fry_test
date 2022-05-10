@@ -393,8 +393,7 @@ process run_STARSolo {
     path("STAR_index") from STAR_INDEX
 
     output:
-    path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
-    val(runId) into STAR_MAPPING_RATE
+    set val(runId), path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
 
     script:
     if( barcodeConfig == '10XV3' )
@@ -425,7 +424,7 @@ methods = ['Gene', 'GeneFull']
 process get_STAR_mapping {
 
     input:
-    set path("${runId}_STAR_tmpSolo.out"), val(runId) from STAR_RESULTS.join(STAR_MAPPING_RATE)
+    set path("${runId}_STAR_tmpSolo.out"), val(runId) from STAR_RESULTS
     each mode from methods
 
     output:
