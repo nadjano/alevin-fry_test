@@ -438,7 +438,7 @@ process get_STAR_mapping {
     """
 }
 
-STAR_MAPPING.view {print $it}
+STAR_MAPPING.view()
 
 // index kb tools 
 
