@@ -424,10 +424,10 @@ process get_STAR_mapping {
 
     input:
     path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
-    val(mode) from ['Gene', 'GeneFull']
+    mode from ['Gene', 'GeneFull']
 
     output:
-    env MR_${runId}_${mode} into STAR_MAPPING
+    env "MR_${runId}_${mode}" into STAR_MAPPING
 
     """
     mapping_rate = \$(grep "Reads Mapped to Gene: Unique ${mode}" "${runId}_STAR_tmpSolo.out/${mode}/Summary.csv" | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4  > ${mode}_MR_${runId}.txt)
