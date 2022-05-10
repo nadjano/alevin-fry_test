@@ -538,11 +538,11 @@ STAR_GROUP  = STAR_MAPPING.groupTuple()
     
 
 process write_table {
-    publishDir "$resultsRoot/${key}.txt", mode: 'copy', overwrite: true
+    publishDir "$resultsRoot", mode: 'copy', overwrite: true
    
     input:
     set val(key), mr1, mr2, mr3, mr4 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING)
-    set val(a), val(b), val(c) from STAR_GROUP.flatten().collate(3)
+    set val(a), val(b).toInteger.sum(it *100), val(c).toInteger.sum(it *100) from STAR_GROUP.flatten().collate(3)
     output:
     file("${key}.txt") into RESULTS_FOR_COUNTING
     
