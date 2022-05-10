@@ -420,11 +420,13 @@ process run_STARSolo {
         """
 }
 
+methods = ['Gene', 'GeneFull']
+
 process get_STAR_mapping {
 
     input:
     path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
-    each mode from ['Gene', 'GeneFull']
+    each mode from methods
 
     output:
     env "MR_${runId}_${mode}" into STAR_MAPPING
