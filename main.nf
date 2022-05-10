@@ -430,7 +430,7 @@ process get_STAR_mapping {
     each mode from methods
 
     output:
-    env MR_${runId}_${mode} into STAR_MAPPING
+    env "MR_${runId}_${mode}" into STAR_MAPPING
 
     """
     MR_${runId}_${mode}="\$(grep "Reads Mapped to ${mode}: Unique ${mode}" ${runId}_STAR_tmpSolo.out/${mode}/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)"
