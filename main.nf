@@ -535,28 +535,30 @@ process kb_count_splici {
 // MAPPING_GROUP.view()
 // Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
 STAR_GROUP  = STAR_MAPPING.groupTuple()
+ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING).join(STAR_GROUP).flatten().view()
+    
 
-process write_table {
-    publishDir "$resultsRoot/${key}.txt", mode: 'copy', overwrite: true
+// process write_table {
+//     publishDir "$resultsRoot/${key}.txt", mode: 'copy', overwrite: true
    
-    input:
-    set val(key), mr1, mr2, mr3, mr4, mr5, mr6 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING).join(STAR_GROUP).flatten()
+//     input:
+//     set val(key), mr1, mr2, mr3, mr4, mr5, mr6 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING).join(STAR_GROUP).flatten()
     
-    output:
-    file("${key}.txt") into RESULTS_FOR_COUNTING
+//     output:
+//     file("${key}.txt") into RESULTS_FOR_COUNTING
     
-    """
-    echo "${key}\n
-        \tMPR1\tMPR2\tMPR3\n 
-        Alevin\t${mr1}\t${mr2}\tNA\n
-        Alevin-fry\tNA\tNA\tNA\n
-        kb-tools\t${mr3}\tNA\t${mr4}\n
-        STARSolo\t${mr5}\tNA\t${mr6}\n" > ${key}.txt
+//     """
+//     echo "${key}\n
+//         \tMPR1\tMPR2\tMPR3\n 
+//         Alevin\t${mr1}\t${mr2}\tNA\n
+//         Alevin-fry\tNA\tNA\tNA\n
+//         kb-tools\t${mr3}\tNA\t${mr4}\n
+//         STARSolo\t${mr5}\tNA\t${mr6}\n" > ${key}.txt
          
-    """
+//     """
 
 
-}
+// }
 
 // ch.view { print "$it" }
 
