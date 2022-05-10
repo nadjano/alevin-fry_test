@@ -552,7 +552,7 @@ process write_table {
         Alevin\t${mr1}\t${mr2}\tNA\n
         Alevin-fry\tNA\tNA\tNA\n
         kb-tools\t${mr3}\tNA\t${mr4}\n
-        STARSolo\t(expr ${b} *100)\tNA\t${c}\n" > ${key}.txt
+        STARSolo\t\$(expr ${b} '*' 100)\tNA\t$(expr ${c} '*' 100)\n" > ${key}.txt
          
     """
 
