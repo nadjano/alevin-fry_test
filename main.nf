@@ -556,7 +556,7 @@ process write_table {
     """
 
 
-// }
+}
 
 // ch.view { print "$it" }
 
