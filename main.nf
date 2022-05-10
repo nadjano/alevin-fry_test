@@ -424,7 +424,7 @@ process get_STAR_mapping {
 
     input:
     path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
-    mode from ['Gene', 'GeneFull']
+    each mode from ['Gene', 'GeneFull']
 
     output:
     env "MR_${runId}_${mode}" into STAR_MAPPING
