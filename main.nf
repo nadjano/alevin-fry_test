@@ -501,30 +501,30 @@ MAPPING = ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).
 
 MAPPING.view()
 
-// MAPPING_GROUP = Channel.from(MAPPING).groupTuple()
+MAPPING_GROUP = Channel.from(MAPPING).groupTuple()
 
-// MAPPING_GROUP.view()
-// Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
+MAPPING_GROUP.view()
+Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
 
 
-// process write_table {
+process write_table {
 
-//     input:
-//     set val(key) and val(vlaues) from MAPPING
-//     set val(one), val(two), val(three), val(four) from values
+    input:
+    set val(key) and val(vlaues) from MAPPING
+    set val(one), val(two), val(three), val(four) from values
 
-//     """
-    // echo "${key}\n
-//          \tMPR1\tMPR2\tMPR3\n 
-//         Alevin\t${one}\t${two}\tNA\n
-//         Alevin-fry\tNA\tNA\tNA\n
-//         kbtoolst${three}\tNA\t${four}\n
-//         STARSolo\tNA\tNA\tNA\n
+    """
+    echo "${key}\n
+         \tMPR1\tMPR2\tMPR3\n 
+        Alevin\t${one}\t${two}\tNA\n
+        Alevin-fry\tNA\tNA\tNA\n
+        kbtoolst${three}\tNA\t${four}\n
+        STARSolo\tNA\tNA\tNA\n
          
-//     """
+    """
 
 
-// }
+}
 
 
 // KB_SPLICI_MAPPING.subscribe {println it}
