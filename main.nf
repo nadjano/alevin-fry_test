@@ -547,7 +547,6 @@ process write_table {
     file("${key}.txt") into RESULTS_FOR_COUNTING
     
     """
-    mkdir -p 
     echo "${key}\n
         \tMPR1\tMPR2\tMPR3\n 
         Alevin\t${mr1}\t${mr2}\tNA\n
