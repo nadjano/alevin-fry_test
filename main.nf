@@ -534,13 +534,13 @@ process kb_count_splici {
 
 // MAPPING_GROUP.view()
 // Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
-
+STAR_GROUP  = STAR_MAPPING.groupTuple()
 
 process write_table {
     publishDir "$resultsRoot/${key}.txt", mode: 'copy', overwrite: true
    
     input:
-    set val(key), mr1, mr2, mr3, mr4, mr5, mr6 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING).join(STAR_MAPPING).groupTuple()
+    set val(key), mr1, mr2, mr3, mr4, mr5, mr6 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING).join(STAR_GROUP)
     
     output:
     file("${key}.txt") into RESULTS_FOR_COUNTING
