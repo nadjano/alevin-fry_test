@@ -10,9 +10,9 @@ outdir = "out_dir"
 ref_type = ['cDNA', 'splici']
 
 
-REFERENCE_CDNA = Channel.fromPath(referencecDNA,checkIfExists: true , decompress = true ).first()
-REFERENCE_GTF = Channel.fromPath( referenceGtf,checkIfExists: true , decompress = true ).first()
-REFERENCE_GENOME = Channel.fromPath( referenceGenome,checkIfExists: true, decompress = true ).first()
+REFERENCE_CDNA = Channel.fromPath(referencecDNA,checkIfExists: true).first()
+REFERENCE_GTF = Channel.fromPath( referenceGtf,checkIfExists: true ).first()
+REFERENCE_GENOME = Channel.fromPath( referenceGenome,checkIfExists: true ).first()
 
 
 manualDownloadFolder =''
@@ -372,7 +372,7 @@ process index_star {
         path("STAR_index") into STAR_INDEX
     
     """
-    STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles ${referenceGenome}  --sjdbGTFfile ${referenceGtf} --genomeSAindexNbases 12 --readFilesCommand zcat
+    STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles <(gunzip -c ${referenceGenome})  --sjdbGTFfile ${referenceGtf} --genomeSAindexNbases 12 
 
     """
 
