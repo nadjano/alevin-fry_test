@@ -182,7 +182,7 @@ process build_splici {
         path("${outdir}/splici_fl45*.tsv") into T2G_3_FOR_FRY
         
     """
-    pyroe make-splici  ${referenceGenome} ${referenceGtf}  50 ${outdir}
+    pyroe make-splici <(gunzip -c ${referenceGenome}) <(gunzip -c ${referenceGtf})  50 ${outdir}
 
     """
 }
@@ -372,7 +372,7 @@ process index_star {
         path("STAR_index") into STAR_INDEX
     
     """
-    STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles <(gunzip -c ${referenceGenome})  --sjdbGTFfile ${referenceGtf} --genomeSAindexNbases 12 
+    STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles <(gunzip -c ${referenceGenome})  --sjdbGTFfile <(gunzip -c ${referenceGtf})  --genomeSAindexNbases 12 
 
     """
 
