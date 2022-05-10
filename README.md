@@ -2,8 +2,7 @@
 # snRNA-mapping-rate: Pipeline to compare mapping rates accross different tools for single-nuclei RNA sequencing experiments.
 
 ## Requirements
-Install Dockker image for alevin-fry: 
-singularity pull docker://combinelab/usefulaf:latest
+Nextflow (version 21.10.6)
 
 ## How to run
 ```
