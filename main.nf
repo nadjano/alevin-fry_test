@@ -424,11 +424,12 @@ methods = ['Gene', 'GeneFull']
 process get_STAR_mapping {
 
     input:
-    set val(runId), path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
     each mode from methods
+    set val(runId), path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
+    
 
     output:
-    set val(runId), env(MR), val(mode) into STAR_MAPPING
+    set val(runId), val(mode), env(MR) into STAR_MAPPING
 
     """
     MR="\$(grep "Reads Mapped to ${mode}: Unique ${mode}" ${runId}_STAR_tmpSolo.out/${mode}/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)"
