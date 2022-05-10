@@ -425,6 +425,7 @@ methods = ['Gene', 'GeneFull']
 process get_STAR_mapping {
 
     input:
+    val(runId) from STAR_MAPPING_RATE
     path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
     each mode from methods
 
@@ -433,7 +434,7 @@ process get_STAR_mapping {
 
     """
     mapping_rate = \$(grep "Reads Mapped to Gene: Unique ${mode}" "${runId}_STAR_tmpSolo.out/${mode}/Summary.csv" | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4  > ${mode}_MR_${runId}.txt)
-    MR_${runId}_${mode}=$mapping_rate
+    "MR_${runId}_${mode}"=$mapping_rate
     """
 
 }
@@ -547,10 +548,10 @@ process write_table {
     publishDir("${resultsRoot}/${key}.txt")
     """
     echo "${key}\n
-         \tMPR1\tMPR2\tMPR3\n 
+        \tMPR1\tMPR2\tMPR3\n 
         Alevin\t${mr1}\t${mr2}\tNA\n
         Alevin-fry\tNA\tNA\tNA\n
-        kbtoolst\t${mr3}\tNA\t${mr4}\n
+        kb-tools\t${mr3}\tNA\t${mr4}\n
         STARSolo\tNA\tNA\tNA\n" > ${key}.txt
          
     """
