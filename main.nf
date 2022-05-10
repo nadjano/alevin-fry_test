@@ -544,7 +544,7 @@ process write_table {
 
     output:
     stdout ch
-    publishDir("${resultsRoot}/${key}.txt")
+    publishDir("${key}.txt")
     """
     echo "${key}\n
         \tMPR1\tMPR2\tMPR3\n 
