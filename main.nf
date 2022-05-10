@@ -518,8 +518,8 @@ process write_table {
          \tMPR1\tMPR2\tMPR3\n 
         Alevin\t${mr1}\t${mr2}\tNA\n
         Alevin-fry\tNA\tNA\tNA\n
-        kbtoolst${mr3}\tNA\t${mr4}\n
-        STARSolo\tNA\tNA\tNA\n
+        kbtoolst\t${mr3}\tNA\t${mr4}\n
+        STARSolo\tNA\tNA\tNA\n"
          
     """
 
