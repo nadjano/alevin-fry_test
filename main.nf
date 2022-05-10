@@ -425,8 +425,7 @@ methods = ['Gene', 'GeneFull']
 process get_STAR_mapping {
 
     input:
-    path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
-    val(runId) from STAR_MAPPING_RATE
+    set path("${runId}_STAR_tmpSolo.out"), val(runId) from STAR_RESULTS.join(STAR_MAPPING_RATE)
     each mode from methods
 
     output:
