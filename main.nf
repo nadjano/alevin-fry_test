@@ -422,7 +422,7 @@ process run_STARSolo {
 
 process get_STAR_mapping {
 
-    intput:
+    input:
     path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
     val(mode) from ['Gene', 'GeneFull']
 
