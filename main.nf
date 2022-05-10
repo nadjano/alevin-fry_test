@@ -394,7 +394,7 @@ process run_STARSolo {
 
     output:
     path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
-    set val(runId), stdout into STAR_MAPPING_RATE
+    val(runId) stdout into STAR_MAPPING_RATE
 
     script:
     if( barcodeConfig == '10XV3' )
