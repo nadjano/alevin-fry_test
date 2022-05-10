@@ -318,7 +318,7 @@ process alevin_splici {
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_splici -p ${task.cpus} -o ${runId}_splici_ALEVIN_tmp --tgMap t2g_splici.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx > /dev/null
-    mapping_rate=\$(grep "mapping_rate" ${runId}_splici_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
+    mapping_rate=\$(grep "mapping_rate" ${runId}_splici_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
     
     echo -n "\$mapping_rate"
     mv ${runId}_splici_ALEVIN_tmp ${runId}_splici_ALEVIN
@@ -353,7 +353,7 @@ process alevin_cDNA {
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_cDNA -p ${task.cpus} -o ${runId}_cdna_ALEVIN_tmp --tgMap t2g_cDNA.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx > /dev/null
-    mapping_rate=\$(grep "mapping_rate" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)
+    mapping_rate=\$(grep "mapping_rate" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
     echo -n "\$mapping_rate" 
     mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
     """
@@ -420,7 +420,23 @@ process run_STARSolo {
         """
 }
 
-// ch.view { print "mapping rate is $it" }
+process get_STAR_mapping {
+
+    intput:
+    path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
+    val(mode) from ['Gene', 'GeneFull']
+
+    output:
+    env MR_${runId}_${Mode} into STAR_MAPPING
+
+    """
+    mapping_rate = \$(grep "Reads Mapped to Gene: Unique Gene" "${runId}_STAR_tmpSolo.out/${Mode}/Summary.csv" | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4  > ${Mode}_MR_${runId}.txt)
+    MR_${runId}_${Mode}=$mapping_rate
+    """
+
+}
+
+STAR_MAPPING.view {}
 
 // index kb tools 
 
