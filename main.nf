@@ -541,7 +541,7 @@ process write_table {
     publishDir "$resultsRoot/${key}.txt", mode: 'copy', overwrite: true
    
     input:
-    set val(key), mr1, mr2, mr3, mr4, mr5, mr6 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING)
+    set val(key), mr1, mr2, mr3, mr4 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING)
     val(a) from STAR_GROUP
     output:
     file("${key}.txt") into RESULTS_FOR_COUNTING
