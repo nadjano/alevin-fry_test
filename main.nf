@@ -560,7 +560,7 @@ process write_table {
 
 }
 
-ch.view { print "$it" }
+// ch.view { print "$it" }
 
 // KB_SPLICI_MAPPING.subscribe {println it}
 // KB_CDNA_MAPPING.subscribe {println it}
