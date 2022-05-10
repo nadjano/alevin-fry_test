@@ -436,7 +436,7 @@ process get_STAR_mapping {
     """
 }
 
-STAR_MAPPING.view()
+STAR_MAPPING.groupTuple().view()
 
 // index kb tools 
 
