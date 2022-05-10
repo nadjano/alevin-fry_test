@@ -429,7 +429,7 @@ process get_STAR_mapping {
     
 
     output:
-    set val(runId), val(mode), env(MR) into STAR_MAPPING
+    set val(runId), env(MR) into STAR_MAPPING
 
     """
     MR="\$(grep "Reads Mapped to ${mode}: Unique ${mode}" ${runId}_STAR_tmpSolo.out/${mode}/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)"
@@ -437,7 +437,7 @@ process get_STAR_mapping {
     """
 }
 
-STAR_MAPPING.groupTuple().view()
+STAR_GROU=STAR_MAPPING.groupTuple().view()
 
 // index kb tools 
 
@@ -541,6 +541,7 @@ process write_table {
    
     input:
     set val(key), mr1, mr2, mr3, mr4 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING)
+    set val(key), mr5, mr6 STAR_MAPPING.groupTuple()
 
     output:
     file("${key}.txt") into RESULTS_FOR_COUNTING
@@ -551,7 +552,7 @@ process write_table {
         Alevin\t${mr1}\t${mr2}\tNA\n
         Alevin-fry\tNA\tNA\tNA\n
         kb-tools\t${mr3}\tNA\t${mr4}\n
-        STARSolo\tNA\tNA\tNA\n" > ${key}.txt
+        STARSolo\t${mr5}\tNA\t${mr3}\n" > ${key}.txt
          
     """
 
