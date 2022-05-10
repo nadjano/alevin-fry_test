@@ -542,7 +542,7 @@ process write_table {
    
     input:
     set val(key), mr1, mr2, mr3, mr4 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING)
-    val(a) from STAR_GROUP
+    set val(a), val(b), val(c) from STAR_GROUP
     output:
     file("${key}.txt") into RESULTS_FOR_COUNTING
     
@@ -552,7 +552,7 @@ process write_table {
         Alevin\t${mr1}\t${mr2}\tNA\n
         Alevin-fry\tNA\tNA\tNA\n
         kb-tools\t${mr3}\tNA\t${mr4}\n
-        STARSolo\t${a}\tNA\t${mr4}\n" > ${key}.txt
+        STARSolo\t${b}\tNA\t${c}\n" > ${key}.txt
          
     """
 
