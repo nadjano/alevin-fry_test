@@ -538,15 +538,16 @@ process kb_count_splici {
 
 
 process write_table {
-    publishDir("${key}.txt")
-
+    publishDir "$resultsRoot/${key}.txt", mode: 'copy', overwrite: true
+   
     input:
     set val(key), mr1, mr2, mr3, mr4 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING)
 
     output:
-    stdout ch
+    file("${key}.txt") into RESULTS_FOR_COUNTING
     
     """
+    mkdir -p 
     echo "${key}\n
         \tMPR1\tMPR2\tMPR3\n 
         Alevin\t${mr1}\t${mr2}\tNA\n
