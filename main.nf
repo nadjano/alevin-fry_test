@@ -531,13 +531,15 @@ process index_kb_preRNA{
 
     output:
     set file("kb_index_preRNA"), file("t2g_kb.txt") into KB_INDEX_PRERNA
+    file("preRNA_referenceGtf")
+    file("referenceTranscriptome")
 
     """
-    awk 'BEGIN{FS="\t"; OFS="\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf}  > ${preRNA_referenceGtf} 
+    awk 'BEGIN{FS="\t"; OFS="\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf}  > preRNA_referenceGtf
 
-    gffread -F -w ${referenceTranscriptome} -g ${referenceGenome} ${preRNA_referenceGtf} 
+    gffread -F -w referenceTranscriptome -g ${referenceGenome} preRNA_referenceGtf 
 
-    kb ref -i kb_index_cDNA -g t2g_kb.txt -f1 cDNA.fa ${referenceTranscriptome} ${preRNA_referenceGtf} 
+    kb ref -i kb_index_cDNA -g t2g_kb.txt -f1 cDNA.fa referenceTranscriptome ${preRNA_referenceGtf} 
     """
        
 }
