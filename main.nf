@@ -69,7 +69,7 @@ process download_fastqs {
     
     maxForks params.maxConcurrentDownloads
     time { 10.hour * task.attempt }
-    memory { 2.GB * task.attempt }
+    memory { 20.GB * task.attempt }
 
     errorStrategy { task.attempt<=10 & task.exitStatus != 4 ? 'retry' : 'finish' } 
     
@@ -166,7 +166,7 @@ process build_splici {
    
    conda "${baseDir}/envs/pyroe.yml"
 
-    memory { 2.GB * task.attempt }
+    memory { 20.GB * task.attempt }
     cpus 4
 
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -191,6 +191,9 @@ process build_splici {
 
 process index_alevin_splici {
 
+    memory { 20.GB * task.attempt }
+    cpus 4
+
     conda "${baseDir}/envs/alevin.yml"
 
     input:
@@ -207,6 +210,8 @@ process index_alevin_splici {
  }
 
  process index_alevin_cDNA {
+    memory { 20.GB * task.attempt }
+    cpus 4
 
     conda "${baseDir}/envs/alevin.yml"
 
@@ -223,6 +228,8 @@ process index_alevin_splici {
  }
 
 process t2g_splici{
+    memory { 20.GB * task.attempt }
+    cpus 4
     input:
         file("${outdir}/splici_fl45*.tsv") from T2G_3
       
@@ -237,6 +244,8 @@ process t2g_splici{
 }
 
 process alevin_config {
+    memory { 20.GB * task.attempt }
+    cpus 4
 
     input:
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount) from FINAL_FASTQS_FOR_CONFIG
@@ -295,6 +304,8 @@ process alevin_config {
 
 
 process alevin_splici {
+    memory { 20.GB * task.attempt }
+    cpus 4
 
     conda "${baseDir}/envs/alevin.yml"
     
@@ -329,6 +340,8 @@ process alevin_splici {
 
 
 process alevin_cDNA {
+    memory { 20.GB * task.attempt }
+    cpus 4
 
     conda "${baseDir}/envs/alevin.yml"
     
@@ -364,6 +377,8 @@ process alevin_cDNA {
 
 // build index to runSTARSolo
 process index_star {
+    memory { 20.GB * task.attempt }
+    cpus 4
 
     conda "${baseDir}/envs/star.yml"
 
@@ -382,9 +397,10 @@ process index_star {
 // run STARSolo 
 
 process run_STARSolo {
+   
     cache 'lenient'
 
-    memory { 10.GB * task.attempt }
+    memory { 20.GB * task.attempt }
     cpus 10
 
     conda "${baseDir}/envs/star.yml"
@@ -424,6 +440,7 @@ process run_STARSolo {
 methods = ['Gene', 'GeneFull']
 
 process get_STAR_mapping {
+    
 
     input:
     each mode from methods
@@ -446,6 +463,8 @@ process get_STAR_mapping {
 // index kb tools 
 
 process index_kb_cDNA {
+    memory { 20.GB * task.attempt }
+    cpus 4
 
     conda "${baseDir}/envs/kb-tools.yml"
     
@@ -464,6 +483,8 @@ process index_kb_cDNA {
 }  
 // run kb tools count for cDNA reference
 process kb_count_cDNA {
+    memory { 20.GB * task.attempt }
+    cpus 4
     conda "${baseDir}/envs/kb-tools.yml"
 
 
@@ -487,6 +508,8 @@ process kb_count_cDNA {
 
 
 process index_kb_splici {
+    memory { 20.GB * task.attempt }
+    cpus 4
 
     conda "${baseDir}/envs/kb-tools.yml"
     
@@ -505,6 +528,8 @@ process index_kb_splici {
 }  
 // run kb tools count for splici reference
 process kb_count_splici {
+    memory { 20.GB * task.attempt }
+    cpus 4
     conda "${baseDir}/envs/kb-tools.yml"
 
     input:
@@ -526,6 +551,8 @@ process kb_count_splici {
 }
 
 process index_kb_preRNA {
+    memory { 20.GB * task.attempt }
+    cpus 4
     conda "${baseDir}/envs/gff_read.yml"
 
     input:
@@ -547,6 +574,8 @@ process index_kb_preRNA {
 }
 
 process kb_count_preRNA {
+    memory { 20.GB * task.attempt }
+    cpus 4
     conda "${baseDir}/envs/kb-tools.yml"
 
     input:
