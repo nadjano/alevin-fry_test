@@ -553,7 +553,7 @@ process kb_count_preRNA {
 
 
     input:
-        set file("kb_index_preRNA"), file("t2g_kb_preRNA"), file("cDNA_preRNA.fa") from KB_INDEX_PRERNA
+        set file("kb_index_preRNA"), file("t2g_kb_preRNA.txt"), file("cDNA_preRNA.fa") from KB_INDEX_PRERNA
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS_PRERNA.join(KB_CONFIG_PRERNA)
         val protocol
     output:
@@ -561,7 +561,7 @@ process kb_count_preRNA {
 
 
     """
-    kb count -i ${kb_index_preRNA} -t 2 -g ${t2g_kb_preRNA} -x $protocol \
+    kb count -i ${kb_index_preRNA} -t 2 -g ${t2g_kb_preRNA.txt} -x $protocol \
     -c1 ${cDNA_preRNA.fa} barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_preRNA"
 
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_preRNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
