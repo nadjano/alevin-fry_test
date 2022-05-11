@@ -248,7 +248,7 @@ process alevin_config {
         set val(runId), stdout into STAR_CONFIG
         set val(runId), stdout into KB_CONFIG
         set val(runId), stdout into KB_CONFIG_SPLICI
-        set val(runId), stdout into KB_CONFIG_CDNA
+        set val(runId), stdout into KB_CONFIG_PRERNA
         set val(runId), stdout into ALEVIN_FRY_CONFIG
     
     script:
