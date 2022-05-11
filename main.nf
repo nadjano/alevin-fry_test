@@ -583,33 +583,33 @@ process kb_count_preRNA {
 
 // MAPPING_GROUP.view()
 // Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
-STAR_MAPPING.groupTuple(by:1).view()
+STAR_GROUP = STAR_MAPPING.groupTuple(by:1)
 
 
 // STAR_GROUP = STAR_MAPPING.groupTuple()
 // STAR_GROUP.view()
 
-// process write_table {
-//     publishDir "$resultsRoot", mode: 'copy', overwrite: true
+process write_table {
+    publishDir "$resultsRoot", mode: 'copy', overwrite: true
    
-//     input:
-//     set val(key), mr1, mr2, mr3, mr4, mr5 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING)
-//     set val(a), mr6, mr7 from STAR_GROUP.flatten().collate(3)
+    input:
+    set val(runId), mr1, mr2, mr3, mr4, mr5 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING)
+    set val(mode), val(runId), star_mr from STAR_GROUP.flatten().collate(3)
     
-//     output:
-//     file("*_${key}.txt") into RESULTS_FOR_COUNTING
+    output:
+    file("*_${key}.txt") into RESULTS_FOR_COUNTING
     
     
-//     """
+    """
     
-//     echo "${key}\n
-//         \t\tMPR1\tMPR2\tMPR3\n 
-//         Alevin (%)\t${mr1}\t${mr2}\tNA\n
-//         Alevin-fry (%)\tNA\tNA\tNA\n
-//         kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
-//         STARSolo (frac)\t${mr6}\tNA\t${mr7}\n" > \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' | awk '{split(\$0, array, "."); print array[1]}')_${key}.txt
+    echo "${runId}\n
+        \t\tMPR1\tMPR2\tMPR3\n 
+        Alevin (%)\t${mr1}\t${mr2}\tNA\n
+        Alevin-fry (%)\tNA\tNA\tNA\n
+        kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
+        STARSolo (frac)\t${star_mr}\tNA\t${star_mr}\n" > \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' | awk '{split(\$0, array, "."); print array[1]}')_${runId}.txt
          
-//     """
+    """
 
 
 // }
