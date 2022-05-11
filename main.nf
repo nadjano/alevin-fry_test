@@ -431,10 +431,12 @@ process get_STAR_mapping {
     
 
     output:
-    set val(mode),val(runId), env(MR) into STAR_MAPPING
+    set val(runId), env(MR_GENE) into STAR_MAPPING_GENE
+    set val(runId), env(MR_GENEFULL) into STAR_MAPPING_GENEFULL
 
     """
-    MR="\$(grep "Reads Mapped to ${mode}: Unique ${mode}" ${runId}_STAR_tmpSolo.out/${mode}/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)"
+    MR_GENE="\$(grep "Reads Mapped to Gene: Unique Gene" ${runId}_STAR_tmpSolo.out/Gene/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)"
+    MR_GENEFULL="\$(grep "Reads Mapped to GeneFull: Unique GeneFull" ${runId}_STAR_tmpSolo.out/GeneFull/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)"
    
     """
 }
@@ -594,7 +596,7 @@ process write_table {
    
     input:
     set val(runId), mr1, mr2, mr3, mr4, mr5 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING)
-    set val(mode1), val(mode2), val(runId), star_mr1, star_mr2 from STAR_GROUP
+    set val(runId), mr6, mr7 from STAR_MAPPING_GENE.join(STAR_MAPPING_GENEFULL)
     
     output:
     file("*_${runId}.txt") into RESULTS_FOR_COUNTING
@@ -607,7 +609,7 @@ process write_table {
         Alevin (%)\t${mr1}\t${mr2}\tNA\n
         Alevin-fry (%)\tNA\tNA\tNA\n
         kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
-        STARSolo (frac)\t${star_mr1}\tNA\t${star_mr2}\n" > \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' | awk '{split(\$0, array, "."); print array[1]}')_${runId}.txt
+        STARSolo (frac)\t${mr6}\tNA\t${mr7}\n" > \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' | awk '{split(\$0, array, "."); print array[1]}')_${runId}.txt
          
     """
 
