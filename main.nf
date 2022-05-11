@@ -426,7 +426,7 @@ methods = ['Gene', 'GeneFull']
 process get_STAR_mapping {
 
     input:
-    mode from methods
+    each mode from methods
     set val(runId), path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
     
 
@@ -583,7 +583,7 @@ process kb_count_preRNA {
 
 // MAPPING_GROUP.view()
 // Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
-STAR_MAPPING.view()
+STAR_MAPPING.sort().view()
 // STAR_GROUP = STAR_MAPPING.groupTuple()
 // STAR_GROUP.view()
 
