@@ -533,7 +533,7 @@ process index_kb_preRNA{
     set file("kb_index_preRNA"), file("t2g_kb.txt") into KB_INDEX_PRERNA
 
     """
-    awk 'BEGIN{FS="\t"; OFS="\t"} $3 == "transcript"{ $3="exon"; print}' ${referenceGtf}  > ${preRNA_referenceGtf} 
+    awk 'BEGIN{FS="\t"; OFS="\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf}  > ${preRNA_referenceGtf} 
 
     gffread -F -w ${referenceTranscriptome} -g ${referenceGenome} ${preRNA_referenceGtf} 
 
