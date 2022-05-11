@@ -523,7 +523,7 @@ process kb_count_splici {
 
 }
 
-process index_kb_preRNA{
+process index_kb_preRNA_2{
     conda "${baseDir}/envs/gff_read.yml"
 
     input:
