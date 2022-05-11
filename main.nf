@@ -534,8 +534,8 @@ process index_kb_preRNA {
 
     output:
     set file("kb_index_preRNA"), file("t2g_kb_preRNA.txt"), file("cDNA_preRNA.fa") into KB_INDEX_PRERNA
-    file("preRNA_referenceGtf")
-    file("referenceTranscriptome")
+    file("preRNA_referenceGtf.gtf")
+    file("referenceTranscriptome.fa")
     
 
     """
@@ -543,7 +543,7 @@ process index_kb_preRNA {
 
     gffread -F -w referenceTranscriptome.fa -g ${referenceGenome} preRNA_referenceGtf.gtf 
 
-    kb ref -i kb_index_preRNA -g ${t2g_kb_preRNA.txt} -f1 ${cDNA_preRNA.fa} referenceTranscriptome.fa preRNA_referenceGtf.gtf
+    kb ref -i kb_index_preRNA -g t2g_kb_preRNA.txt -f1 cDNA_preRNA.fa referenceTranscriptome.fa preRNA_referenceGtf.gtf
     """
        
 }
