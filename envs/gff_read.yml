@@ -1,4 +1,4 @@
-name: gffread
+name: gff_read
 dependencies:
   - bioconda::gffread 
   - conda-forge::scanpy 
