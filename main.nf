@@ -460,7 +460,7 @@ process index_kb_cDNA {
     kb ref -i kb_index_cDNA -g t2g_kb.txt -f1 cDNA.fa ${referenceGenome} ${referenceGtf} 
     """
 }  
-
+// run kb tools count for cDNA reference
 process kb_count_cDNA {
     conda "${baseDir}/envs/kb-tools.yml"
 
@@ -483,7 +483,7 @@ process kb_count_cDNA {
 
 }
 
-// ch.view { print "mapping rate is $it" }
+
 process index_kb_splici {
 
     conda "${baseDir}/envs/kb-tools.yml"
@@ -501,7 +501,7 @@ process index_kb_splici {
          ${referenceGenome} ${referenceGtf}  --workflow nucleus
     """
 }  
-
+// run kb tools count for splici reference
 process kb_count_splici {
     conda "${baseDir}/envs/kb-tools.yml"
 
@@ -540,7 +540,7 @@ process index_kb_preRNA_2{
 
     gffread -F -w referenceTranscriptome -g ${referenceGenome} preRNA_referenceGtf 
 
-    kb ref -i kb_index_cDNA -g t2g_kb.txt -f1 cDNA.fa referenceTranscriptome preRNA_referenceGtf
+    kb ref -i kb_index_preRNA -g t2g_kb.txt -f1 cDNA.fa referenceTranscriptome preRNA_referenceGtf
     """
        
 }
@@ -552,7 +552,7 @@ process kb_count_preRNA {
 
 
     input:
-        set file("kb_index_cDNA"), file("t2g_kb") from KB_INDEX_PRERNA
+        set file("kb_index_preRNA"), file("t2g_kb") from KB_INDEX_PRERNA
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS_PRERNA.join(KB_CONFIG_PRERNA)
         val protocol
     output:
@@ -560,10 +560,10 @@ process kb_count_preRNA {
 
 
     """
-    kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x $protocol \
-    -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
+    kb count -i ${kb_index_preRNA} -t 2 -g ${t2g_kb} -x $protocol \
+    -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_preRNA"
 
-    mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
+    mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_preRNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
     echo -n "\$mapping_rate"
     """
 
