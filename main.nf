@@ -598,7 +598,7 @@ process write_table {
     
     
     """
-    echo ${sdrf}|  cut -c 1-10
+    echo ${params.sdrf}|  cut -c 1-10
     echo "${key}\n
         \tMPR1\tMPR2\tMPR3\n 
         Alevin\t\t${mr1}\t${mr2}\tNA\n
