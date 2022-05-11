@@ -594,7 +594,7 @@ process write_table {
     set val(a), b, val(c) from STAR_GROUP.flatten().collate(3)
     
     output:
-    file("${key}.txt") into RESULTS_FOR_COUNTING
+    file("$(echo ${params.sdrf}|  cut -c 1-10)_${key}.txt") into RESULTS_FOR_COUNTING
     
     
     """
