@@ -605,8 +605,6 @@ process write_table {
         Alevin-fry\tNA\tNA\tNA\n
         kb-tools\t${mr3}\t${mr4}\t${mr5}\n
         STARSolo\t${b}\tNA\t${c}\n" > \$(echo ${params.sdrf}| grep "[A-Z]-[A-Z]*\-\d*")_${key}.txt
-
-        
          
     """
 
