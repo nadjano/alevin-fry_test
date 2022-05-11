@@ -534,9 +534,7 @@ process index_kb_preRNA {
 
     output:
     set file("kb_index_preRNA"), file("t2g_kb_preRNA.txt"), file("cDNA_preRNA.fa") into KB_INDEX_PRERNA
-    file("preRNA_referenceGtf.gtf")
-    file("referenceTranscriptome.fa")
-    
+   
 
     """
     awk 'BEGIN{FS="\t"; OFS="\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf}  > preRNA_referenceGtf.gtf
