@@ -591,7 +591,7 @@ process write_table {
    
     input:
     set val(key), mr1, mr2, mr3, mr4, mr5 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING)
-    set val(a), mr7, mr6 from STAR_GROUP.flatten().collate(3)
+    set val(a), mr6, mr7 from STAR_GROUP.flatten().collate(3)
     
     output:
     file("*_${key}.txt") into RESULTS_FOR_COUNTING
