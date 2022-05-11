@@ -561,8 +561,8 @@ process kb_count_preRNA {
 
 
     """
-    kb count -i ${kb_index_preRNA} -t 2 -g ${t2g_kb_preRNA.txt} -x $protocol \
-    -c1 ${cDNA_preRNA.fa} barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_preRNA"
+    kb count -i ${kb_index_preRNA} -t 2 -g t2g_kb_preRNA.txt -x $protocol \
+    -c1 cDNA_preRNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_preRNA"
 
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_preRNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
     echo -n "\$mapping_rate"
