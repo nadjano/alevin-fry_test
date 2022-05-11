@@ -431,7 +431,7 @@ process get_STAR_mapping {
     
 
     output:
-    set val(runId), env(MR) into STAR_MAPPING
+    set val(runId), val(mode), env(MR) into STAR_MAPPING
 
     """
     MR="\$(grep "Reads Mapped to ${mode}: Unique ${mode}" ${runId}_STAR_tmpSolo.out/${mode}/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)"
@@ -584,7 +584,7 @@ process kb_count_preRNA {
 // MAPPING_GROUP.view()
 // Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
 STAR_GROUP  = STAR_MAPPING.groupTuple()
-    
+STAR_GROUP.view()
 
 process write_table {
     publishDir "$resultsRoot", mode: 'copy', overwrite: true
@@ -601,7 +601,7 @@ process write_table {
     
     echo "${key}\n
         \t\tMPR1\tMPR2\tMPR3\n 
-        Alevin (%)\t\t${mr1}\t${mr2}\tNA\n
+        Alevin (%)\t${mr1}\t${mr2}\tNA\n
         Alevin-fry (%)\tNA\tNA\tNA\n
         kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
         STARSolo (frac)\t${mr6}\tNA\t${mr7}\n" > \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' | awk '{split(\$0, array, "."); print array[1]}')_${key}.txt
