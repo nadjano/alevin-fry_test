@@ -526,7 +526,6 @@ process kb_count_splici {
 process index_kb_preRNA{
     conda "${baseDir}/envs/gffread.yml"
 
-
     input:
     path(referenceGenome) from REFERENCE_GENOME
         path(referenceGtf) from REFERENCE_GTF
