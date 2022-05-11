@@ -600,11 +600,11 @@ process write_table {
     """
     
     echo "${key}\n
-        \tMPR1\tMPR2\tMPR3\n 
+        \t\tMPR1\tMPR2\tMPR3\n 
         Alevin\t\t${mr1}\t${mr2}\tNA\n
         Alevin-fry\tNA\tNA\tNA\n
         kb-tools\t${mr3}\t${mr4}\t${mr5}\n
-        STARSolo\t${b}\tNA\t${c}\n" > \$(echo ${params.sdrf} | grep [A-Z]\\W[A-Z]*\\W\\d*)_${key}.txt
+        STARSolo\t${b}\tNA\t${c}\n" > \$(echo ${params.sdrf} | grep "[A-Z]\\W[A-Z]*\\W\\d*")_${key}.txt
          
     """
 
