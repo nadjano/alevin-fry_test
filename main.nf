@@ -598,13 +598,13 @@ process write_table {
     
     
     """
-    exp=\$(echo ${sdrf}|  cut -c 1-10)
+    EXP=\$(echo ${sdrf}|  cut -c 1-10)
     echo "${key}\n
         \tMPR1\tMPR2\tMPR3\n 
         Alevin\t\t${mr1}\t${mr2}\tNA\n
         Alevin-fry\tNA\tNA\tNA\n
         kb-tools\t${mr3}\t${mr4}\t${mr5}\n
-        STARSolo\t\$${b}\tNA\t${c}\n" > $exp_${key}.txt
+        STARSolo\t\$${b}\tNA\t${c}\n" > $EXP_${key}.txt
          
     """
 
