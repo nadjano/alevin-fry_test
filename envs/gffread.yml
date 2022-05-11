@@ -1,3 +1,5 @@
 name: gffread
 dependencies:
   - bioconda::gffread 
+  - conda-forge::scanpy 
+  - bioconda::kb-python 
