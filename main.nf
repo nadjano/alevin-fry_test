@@ -607,7 +607,7 @@ process write_table {
         Alevin (%)\t${mr1}\t${mr2}\tNA\n
         Alevin-fry (%)\tNA\tNA\tNA\n
         kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
-        STARSolo (frac)\t${star_mr}\tNA\t${star_mr}\n" > \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' | awk '{split(\$0, array, "."); print array[1]}')_${runId}.txt
+        STARSolo (frac)\t${star_mr1}\tNA\t${star_mr2}\n" > \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' | awk '{split(\$0, array, "."); print array[1]}')_${runId}.txt
          
     """
 
