@@ -156,6 +156,7 @@ FINAL_FASTQS.into{
     FINAL_FASTQS_FOR_STAR
     FINAL_FASTQS_FOR_KB_TOOLS
     FINAL_FASTQS_FOR_KB_TOOLS_SPLICI
+    FINAL_FASTQS_FOR_KB_TOOLS_PRERNA
     FINAL_FASTQS_FOR_ALEVIN_FRY
 }
 
@@ -247,6 +248,7 @@ process alevin_config {
         set val(runId), stdout into STAR_CONFIG
         set val(runId), stdout into KB_CONFIG
         set val(runId), stdout into KB_CONFIG_SPLICI
+        set val(runId), stdout into KB_CONFIG_CDNA
         set val(runId), stdout into ALEVIN_FRY_CONFIG
     
     script:
@@ -520,6 +522,50 @@ process kb_count_splici {
     """
 
 }
+
+process index_kb_preRNA{
+
+    input:
+    path(referenceGenome) from REFERENCE_GENOME
+        path(referenceGtf) from REFERENCE_GTF
+
+    output:
+    set file("kb_index_preRNA"), file("t2g_kb.txt") into KB_INDEX_PRERNA
+
+    """
+    awk 'BEGIN{FS="\t"; OFS="\t"} $3 == "transcript"{ $3="exon"; print}' ${referenceGtf}  > ${preRNA_referenceGtf} 
+
+    gffread -F -w ${referenceTranscriptome} -g ${referenceGenome} ${preRNA_referenceGtf} 
+
+    kb ref -i kb_index_cDNA -g t2g_kb.txt -f1 cDNA.fa ${referenceTranscriptome} ${preRNA_referenceGtf} 
+    """
+       
+}
+
+
+
+process kb_count_cDNA {
+    conda "${baseDir}/envs/kb-tools.yml"
+
+
+    input:
+        set file("kb_index_cDNA"), file("t2g_kb") from KB_INDEX_PRERNA
+        set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS_PRERNA.join(KB_CONFIG_PRERNA)
+        val protocol
+    output:
+        set val(runId), stdout into KB_PRERNA_MAPPING
+
+
+    """
+    kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x $protocol \
+    -c1 cDNA.fa barcodes.fastq.gz cdna.fastq.gz -o "${runId}_out_kb_cDNA"
+
+    mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
+    echo -n "\$mapping_rate"
+    """
+
+}
+
 // ALEVIN_CDNA_MAPPING.view()
 // ALEVIN_SPLICI_MAPPING.view()
 // KB_CDNA_MAPPING.view()
@@ -541,7 +587,7 @@ process write_table {
     publishDir "$resultsRoot", mode: 'copy', overwrite: true
    
     input:
-    set val(key), mr1, mr2, mr3, mr4 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING)
+    set val(key), mr1, mr2, mr3, mr4, mr5 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_PRERNA_MAPPING).join(KB_CDNA_MAPPING).join(KB_SPLICI_MAPPING)
     set val(a), b, val(c) from STAR_GROUP.flatten().collate(3)
     output:
     file("${key}.txt") into RESULTS_FOR_COUNTING
@@ -549,10 +595,10 @@ process write_table {
     """
     echo "${key}\n
         \tMPR1\tMPR2\tMPR3\n 
-        Alevin\t${mr1}\t${mr2}\tNA\n
+        Alevin\t\t${mr1}\t${mr2}\tNA\n
         Alevin-fry\tNA\tNA\tNA\n
-        kb-tools\t${mr3}\tNA\t${mr4}\n
-        STARSolo\t \$${c}\tNA\t${c}\n" > ${key}.txt
+        kb-tools\t${mr3}\t${mr4}\t${mr5}\n
+        STARSolo\t\$${b}\tNA\t${c}\n" > ${key}.txt
          
     """
 
