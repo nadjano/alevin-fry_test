@@ -431,7 +431,7 @@ process get_STAR_mapping {
     
 
     output:
-    set val(mode),val(runId), env(MR) into STAR_MAPPING_${runId}
+    set val(mode),val(runId), env(MR) into STAR_MAPPING
 
     """
     MR="\$(grep "Reads Mapped to ${mode}: Unique ${mode}" ${runId}_STAR_tmpSolo.out/${mode}/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)"
@@ -583,8 +583,8 @@ process kb_count_preRNA {
 
 // MAPPING_GROUP.view()
 // Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
-GROUP = STAR_MAPPING.view()
-GROUP.view()
+STAR_MAPPING.view()
+
 // STAR_GROUP = STAR_MAPPING.groupTuple()
 // STAR_GROUP.view()
 
