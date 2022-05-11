@@ -583,9 +583,9 @@ process kb_count_preRNA {
 
 // MAPPING_GROUP.view()
 // Channel.from(ALEVIN_CDNA_MAPPING,ALEVIN_SPLICI_MAPPING,KB_SPLICI_MAPPING, KB_CDNA_MAPPING).groupTuple().set{ MAPPING}
-
-STAR_GROUP = STAR_MAPPING.groupTuple()
-STAR_GROUP.view()
+STAR_MAPPING.view()
+// STAR_GROUP = STAR_MAPPING.groupTuple()
+// STAR_GROUP.view()
 
 // process write_table {
 //     publishDir "$resultsRoot", mode: 'copy', overwrite: true
