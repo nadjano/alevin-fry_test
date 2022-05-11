@@ -544,7 +544,7 @@ process index_kb_preRNA{
 
 
 
-process kb_count_cDNA {
+process kb_count_preRNA {
     conda "${baseDir}/envs/kb-tools.yml"
 
 
