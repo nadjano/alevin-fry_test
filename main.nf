@@ -708,7 +708,8 @@ process alevin_fry {
     output:
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS
-        val(runId), stdout into KB_ALEVIN_FRY_MAPPING
+        set val(runId), stdout into KB_ALEVIN_FRY_MAPPING
+
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map --tgMap t2g_cDNA.txt --keepCBFraction 1 \
