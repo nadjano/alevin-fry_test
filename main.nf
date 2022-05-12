@@ -649,7 +649,7 @@ process alevin_fry{
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
         path "alevin_index_splici" from ALEVIN_FRY_INDEX_SPLICI
-        path("${outdir}/splici_fl45*.tsv") from T2G_3_FORFRY
+        path("${outdir}/splici_fl45*.tsv") from T2G_3_FOR_FRY
     output:
         // publishDir path "${runId}_ALEVIN"
         set val(index_dir), val(runId), file("${runId}_ALEVIN_fry") into ALEVIN_FRY_RESULTS
