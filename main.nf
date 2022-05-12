@@ -165,7 +165,7 @@ FINAL_FASTQS.into{
 // make splici transcript 
 process build_splici {
    
-   conda "${baseDir}/envs/pyroe.yml"
+    conda "${baseDir}/envs/pyroe.yml"
 
     memory { 20.GB * task.attempt }
     cpus 4
@@ -378,7 +378,7 @@ process alevin_cDNA {
 
 // build index to runSTARSolo
 process index_star {
-    memory { 20.GB * task.attempt }
+    memory { 50.GB * task.attempt }
     cpus 4
 
     conda "${baseDir}/envs/star.yml"
@@ -677,11 +677,11 @@ process alevin_fry {
         stdout into KB_ALEVIN_FRY_MAPPING
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
-        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map --tgMap t2g_cDNA.txt --dumpFeatures --keepCBFraction 1 \
-        --freqThreshold ${params.minCbFreq} --dumpMtx 
-    alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map --expected-ori fw --output-dir ${runId}_ALEVIN_fry_quant -k
+        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map --tgMap t2g_cDNA.txt --keepCBFraction 1 \
+        --freqThreshold ${params.minCbFreq} 
+    alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k
     alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 4
-    alevin-fry quant -i ${runId}_ALEVIN_fry_quant -m t2g_cDNA.txt -t 4 -r cr-like -o ${runId}_ALEVIN_fry_quant
+    alevin-fry quant -i ${runId}_ALEVIN_fry_quant -m t2g_cDNA.txt -t 4 -r cr-like -o ${runId}_ALEVIN_fry_quant --use-mtx RUST_BACKTRACE=1
     mapping_rate=\$(grep "mapping_rate" ${runId}_ALEVIN_fry_quant/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
     echo -n "\$mapping_rate" 
     
