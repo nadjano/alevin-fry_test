@@ -644,11 +644,30 @@ process write_table {
 // ch.view { print "$it" }
 
 
+ process index_alevin_for_fry {
+    memory { 20.GB * task.attempt }
+    cpus 4
+
+    conda "${baseDir}/envs/alevin-fry_2.yml"
+
+    input:
+        path reference from REFERENCE_CDNA
+        
+    output:
+        path "alevin_index_for_fry" into ALEVIN_INDEX_FOR_FRY
+
+    """
+    salmon index --transcript ${reference}   -i alevin_index_cDNA
+    """
+
+ }
+
+
 process alevin_fry{
     conda "${baseDir}/envs/alevin-fry_2.yml"
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
-        path "alevin_index_splici" from ALEVIN_FRY_INDEX_SPLICI
+        path "alevin_index_for_fry" into ALEVIN_INDEX_FOR_FRY
         path("${outdir}/splici_fl45*.tsv") from T2G_3_FOR_FRY
        
     output:
@@ -657,7 +676,7 @@ process alevin_fry{
         stdout into KB_ALEVIN_FRY_MAPPING
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
-        -i alevin_index_splici -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap ${outdir}/splici_fl45*.tsv --dumpFeatures --keepCBFraction 1 \
+        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap ${outdir}/splici_fl45*.tsv --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx 
     alevin-fry generate-permit-list --input ${runId}_ALEVIN_tmp --expected-ori fw --output-dir ${runId}_ALEVIN_fry_tmp -k
     alevin-fry collate -i {runId}_ALEVIN_fry_tmp -r ${runId}_ALEVIN_tmp -t 4
