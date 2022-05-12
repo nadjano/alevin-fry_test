@@ -657,7 +657,7 @@ process write_table {
         path "alevin_index_for_fry" into ALEVIN_INDEX_FOR_FRY
 
     """
-    salmon index --transcript ${reference}   -i alevin_index_for_fry
+    salmon index --transcript ${reference}  -i alevin_index_for_fry -k 19
     """
 
  }
@@ -678,6 +678,8 @@ process alevin_fry {
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry --tgMap ${outdir}/splici_fl45*.tsv --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx 
+    mapping_rate=\$(grep "mapping_rate" ${runId}_cdna_ALEVIN_fry/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
+    echo -n "\$mapping_rate" 
       """
 }
 
