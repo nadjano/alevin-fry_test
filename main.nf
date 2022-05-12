@@ -464,7 +464,7 @@ process get_STAR_mapping {
 // index kb tools 
 
 process index_kb_cDNA {
-    memory { 20.GB * task.attempt }
+    memory { 50.GB * task.attempt }
     cpus 4
 
     conda "${baseDir}/envs/kb-tools.yml"
@@ -509,7 +509,7 @@ process kb_count_cDNA {
 
 
 process index_kb_splici {
-    memory { 20.GB * task.attempt }
+    memory { 50.GB * task.attempt }
     cpus 4
 
     conda "${baseDir}/envs/kb-tools.yml"
@@ -552,7 +552,7 @@ process kb_count_splici {
 }
 
 process index_kb_preRNA {
-    memory { 20.GB * task.attempt }
+    memory { 50.GB * task.attempt }
     cpus 4
     conda "${baseDir}/envs/gff_read.yml"
 
