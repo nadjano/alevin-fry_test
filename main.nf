@@ -192,8 +192,11 @@ process build_splici {
 
 process index_alevin_splici {
 
-    memory { 20.GB * task.attempt }
+    memory { 40.GB * task.attempt }
     cpus 4
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
+
 
     conda "${baseDir}/envs/alevin.yml"
 
@@ -211,8 +214,11 @@ process index_alevin_splici {
  }
 
  process index_alevin_cDNA {
-    memory { 20.GB * task.attempt }
+    memory { 40.GB * task.attempt }
     cpus 4
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
+
 
     conda "${baseDir}/envs/alevin.yml"
 
@@ -307,6 +313,9 @@ process alevin_config {
 process alevin_splici {
     memory { 20.GB * task.attempt }
     cpus 4
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
+
 
     conda "${baseDir}/envs/alevin.yml"
     
@@ -343,6 +352,9 @@ process alevin_splici {
 process alevin_cDNA {
     memory { 20.GB * task.attempt }
     cpus 4
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
+
 
     conda "${baseDir}/envs/alevin.yml"
     
@@ -380,6 +392,9 @@ process alevin_cDNA {
 process index_star {
     memory { 50.GB * task.attempt }
     cpus 4
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
+
 
     conda "${baseDir}/envs/star.yml"
 
@@ -403,6 +418,9 @@ process run_STARSolo {
 
     memory { 50.GB * task.attempt }
     cpus 10
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
+
 
     conda "${baseDir}/envs/star.yml"
 
@@ -465,6 +483,8 @@ process get_STAR_mapping {
 
 process index_kb_cDNA {
     memory { 50.GB * task.attempt }
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
     cpus 4
 
     conda "${baseDir}/envs/kb-tools.yml"
@@ -485,7 +505,8 @@ process index_kb_cDNA {
 // run kb tools count for cDNA reference
 process kb_count_cDNA {
     memory { 20.GB * task.attempt }
-    cpus 4
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
     conda "${baseDir}/envs/kb-tools.yml"
 
 
@@ -511,6 +532,8 @@ process kb_count_cDNA {
 process index_kb_splici {
     memory { 50.GB * task.attempt }
     cpus 4
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
 
     conda "${baseDir}/envs/kb-tools.yml"
     
@@ -530,7 +553,8 @@ process index_kb_splici {
 // run kb tools count for splici reference
 process kb_count_splici {
     memory { 20.GB * task.attempt }
-    cpus 4
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
     conda "${baseDir}/envs/kb-tools.yml"
 
     input:
@@ -553,6 +577,8 @@ process kb_count_splici {
 
 process index_kb_preRNA {
     memory { 50.GB * task.attempt }
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
     cpus 4
     conda "${baseDir}/envs/gff_read.yml"
 
@@ -576,6 +602,8 @@ process index_kb_preRNA {
 
 process kb_count_preRNA {
     memory { 20.GB * task.attempt }
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
     cpus 4
     conda "${baseDir}/envs/kb-tools.yml"
 
@@ -647,6 +675,8 @@ process write_table {
 
  process index_alevin_for_fry {
     memory { 20.GB * task.attempt }
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
     cpus 4
 
     conda "${baseDir}/envs/alevin-fry_2.yml"
@@ -665,6 +695,9 @@ process write_table {
 
 
 process alevin_fry {
+    memory { 20.GB * task.attempt }
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
     conda "${baseDir}/envs/alevin-fry_2.yml"
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
