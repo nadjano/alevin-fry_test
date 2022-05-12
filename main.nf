@@ -595,7 +595,7 @@ process index_kb_preRNA {
 
     gffread -F -w referenceTranscriptome.fa -g ${referenceGenome} preRNA_referenceGtf.gtf 
 
-    sed -i ’s/transcript://g' referenceTranscriptome.fa
+    sed -i 's/transcript://g' referenceTranscriptome.fa
 
     kb ref -i kb_index_preRNA -g t2g_kb_preRNA.txt -f1 cDNA_preRNA.fa referenceTranscriptome.fa preRNA_referenceGtf.gtf
     """
