@@ -206,7 +206,6 @@ process index_alevin_splici {
         
     output:
         path "alevin_index_splici" into ALEVIN_INDEX_SPLICI
-        path "alevin_index_splici" into ALEVIN_FRY_INDEX_SPLICI
 
     """
     salmon index --transcript ${reference}   -i alevin_index_splici
