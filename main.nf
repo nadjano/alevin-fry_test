@@ -180,6 +180,7 @@ process build_splici {
     output:
         // publishDir "${outdir}"
         path("${outdir}/splici_fl45.fa") into splici_fasta
+        path("${outdir}/splici_fl45.fa") into SPLICI_FASTA_FOR_FRY
         path("${outdir}/splici_fl45*.tsv") into T2G_3
         path("${outdir}/splici_fl45*.tsv") into T2G_3_FOR_FRY
         
@@ -672,6 +673,28 @@ process write_table {
 
 // ch.view { print "$it" }
 
+process index_alevin_splici_fro_fry {
+
+    memory { 40.GB * task.attempt }
+    cpus 4
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
+
+
+    conda "${baseDir}/envs/alevin-fry_2.yml"
+
+    input:
+        path reference from  SPLICI_FASTA_FOR_FRY
+        
+    output:
+        path "alevin_index_splici" into ALEVIN_FRY_INDEX_SPLICI
+
+    """
+    salmon index --transcript ${reference}   -i alevin_index_splici
+    """
+
+ }
+
 
  process index_alevin_for_fry {
     memory { 20.GB * task.attempt }
@@ -701,8 +724,8 @@ process alevin_fry {
     conda "${baseDir}/envs/alevin-fry_2.yml"
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
-        path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY
-        path "t2g_cDNA.txt" from T2G_FOR_FRY
+        path "alevin_index_for_fry" from ALEVIN_FRY_INDEX_SPLICI
+        path "t2g_cDNA.txt" from T2G_3_FOR_FRY
        
     output:
         // publishDir path "${runId}_ALEVIN"
