@@ -647,30 +647,7 @@ process kb_count_preRNA {
 // STAR_GROUP = STAR_MAPPING.groupTuple()
 // STAR_GROUP.view()
 
-process write_table {
-    publishDir "$resultsRoot", mode: 'copy', overwrite: true
-   
-    input:
-    set val(runId), mr1, mr2, mr3, mr4, mr5, mr8 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(KB_ALEVIN_FRY_MAPPING)
-    set val(runId), mr6, mr7 from STAR_MAPPING_GENE.join(STAR_MAPPING_GENEFULL)
-    
-    output:
-    file("*_${runId}.txt") into RESULTS_FOR_COUNTING
-    
-    
-    """
-    
-    echo "${runId}\n
-        \t\tMPR1\tMPR2\tMPR3\n 
-        Alevin (%)\t${mr1}\t${mr2}\tNA\n
-        Alevin-fry (%)\tNA\tNA\t${mr8}\n
-        kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
-        STARSolo (frac)\t${mr6}\tNA\t${mr7}\n" > \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' | awk '{split(\$0, array, "."); print array[1]}')_${runId}.txt
-         
-    """
 
-
-}
 
 // ch.view { print "$it" }
 
@@ -745,6 +722,30 @@ process alevin_fry {
     """
 }
 
+process write_table {
+    publishDir "$resultsRoot", mode: 'copy', overwrite: true
+   
+    input:
+    set val(runId), mr1, mr2, mr3, mr4, mr5, mr8 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(KB_ALEVIN_FRY_MAPPING)
+    set val(runId), mr6, mr7 from STAR_MAPPING_GENE.join(STAR_MAPPING_GENEFULL)
+    
+    output:
+    file("*_${runId}.txt") into RESULTS_FOR_COUNTING
+    
+    
+    """
+    
+    echo "${runId}\n
+        \t\tMPR1\tMPR2\tMPR3\n 
+        Alevin (%)\t${mr1}\t${mr2}\tNA\n
+        Alevin-fry (%)\tNA\tNA\t${mr8}\n
+        kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
+        STARSolo (frac)\t${mr6}\tNA\t${mr7}\n" > \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' | awk '{split(\$0, array, "."); print array[1]}')_${runId}.txt
+         
+    """
+
+
+}
 // alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry --expected-ori fw --output-dir ${runId}_ALEVIN_fry_2 -k
 //     alevin-fry collate -i {runId}_ALEVIN_fry_tmp -r ${runId}_ALEVIN_tmp -t 4
 //     alevin-fry quant -i {runId}_ALEVIN_fry_2 -m ${outdir}/splici_fl45*.tsv -t 4 -r cr-like -o ${runId}_ALEVIN_fry_3
