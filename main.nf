@@ -728,7 +728,7 @@ process alevin_fry {
        
     output:
         // publishDir path "${runId}_ALEVIN"
-        val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS
+        set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS
         stdout into KB_ALEVIN_FRY_MAPPING
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
