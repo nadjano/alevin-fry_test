@@ -1,0 +1,11 @@
+SAMN16069893
+
+                        MPR1    MPR2    MPR3
+
+        Alevin (%)      32.0    43.7    NA
+
+        Alevin-fry (%)  NA      NA      NA
+
+        kb-tools (%)    65.1    0.0     73.1
+
+        STARSolo (frac) 0.45    NA      0.75
