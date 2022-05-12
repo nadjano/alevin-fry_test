@@ -649,7 +649,7 @@ process write_table {
     publishDir "$resultsRoot", mode: 'copy', overwrite: true
    
     input:
-    set val(runId), mr1, mr2, mr3, mr4, mr5 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING)
+    set val(runId), mr1, mr2, mr3, mr4, mr5, mr8 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(KB_ALEVIN_FRY_MAPPING)
     set val(runId), mr6, mr7 from STAR_MAPPING_GENE.join(STAR_MAPPING_GENEFULL)
     
     output:
@@ -661,7 +661,7 @@ process write_table {
     echo "${runId}\n
         \t\tMPR1\tMPR2\tMPR3\n 
         Alevin (%)\t${mr1}\t${mr2}\tNA\n
-        Alevin-fry (%)\tNA\tNA\tNA\n
+        Alevin-fry (%)\tNA\tNA\t${mr8}\n
         kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
         STARSolo (frac)\t${mr6}\tNA\t${mr7}\n" > \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' | awk '{split(\$0, array, "."); print array[1]}')_${runId}.txt
          
@@ -729,7 +729,7 @@ process alevin_fry {
     output:
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS
-        stdout into KB_ALEVIN_FRY_MAPPING
+        val(runId), stdout into KB_ALEVIN_FRY_MAPPING
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map --tgMap t2g_cDNA.txt --keepCBFraction 1 \
