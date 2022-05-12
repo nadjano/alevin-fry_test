@@ -657,13 +657,13 @@ process write_table {
         path "alevin_index_for_fry" into ALEVIN_INDEX_FOR_FRY
 
     """
-    salmon index --transcript ${reference}   -i alevin_index_cDNA
+    salmon index --transcript ${reference}   -i alevin_index_for_fry
     """
 
  }
 
 
-process alevin_fry{
+process alevin_fry {
     conda "${baseDir}/envs/alevin-fry_2.yml"
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
