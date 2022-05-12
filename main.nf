@@ -676,16 +676,16 @@ process alevin_fry {
         stdout into KB_ALEVIN_FRY_MAPPING
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
-        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap ${outdir}/splici_fl45*.tsv --dumpFeatures --keepCBFraction 1 \
+        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry --tgMap ${outdir}/splici_fl45*.tsv --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx 
-    alevin-fry generate-permit-list --input ${runId}_ALEVIN_tmp --expected-ori fw --output-dir ${runId}_ALEVIN_fry_tmp -k
-    alevin-fry collate -i {runId}_ALEVIN_fry_tmp -r ${runId}_ALEVIN_tmp -t 4
-    alevin-fry quant -i {runId}_ALEVIN_fry_tmp -m ${outdir}/splici_fl45*.tsv -t 4 -r cr-like -o ${runId}_ALEVIN_fry_tmp
-    mv ${runId}_ALEVIN_fry_tmp ${runId}_ALEVIN_fry
-    """
+      """
 }
 
-
+// alevin-fry generate-permit-list --input ${runId}_ALEVIN_tmp --expected-ori fw --output-dir ${runId}_ALEVIN_fry_tmp -k
+//     alevin-fry collate -i {runId}_ALEVIN_fry_tmp -r ${runId}_ALEVIN_tmp -t 4
+//     alevin-fry quant -i {runId}_ALEVIN_fry_tmp -m ${outdir}/splici_fl45*.tsv -t 4 -r cr-like -o ${runId}_ALEVIN_fry_tmp
+//     mv ${runId}_ALEVIN_fry_tmp ${runId}_ALEVIN_fry
+  
 
 // grep "percent_mapped" ${runId}_ALEVIN__fry_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
     
