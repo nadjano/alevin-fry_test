@@ -650,17 +650,18 @@ process alevin_fry{
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
         path "alevin_index_splici" from ALEVIN_FRY_INDEX_SPLICI
         path("${outdir}/splici_fl45*.tsv") from T2G_3_FOR_FRY
+       
     output:
         // publishDir path "${runId}_ALEVIN"
         set val(index_dir), val(runId), file("${runId}_ALEVIN_fry") into ALEVIN_FRY_RESULTS
         stdout into KB_ALEVIN_FRY_MAPPING
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
-        -i alevin_index_splici -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap "${outdir}/splici_fl45*.tsv" --dumpFeatures --keepCBFraction 1 \
+        -i alevin_index_splici -p ${task.cpus} -o ${runId}_ALEVIN_tmp --tgMap ${outdir}/splici_fl45*.tsv --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx 
     alevin-fry generate-permit-list --input ${runId}_ALEVIN_tmp --expected-ori fw --output-dir ${runId}_ALEVIN_fry_tmp -k
     alevin-fry collate -i {runId}_ALEVIN_fry_tmp -r ${runId}_ALEVIN_tmp -t 4
-    alevin-fry quant -i {runId}_ALEVIN_fry_tmp -m "${outdir}/splici_fl45*.tsv" -t 4 -r cr-like -o ${runId}_ALEVIN_fry_tmp
+    alevin-fry quant -i {runId}_ALEVIN_fry_tmp -m ${outdir}/splici_fl45*.tsv -t 4 -r cr-like -o ${runId}_ALEVIN_fry_tmp
     mv ${runId}_ALEVIN_fry_tmp ${runId}_ALEVIN_fry
     """
 }
