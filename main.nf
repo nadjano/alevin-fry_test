@@ -696,25 +696,25 @@ process index_alevin_splici_fro_fry {
  }
 
 
- process index_alevin_for_fry {
-    memory { 20.GB * task.attempt }
-    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
-    maxRetries 10
-    cpus 4
+//  process index_alevin_for_fry {
+//     memory { 20.GB * task.attempt }
+//     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+//     maxRetries 10
+//     cpus 4
 
-    conda "${baseDir}/envs/alevin-fry_2.yml"
+//     conda "${baseDir}/envs/alevin-fry_2.yml"
 
-    input:
-        path reference from REFERENCE_CDNA
+//     input:
+//         path reference from REFERENCE_CDNA
         
-    output:
-        path "alevin_index_for_fry" into ALEVIN_INDEX_FOR_FRY
+//     output:
+//         path "alevin_index_for_fry" into ALEVIN_INDEX_FOR_FRY
 
-    """
-    salmon index --transcript ${reference}  -i alevin_index_for_fry -k 19
-    """
+//     """
+//     salmon index --transcript ${reference}  -i alevin_index_for_fry -k 19
+//     """
 
- }
+//  }
 
 
 process alevin_fry {
