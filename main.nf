@@ -401,7 +401,7 @@ process run_STARSolo {
    
     cache 'lenient'
 
-    memory { 20.GB * task.attempt }
+    memory { 50.GB * task.attempt }
     cpus 10
 
     conda "${baseDir}/envs/star.yml"
