@@ -679,7 +679,7 @@ process alevin_fry {
         -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map --tgMap ${outdir}/splici_fl45*.tsv --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx 
     alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map --expected-ori fw --output-dir ${runId}_ALEVIN_fry_quant -k
-    alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_map -t 4
+    alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 4
     alevin-fry quant -i ${runId}_ALEVIN_fry_quant -m ${outdir}/splici_fl45*.tsv -t 4 -r cr-like -o ${runId}_ALEVIN_fry_quant
     mapping_rate=\$(grep "mapping_rate" ${runId}_ALEVIN_fry_quant/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
     echo -n "\$mapping_rate" 
