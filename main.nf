@@ -54,6 +54,7 @@ process make_t2g_file {
 
     output:
         path "t2g_cDNA.txt" into T2G_CDNA
+        path "t2g_cDNA.txt" into T2G_FOR_FRY
 
 
     """
@@ -668,7 +669,7 @@ process alevin_fry {
     input:
         set val(runId), file("cdna.fastq.gz"), file("barcodes.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
         path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY
-        path("${outdir}/splici_fl45*.tsv") from T2G_3_FOR_FRY
+        path "t2g_cDNA.txt" from T2G_FOR_FRY
        
     output:
         // publishDir path "${runId}_ALEVIN"
@@ -676,11 +677,11 @@ process alevin_fry {
         stdout into KB_ALEVIN_FRY_MAPPING
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna.fastq.gz | tr '\\n' ' ') \
-        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map --tgMap ${outdir}/splici_fl45*.tsv --dumpFeatures --keepCBFraction 1 \
+        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map --tgMap t2g_cDNA.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx 
     alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map --expected-ori fw --output-dir ${runId}_ALEVIN_fry_quant -k
     alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 4
-    alevin-fry quant -i ${runId}_ALEVIN_fry_quant -m ${outdir}/splici_fl45*.tsv -t 4 -r cr-like -o ${runId}_ALEVIN_fry_quant
+    alevin-fry quant -i ${runId}_ALEVIN_fry_quant -m t2g_cDNA.txt -t 4 -r cr-like -o ${runId}_ALEVIN_fry_quant
     mapping_rate=\$(grep "mapping_rate" ${runId}_ALEVIN_fry_quant/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
     echo -n "\$mapping_rate" 
     
