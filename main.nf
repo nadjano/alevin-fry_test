@@ -160,6 +160,7 @@ FINAL_FASTQS.into{
     FINAL_FASTQS_FOR_KB_TOOLS_SPLICI
     FINAL_FASTQS_FOR_KB_TOOLS_PRERNA
     FINAL_FASTQS_FOR_ALEVIN_FRY
+    FINAL_FASTQS_FOR_ALEVIN_FRY_CDNA
 }
 
 
@@ -270,6 +271,7 @@ process alevin_config {
         set val(runId), stdout into KB_CONFIG_SPLICI
         set val(runId), stdout into KB_CONFIG_PRERNA
         set val(runId), stdout into ALEVIN_FRY_CONFIG
+        set val(runId), stdout into ALEVIN_FRY_CONFIG_CDNA
     
     script:
 
@@ -732,7 +734,7 @@ process alevin_fry_cdna {
     maxRetries 10
     conda "${baseDir}/envs/alevin-fry_2.yml"
     input:
-        set val(runId), file("cdna*.fastq.gz"), file("barcodes.*fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY.join(ALEVIN_FRY_CONFIG)
+        set val(runId), file("cdna*.fastq.gz"), file("barcodes.*fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY_CDNA.join(ALEVIN_FRY_CONFIG_CDNA)
         path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY
         path "t2g_cDNA.txt" from T2G_FOR_FRY
        
