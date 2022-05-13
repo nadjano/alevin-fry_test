@@ -676,7 +676,7 @@ process index_alevin_splici_for_fry {
     output:
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_SPLICI
-        set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_CDNA
+        set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_SPLICI
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -774,7 +774,7 @@ process write_table {
     publishDir "$resultsRoot", mode: 'copy', overwrite: true
    
     input:
-    set val(runId), mr1, mr2, mr3, mr4, mr5, mr8, mr9 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(ALEVIN_FRY_MAPPING_CDNA).join(ALEVIN_FRY_MAPPING)
+    set val(runId), mr1, mr2, mr3, mr4, mr5, mr8, mr9 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(ALEVIN_FRY_MAPPING_CDNA).join(ALEVIN_FRY_MAPPING_SPLICI)
     set val(runId), mr6, mr7 from STAR_MAPPING_GENE.join(STAR_MAPPING_GENEFULL)
     
     output:
