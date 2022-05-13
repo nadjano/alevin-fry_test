@@ -11,7 +11,7 @@ nextflow run 'https://github.c/ebi-gene-expression-group/snRNA-mapping-rate.git'
 --resultsRoot [resultsDir] \
 --referenceGenome [DNA.fa] \
 --referencecDNA [cDNA.fa.gz] --referenceGtf [File.gtf] \
--config (change sequncing type to uppercase (10xv2 --> 10XV2))
+-config (change sequencing type to uppercase (10xv2 --> 10XV2))
 ```
 
 ## Output
