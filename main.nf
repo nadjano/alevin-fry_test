@@ -598,7 +598,7 @@ process index_kb_preRNA {
     path(referenceGtf) from REFERENCE_GTF
 
     output:
-    set file("kb_index_preRNA"), file("t2g_kb_preRNA"), file("cDNA_preRNA.fa") into KB_INDEX_PRERNA
+    set file("kb_index_preRNA"), file("t2g_kb_preRNA.txt"), file("cDNA_preRNA.fa") into KB_INDEX_PRERNA
    
 
     """
