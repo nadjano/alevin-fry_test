@@ -722,7 +722,7 @@ process alevin_fry {
     output:
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS
-        set val(runId), stdout into KB_ALEVIN_FRY_MAPPING
+        set val(runId), envs(FRY_MAPPING) into KB_ALEVIN_FRY_MAPPING
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -731,8 +731,13 @@ process alevin_fry {
     alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k
     alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 16
     alevin-fry quant -i ${runId}_ALEVIN_fry_quant -m t2g_cDNA.txt -t 16 -r cr-like -o ${runId}_ALEVIN_fry_quant --use-mtx
-    mapping_rate=\$(grep "mapping_rate" ${runId}_ALEVIN_fry_map/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
-    echo -n "\$mapping_rate" 
+
+    TOTAL=\$(grep "num_processed" ${runId}_ALEVIN_fry_map/aux_info/meta_info.json |  awk '{split(\$0, array, ": "); print array[2]}'| sed 's/,//g')
+
+    MAPPED=$(grep "num_mapped" ${runId}_ALEVIN_fry_map/aux_info/meta_info.json |  awk '{split(\$0, array, ": "); print array[2]}'| sed 's/,//g')
+
+    FRY_MAPPING = \$(echo "scale=2;(($MAPPED * 100) / $TOTAL)"|bc)
+
     
     """
 }
