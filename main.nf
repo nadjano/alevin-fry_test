@@ -729,12 +729,12 @@ process alevin_fry {
 
     if (${barcodeConfig} == "--chromium")
     then
-        alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt' --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k
+        alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt' --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
     elif (${barcodeConfig} == "--chromiumV3")
     then
-        alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/3M-february-2018.txt.gz' t --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k
+        alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/3M-february-2018.txt.gz' t --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
     else
-        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k
+        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
     fi
 
     alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 16
