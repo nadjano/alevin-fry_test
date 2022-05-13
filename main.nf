@@ -660,7 +660,7 @@ process index_alevin_splici_for_fry {
 
  }
 
- process alevin_fry {
+ process alevin_fry_splici {
     cache 'lenient'
     memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -725,7 +725,7 @@ process index_alevin_splici_for_fry {
  }
 
 
-process alevin_fry {
+process alevin_fry_cdna {
     cache 'lenient'
     memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
