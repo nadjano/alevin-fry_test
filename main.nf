@@ -71,6 +71,7 @@ process download_fastqs {
     maxForks params.maxConcurrentDownloads
     time { 10.hour * task.attempt }
     memory { 20.GB * task.attempt }
+    cache 'lenient'
 
     errorStrategy { task.attempt<=10 & task.exitStatus != 4 ? 'retry' : 'finish' } 
     
@@ -164,6 +165,7 @@ FINAL_FASTQS.into{
 
 // make splici transcript 
 process build_splici {
+    cache 'lenient'
    
     conda "${baseDir}/envs/pyroe.yml"
 
@@ -192,6 +194,7 @@ process build_splici {
 
 
 process index_alevin_splici {
+    cache 'lenient'
 
     memory { 40.GB * task.attempt }
     cpus 4
@@ -214,6 +217,7 @@ process index_alevin_splici {
  }
 
  process index_alevin_cDNA {
+     cache 'lenient'
     memory { 40.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -311,6 +315,7 @@ process alevin_config {
 
 
 process alevin_splici {
+    cache 'lenient'
     memory { 20.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -350,6 +355,7 @@ process alevin_splici {
 
 
 process alevin_cDNA {
+    cache 'lenient'
     memory { 20.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -390,6 +396,7 @@ process alevin_cDNA {
 
 // build index to runSTARSolo
 process index_star {
+    cache 'lenient'
     memory { 50.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -482,6 +489,7 @@ process get_STAR_mapping {
 // index kb tools 
 
 process index_kb_cDNA {
+    cache 'lenient'
     memory { 50.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -504,6 +512,7 @@ process index_kb_cDNA {
 }  
 // run kb tools count for cDNA reference
 process kb_count_cDNA {
+    cache 'lenient'
     memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -530,6 +539,7 @@ process kb_count_cDNA {
 
 
 process index_kb_splici {
+    cache 'lenient'
     memory { 50.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -552,6 +562,7 @@ process index_kb_splici {
 }  
 // run kb tools count for splici reference
 process kb_count_splici {
+    cache 'lenient'
     memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -576,6 +587,7 @@ process kb_count_splici {
 }
 
 process index_kb_preRNA {
+    cache 'lenient'
     memory { 50.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -603,6 +615,7 @@ process index_kb_preRNA {
 }
 
 process kb_count_preRNA {
+    cache 'lenient'
     memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -652,7 +665,7 @@ process kb_count_preRNA {
 // ch.view { print "$it" }
 
 process index_alevin_splici_fro_fry {
-
+    cache 'lenient'
     memory { 40.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -696,6 +709,7 @@ process index_alevin_splici_fro_fry {
 
 
 process alevin_fry {
+    cache 'lenient'
     memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
