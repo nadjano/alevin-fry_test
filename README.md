@@ -16,9 +16,9 @@ nextflow run 'https://github.c/ebi-gene-expression-group/snRNA-mapping-rate.git'
 
 ## Output
 
-|           | MR1 | MR2 | MR3 |
-| --------- | ----| ----| --- |
-| Alevin    |     |     |     |
+|           | MR1 | MR2 | MR3 |       MR1: Mapping rate with standard single-cell options
+| --------- | ----| ----| --- |       MR2: Mapping rate with custom gtf file where 'trancript' is replaced with 'exon'
+| Alevin    |     |     |     |       MR3: Mapping rate with single-nucleus options 
 | Alevin-fry|     |     |     |
 | kb-tools  |     |     |     |
 | STARsolo  |     |     |     |
