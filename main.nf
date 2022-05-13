@@ -735,7 +735,7 @@ process alevin_fry {
 
     MAPPED=\$(grep "num_mapped" ${runId}_ALEVIN_fry_map/aux_info/meta_info.json |  awk '{split(\$0, array, ": "); print array[2]}'| sed 's/,//g')
 
-    FRY_MAPPING=\$(echo "scale=2;(($MAPPED * 100) / $TOTAL)"|bc)
+    FRY_MAPPING=\$(echo "scale=2;((\$MAPPED * 100) / \$TOTAL)"|bc)
 
     
     """
