@@ -217,7 +217,7 @@ process index_alevin_splici {
  }
 
  process index_alevin_cDNA {
-     cache 'lenient'
+    cache 'lenient'
     memory { 40.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -598,7 +598,7 @@ process index_kb_preRNA {
     path(referenceGtf) from REFERENCE_GTF
 
     output:
-    set file("kb_index_preRNA"), file("t2g_kb_preRNA.txt"), file("cDNA_preRNA.fa") into KB_INDEX_PRERNA
+    set file("kb_index_preRNA"), file("t2g_kb_preRNA"), file("cDNA_preRNA.fa") into KB_INDEX_PRERNA
    
 
     """
@@ -622,7 +622,7 @@ process kb_count_preRNA {
     conda "${baseDir}/envs/kb-tools.yml"
 
     input:
-        set file("kb_index_preRNA"), file("t2g_kb_preRNA.txt"), file("cDNA_preRNA.fa") from KB_INDEX_PRERNA
+        set file("kb_index_preRNA"), file("t2g_kb_preRNA"), file("cDNA_preRNA.fa") from KB_INDEX_PRERNA
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_KB_TOOLS_PRERNA.join(KB_CONFIG_PRERNA)
         val protocol
     output:
@@ -630,7 +630,7 @@ process kb_count_preRNA {
 
 
     """
-    kb count -i ${kb_index_preRNA} -t 2 -g ${t2g_kb_preRNA.txt} -x $protocol \
+    kb count -i ${kb_index_preRNA} -t 2 -g ${t2g_kb_preRNA} -x $protocol \
     -c1 cDNA_preRNA.fa \$(ls barcodes*.fastq.gz | tr '\\n' ' ')  \$(ls cdna*.fastq.gz | tr '\\n' ' ') -o "${runId}_out_kb_preRNA"
 
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_preRNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
@@ -725,9 +725,18 @@ process alevin_fry {
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
-        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map --tgMap t2g_cDNA.txt --keepCBFraction 1 \
-        --freqThreshold ${params.minCbFreq} 
-    alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k
+        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map t2g_cDNA.txt 
+
+    if (${barcodeConfig} == "--chromium")
+    then
+        alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt' --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k
+    elif (${barcodeConfig} == "--chromiumV3")
+    then
+        alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/3M-february-2018.txt.gz' t --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k
+    else
+        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k
+    fi
+
     alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 16
     alevin-fry quant -i ${runId}_ALEVIN_fry_quant -m t2g_cDNA.txt -t 16 -r cr-like -o ${runId}_ALEVIN_fry_quant --use-mtx
 
