@@ -463,24 +463,23 @@ process run_STARSolo {
         """
 }
 
-methods = ['Gene', 'GeneFull']
 
 process get_STAR_mapping {
     
 
     input:
-    each mode from methods
     set val(runId), path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
     
 
     output:
-    set val(runId), env(MR_GENE) into STAR_MAPPING_GENE
-    set val(runId), env(MR_GENEFULL) into STAR_MAPPING_GENEFULL
+    set val(runId), env(GENE_PERCENT) into STAR_MAPPING_GENE
+    set val(runId), env(GENEFULL_PERCENT) into STAR_MAPPING_GENEFULL
 
     """
-    MR_GENE="\$(grep "Reads Mapped to Gene: Unique Gene" ${runId}_STAR_tmpSolo.out/Gene/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)"
-    MR_GENEFULL="\$(grep "Reads Mapped to GeneFull: Unique GeneFull" ${runId}_STAR_tmpSolo.out/GeneFull/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)"
-   
+    GENE=\$(grep "Reads Mapped to Gene: Unique Gene" ${runId}_STAR_tmpSolo.out/Gene/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)
+    GENE_PERCENT=\$(echo "scale=2;((\$GENE * 100))"|bc)
+    GENEFULL=\$(grep "Reads Mapped to GeneFull: Unique GeneFull" ${runId}_STAR_tmpSolo.out/GeneFull/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)
+    GENEFULL_PERCENT=\$(echo "scale=2;((\$GENEFULL * 100))"|bc)
     """
 }
 
@@ -734,9 +733,9 @@ process alevin_fry {
 
     TOTAL=\$(grep "num_processed" ${runId}_ALEVIN_fry_map/aux_info/meta_info.json |  awk '{split(\$0, array, ": "); print array[2]}'| sed 's/,//g')
 
-    MAPPED=$(grep "num_mapped" ${runId}_ALEVIN_fry_map/aux_info/meta_info.json |  awk '{split(\$0, array, ": "); print array[2]}'| sed 's/,//g')
+    MAPPED=\$(grep "num_mapped" ${runId}_ALEVIN_fry_map/aux_info/meta_info.json |  awk '{split(\$0, array, ": "); print array[2]}'| sed 's/,//g')
 
-    FRY_MAPPING = \$(echo "scale=2;(($MAPPED * 100) / $TOTAL)"|bc)
+    FRY_MAPPING=\$(echo "scale=2;(($MAPPED * 100) / $TOTAL)"|bc)
 
     
     """
@@ -751,7 +750,6 @@ process write_table {
     
     output:
     file("*_${runId}.txt") into RESULTS_FOR_COUNTING
-    
     
     """
     
