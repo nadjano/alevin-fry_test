@@ -23,6 +23,6 @@ nextflow run 'https://github.c/ebi-gene-expression-group/snRNA-mapping-rate.git'
 | kb-tools  |     |     |     |
 | STARsolo  |     |     |     |
 
- MR1: Mapping rate with standard single-cell options
- MR2: Mapping rate with custom gtf file where 'trancript' is replaced with 'exon'
- MR3: Mapping rate with single-nucleus options 
+ MR1: Mapping rate with standard single-cell options \n
+ MR2: Mapping rate with custom gtf file where 'trancript' is replaced with 'exon' \n
+ MR3: Mapping rate with single-nucleus options \n
