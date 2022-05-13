@@ -675,7 +675,7 @@ process index_alevin_splici_for_fry {
        
     output:
         // publishDir path "${runId}_ALEVIN"
-        set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_CDNA
+        set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_SPLICI
         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_CDNA
 
     """
