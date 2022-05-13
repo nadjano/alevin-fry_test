@@ -607,11 +607,7 @@ process index_kb_preRNA {
     """
     awk 'BEGIN{FS="\t"; OFS="\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf}  > preRNA_referenceGtf.gtf
 
-    gffread -F -w referenceTranscriptome.fa -g ${referenceGenome} preRNA_referenceGtf.gtf 
-
-    sed -i 's/transcript://g' referenceTranscriptome.fa
-
-    kb ref -i kb_index_preRNA -g t2g_kb_preRNA.txt -f1 cDNA_preRNA.fa referenceTranscriptome.fa preRNA_referenceGtf.gtf
+    kb ref -i kb_index_preRNA -g t2g_kb_preRNA.txt -f1 cDNA_preRNA.fa ${referenceGenome} preRNA_referenceGtf.gtf
     """
        
 }
