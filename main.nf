@@ -7,13 +7,10 @@ referencecDNA = params.referencecDNA
 referenceGtf = params.referenceGtf
 protocol = params.protocol
 outdir = "out_dir"
-ref_type = ['cDNA', 'splici']
-
 
 REFERENCE_CDNA = Channel.fromPath(referencecDNA,checkIfExists: true).first()
 REFERENCE_GTF = Channel.fromPath( referenceGtf,checkIfExists: true ).first()
 REFERENCE_GENOME = Channel.fromPath( referenceGenome,checkIfExists: true ).first()
-
 
 manualDownloadFolder =''
 if ( params.containsKey('manualDownloadFolder')){
@@ -164,7 +161,8 @@ FINAL_FASTQS.into{
 }
 
 
-// make splici transcript 
+// make splici transcript (spliced transcript + introns) 
+// see https://github.com/COMBINE-lab/alevin-fry
 process build_splici {
     cache 'lenient'
    
@@ -182,18 +180,17 @@ process build_splici {
 
     output:
         // publishDir "${outdir}"
-        path("${outdir}/splici_fl45.fa") into splici_fasta
+        path("${outdir}/splici_fl45.fa") into SPLICI_FASTA
         path("${outdir}/splici_fl45.fa") into SPLICI_FASTA_FOR_FRY
         path("${outdir}/splici_fl45*.tsv") into T2G_3
         path("${outdir}/splici_fl45*.tsv") into T2G_3_FOR_FRY
         
     """
     pyroe make-splici ${referenceGenome} ${referenceGtf} 50 ${outdir}
-
     """
 }
 
-
+// build index for alevin with splici transcript
 process index_alevin_splici {
     cache 'lenient'
 
@@ -206,7 +203,7 @@ process index_alevin_splici {
     conda "${baseDir}/envs/alevin.yml"
 
     input:
-        path reference from splici_fasta
+        path reference from SPLICI_FASTA
         
     output:
         path "alevin_index_splici" into ALEVIN_INDEX_SPLICI
@@ -217,6 +214,7 @@ process index_alevin_splici {
 
  }
 
+// build index for alevin with cdDNA 
  process index_alevin_cDNA {
     cache 'lenient'
     memory { 40.GB * task.attempt }
@@ -239,6 +237,7 @@ process index_alevin_splici {
 
  }
 
+// extract first two collumns from t2g file produced by pyroe
 process t2g_splici{
     memory { 20.GB * task.attempt }
     cpus 4
@@ -250,10 +249,11 @@ process t2g_splici{
         path "t2g_splici.txt" into T2G_SPLICI
 
     """
-    cat ${outdir}/splici_fl45*.tsv | awk  '{print\$1"\t"\$1}'  > t2g_splici.txt
+    cat ${outdir}/splici_fl45*.tsv | awk  '{print\$1"\t"\$2}'  > t2g_splici.txt
     """
 
 }
+// Derive Alevin barcodeconfig
 
 process alevin_config {
     memory { 20.GB * task.attempt }
@@ -263,15 +263,7 @@ process alevin_config {
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount) from FINAL_FASTQS_FOR_CONFIG
 
     output:
-        set val(runId), stdout into ALEVIN_CONFIG
-        set val(runId), stdout into ALEVIN_CONFIG_SPLICI
-        set val(runId), stdout into ALEVIN_CONFIG_CDNA
-        set val(runId), stdout into STAR_CONFIG
-        set val(runId), stdout into KB_CONFIG
-        set val(runId), stdout into KB_CONFIG_SPLICI
-        set val(runId), stdout into KB_CONFIG_PRERNA
-        set val(runId), stdout into ALEVIN_FRY_CONFIG
-        set val(runId), stdout into ALEVIN_FRY_CONFIG_CDNA
+        set val(runId), stdout into CONFIG
     
     script:
 
@@ -315,7 +307,20 @@ process alevin_config {
         """
 }
 
+CONFIG
+    .into{
+        ALEVIN_CONFIG
+        ALEVIN_CONFIG_SPLICI
+        ALEVIN_CONFIG_CDNA
+        STAR_CONFIG
+        KB_CONFIG
+        KB_CONFIG_SPLICI
+        KB_CONFIG_PRERNA
+        ALEVIN_FRY_CONFIG
+        ALEVIN_FRY_CONFIG_CDNA
+    }
 
+// run Alevin for splici 
 process alevin_splici {
     cache 'lenient'
     memory { 20.GB * task.attempt }
@@ -348,14 +353,15 @@ process alevin_splici {
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_splici -p ${task.cpus} -o ${runId}_splici_ALEVIN_tmp --tgMap t2g_splici.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx > /dev/null
-    mapping_rate=\$(grep "mapping_rate" ${runId}_splici_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
+    mapping_rate=\$(grep "mapping_rate" ${runId}_splici_ALEVIN_tmp/aux_info/alevin_meta_info.json | \
+    sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
     
     echo -n "\$mapping_rate"
     mv ${runId}_splici_ALEVIN_tmp ${runId}_splici_ALEVIN
     """
 }
 
-
+// run alevin for cDNA
 process alevin_cDNA {
     cache 'lenient'
     memory { 20.GB * task.attempt }
@@ -389,7 +395,8 @@ process alevin_cDNA {
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_cDNA -p ${task.cpus} -o ${runId}_cdna_ALEVIN_tmp --tgMap t2g_cDNA.txt --dumpFeatures --keepCBFraction 1 \
         --freqThreshold ${params.minCbFreq} --dumpMtx > /dev/null
-    mapping_rate=\$(grep "mapping_rate" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
+    mapping_rate=\$(grep "mapping_rate" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json |\
+     sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
     echo -n "\$mapping_rate" 
     mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
     """
@@ -446,52 +453,52 @@ process run_STARSolo {
         """
         STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ' ') \$(ls barcodes*.fastq.gz | tr '\\n' ' ') --soloType Droplet --soloCBwhitelist '${baseDir}/whitelist/3M-february-2018.txt.gz' --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
-        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | awk '{split(\$0, array, "|"); print array[2]}')
+        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out |\
+         awk '{split(\$0, array, "|"); print array[2]}')
         echo  "\${mapping_rate}"
         """
     else if( barcodeConfig == '10XV2' )
         """
         STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ' ') \$(ls barcodes*.fastq.gz | tr '\\n' ' ') --soloType Droplet --soloCBwhitelist '${baseDir}/whitelist/737K-august-2016.txt' --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
-        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | awk '{split(\$0, array, "|"); print array[2]}')
+        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out |\
+         awk '{split(\$0, array, "|"); print array[2]}')
         echo  "\${mapping_rate}"
         """
     else
         """
         STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ' ') \$(ls barcodes*.fastq.gz | tr '\\n' ' ') --soloType Droplet --readFilesCommand zcat --soloCBwhitelist None --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --soloBarcodeReadLength 0
 
-        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | awk '{split(\$0, array, "|"); print array[2]}')
+        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | \
+        awk '{split(\$0, array, "|"); print array[2]}')
         echo  "\${mapping_rate}"
         """
 }
 
-
+// extract mapping rates from star and turn them into percentages
 process get_STAR_mapping {
     
-
     input:
     set val(runId), path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
     
-
     output:
     set val(runId), env(GENE_PERCENT) into STAR_MAPPING_GENE
     set val(runId), env(GENEFULL_PERCENT) into STAR_MAPPING_GENEFULL
 
     """
-    GENE=\$(grep "Reads Mapped to Gene: Unique Gene" ${runId}_STAR_tmpSolo.out/Gene/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)
+    GENE=\$(grep "Reads Mapped to Gene: Unique Gene" ${runId}_STAR_tmpSolo.out/Gene/Summary.csv | \
+    awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)
+
     GENE_PERCENT=\$(echo "scale=2;((\$GENE * 100))"|bc)
-    GENEFULL=\$(grep "Reads Mapped to GeneFull: Unique GeneFull" ${runId}_STAR_tmpSolo.out/GeneFull/Summary.csv | awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)
+
+    GENEFULL=\$(grep "Reads Mapped to GeneFull: Unique GeneFull" ${runId}_STAR_tmpSolo.out/GeneFull/Summary.csv |\
+     awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)
+
     GENEFULL_PERCENT=\$(echo "scale=2;((\$GENEFULL * 100))"|bc)
     """
 }
 
-
-
-
-
-
-// index kb tools 
-
+// build cDNA index for kb-tools 
 process index_kb_cDNA {
     cache 'lenient'
     memory { 50.GB * task.attempt }
@@ -533,15 +540,17 @@ process kb_count_cDNA {
 
     """
     kb count -i ${kb_index_cDNA} -t 2 -g ${t2g_kb} -x $protocol \
-    -c1 cDNA_cDNA.fa \$(ls barcodes*.fastq.gz | tr '\\n' ' ') \$(ls cdna*.fastq.gz | tr '\\n' ' ')  -o "${runId}_out_kb_cDNA"
+    -c1 cDNA_cDNA.fa \$(ls barcodes*.fastq.gz | tr '\\n' ' ') \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
+     -o "${runId}_out_kb_cDNA"
 
-    mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
+    mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | \
+    awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
     echo -n "\$mapping_rate"
     """
 
 }
 
-
+// build index from splici for kb-tools
 process index_kb_splici {
     cache 'lenient'
     memory { 50.GB * task.attempt }
@@ -583,13 +592,14 @@ process kb_count_splici {
     -c1 cDNA.fa \$(ls barcodes*.fastq.gz | tr '\\n' ' ') \$(ls cdna*.fastq.gz | tr '\\n' ' ')  -o "${runId}_out_kb_splici" \
     --workflow nucleus -c1 cDNA_kb.txt -c2 intron_kb.txt
 
-    mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}'| sed 's/^ *//g' | cut -c 1-4)
+    mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_splici/run_info.json |sed 's/,//g' | \
+    awk '{split(\$0, array, ":"); print array[2]}'| sed 's/^ *//g' | cut -c 1-4)
 
     echo -n  "\$mapping_rate"
     """
 
 }
-
+// index preRNA (from adapted gtf file) for kb_tools
 process index_kb_preRNA {
     cache 'lenient'
     memory { 50.GB * task.attempt }
@@ -605,15 +615,13 @@ process index_kb_preRNA {
     output:
     set file("kb_index_preRNA"), file("t2g_kb_preRNA.txt"), file("cDNA_preRNA.fa") into KB_INDEX_PRERNA
    
-
     """
     awk 'BEGIN{FS="\t"; OFS="\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf}  > preRNA_referenceGtf.gtf
 
     kb ref -i kb_index_preRNA -g t2g_kb_preRNA.txt -f1 cDNA_preRNA.fa ${referenceGenome} preRNA_referenceGtf.gtf
-    """
-       
+    """     
 }
-
+// run kb count for preRNA 
 process kb_count_preRNA {
     cache 'lenient'
     memory { 20.GB * task.attempt }
@@ -632,14 +640,15 @@ process kb_count_preRNA {
 
     """
     kb count -i ${kb_index_preRNA} -t 2 -g ${t2g_kb_preRNA} -x $protocol \
-    -c1 cDNA_preRNA.fa \$(ls barcodes*.fastq.gz | tr '\\n' ' ')  \$(ls cdna*.fastq.gz | tr '\\n' ' ') -o "${runId}_out_kb_preRNA"
+    -c1 cDNA_preRNA.fa \$(ls barcodes*.fastq.gz | tr '\\n' ' ')  \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
+    -o "${runId}_out_kb_preRNA"
 
-    mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_preRNA/run_info.json |sed 's/,//g' | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
+    mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_preRNA/run_info.json |sed 's/,//g'| awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
     echo -n "\$mapping_rate"
     """
 
 }
-
+// build salmon index for alevin-fry with splici
 process index_alevin_splici_for_fry {
     cache 'lenient'
     memory { 40.GB * task.attempt }
@@ -651,7 +660,7 @@ process index_alevin_splici_for_fry {
     conda "${baseDir}/envs/alevin-fry_2.yml"
 
     input:
-        path reference from  SPLICI_FASTA_FOR_FRY
+        path reference from SPLICI_FASTA_FOR_FRY
         
     output:
         path "alevin_index_splici" into ALEVIN_FRY_INDEX_SPLICI
@@ -661,7 +670,7 @@ process index_alevin_splici_for_fry {
     """
 
  }
-
+// run alevin-fry for quantification with splici index
  process alevin_fry_splici {
     cache 'lenient'
     memory { 20.GB * task.attempt }
@@ -705,7 +714,7 @@ process index_alevin_splici_for_fry {
     """
 }
 
-
+// build salmon index for alevin-fry
  process index_alevin_cdna_for_fry {
     memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -726,7 +735,7 @@ process index_alevin_splici_for_fry {
 
  }
 
-
+// run alevin-fry for cdna
 process alevin_fry_cdna {
     cache 'lenient'
     memory { 20.GB * task.attempt }
@@ -769,7 +778,7 @@ process alevin_fry_cdna {
     
     """
 }
-
+// make a table for the mapping rates for different tools
 process write_table {
     publishDir "$resultsRoot", mode: 'copy', overwrite: true
    
@@ -787,31 +796,9 @@ process write_table {
         Alevin (%)\t${mr1}\t${mr2}\tNA\n
         Alevin-fry (%)\t${mr8}\tNA\t${mr9}\n
         kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
-        STARSolo (%)\t${mr6}\tNA\t${mr7}\n" > \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' | awk '{split(\$0, array, "."); print array[1]}')_${runId}.txt
+        STARSolo (%)\t${mr6}\tNA\t${mr7}\n" > \
+        \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' |\
+         awk '{split(\$0, array, "."); print array[1]}')_${runId}.txt
          
     """
-
-
 }
-// alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry --expected-ori fw --output-dir ${runId}_ALEVIN_fry_2 -k
-//     alevin-fry collate -i {runId}_ALEVIN_fry_tmp -r ${runId}_ALEVIN_tmp -t 4
-//     alevin-fry quant -i {runId}_ALEVIN_fry_2 -m ${outdir}/splici_fl45*.tsv -t 4 -r cr-like -o ${runId}_ALEVIN_fry_3
-//     
-  
-
-// grep "percent_mapped" ${runId}_ALEVIN__fry_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1   
-    
-
-
-// process
-// COUNT CDNA KB
-//     kb count -i index_kb -t 2 -g t2g_kb.txt -x 10XV2 -c1 cDNA.fa /homes/nnolte/E-ENAD_53/work_cDNA/b5/152bed24016381e4ed8555bb64dba1/barcodes.fastq.gz /homes/nnolte/E-ENAD_53/work_cDNA/b5/152bed24016381e4ed8555bb64dba1/cdna.fastq.gz
-
-//    kb ref --workflow nucleus -i index_splic_kb -g t2g_kb.txt -f1 cDNA.fa.gz \
-//    -f2 introns.fa.gz -c1 cDNA_ttc.txt -c2 intron_ttc.txt Solanum_lycopersicum.SL3.0.dna.toplevel.fa.gz \
-//    Solanum_lycopersicum.SL3.0.53.gtf.gz
- 
-// }
-
-
-// kb ref --workflow nucleus -i index_splic_kb -g t2g_kb.txt -f1 cDNA.fa.gz -f2 introns.fa.gz -c1 cDNA_ttc.txt -c2 intron_ttc.txt Solanum_lycopersicum.SL3.0.dna.toplevel.fa.gz Solanum_lycopersicum.SL3.0.53.gtf.gz
