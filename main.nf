@@ -736,54 +736,54 @@ process index_alevin_splici_for_fry {
  }
 
 // run alevin-fry for cdna
-process alevin_fry_cdna {
-    cache 'lenient'
-    memory { 20.GB * task.attempt }
-    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
-    maxRetries 10
-    conda "${baseDir}/envs/alevin-fry_2.yml"
-    input:
-        set val(runId), file("cdna*.fastq.gz"), file("barcodes.*fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY_CDNA.join(ALEVIN_FRY_CONFIG_CDNA)
-        path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY
-        path "t2g_cDNA.txt" from T2G_FOR_FRY
+// process alevin_fry_cdna {
+//     cache 'lenient'
+//     memory { 20.GB * task.attempt }
+//     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+//     maxRetries 10
+//     conda "${baseDir}/envs/alevin-fry_2.yml"
+//     input:
+//         set val(runId), file("cdna*.fastq.gz"), file("barcodes.*fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY_CDNA.join(ALEVIN_FRY_CONFIG_CDNA)
+//         path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY
+//         path "t2g_cDNA.txt" from T2G_FOR_FRY
        
-    output:
-        // publishDir path "${runId}_ALEVIN"
-        set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_CDNA
-        set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_CDNA
+//     output:
+//         // publishDir path "${runId}_ALEVIN"
+//         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_CDNA
+//         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_CDNA
 
-    """
-    salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
-        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map t2g_cDNA.txt 
+//     """
+//     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
+//         -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map t2g_cDNA.txt 
 
-    if (${barcodeConfig} == "--chromium")
-    then
-        alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt' --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
-    elif (${barcodeConfig} == "--chromiumV3")
-    then
-        alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/3M-february-2018.txt.gz' t --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
-    else
-        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
-    fi
+//     if (${barcodeConfig} == "--chromium")
+//     then
+//         alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt' --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
+//     elif (${barcodeConfig} == "--chromiumV3")
+//     then
+//         alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/3M-february-2018.txt.gz' t --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
+//     else
+//         alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
+//     fi
 
-    alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 16
-    alevin-fry quant -i ${runId}_ALEVIN_fry_quant -m t2g_cDNA.txt -t 16 -r cr-like -o ${runId}_ALEVIN_fry_quant --use-mtx
+//     alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 16
+//     alevin-fry quant -i ${runId}_ALEVIN_fry_quant -m t2g_cDNA.txt -t 16 -r cr-like -o ${runId}_ALEVIN_fry_quant --use-mtx
 
-    TOTAL=\$(grep "num_processed" ${runId}_ALEVIN_fry_map/aux_info/meta_info.json |  awk '{split(\$0, array, ": "); print array[2]}'| sed 's/,//g')
+//     TOTAL=\$(grep "num_processed" ${runId}_ALEVIN_fry_map/aux_info/meta_info.json |  awk '{split(\$0, array, ": "); print array[2]}'| sed 's/,//g')
 
-    MAPPED=\$(grep "num_mapped" ${runId}_ALEVIN_fry_map/aux_info/meta_info.json |  awk '{split(\$0, array, ": "); print array[2]}'| sed 's/,//g')
+//     MAPPED=\$(grep "num_mapped" ${runId}_ALEVIN_fry_map/aux_info/meta_info.json |  awk '{split(\$0, array, ": "); print array[2]}'| sed 's/,//g')
 
-    FRY_MAPPING=\$(echo "scale=2;((\$MAPPED * 100) / \$TOTAL)"|bc)
+//     FRY_MAPPING=\$(echo "scale=2;((\$MAPPED * 100) / \$TOTAL)"|bc)
 
     
-    """
-}
+//     """
+// }
 // make a table for the mapping rates for different tools
 process write_table {
     publishDir "$resultsRoot", mode: 'copy', overwrite: true
    
     input:
-    set val(runId), mr1, mr2, mr3, mr4, mr5, mr8, mr9 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(ALEVIN_FRY_MAPPING_CDNA).join(ALEVIN_FRY_MAPPING_SPLICI)
+    set val(runId), mr1, mr2, mr3, mr4, mr5, mr8 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(ALEVIN_FRY_MAPPING_SPLICI)
     set val(runId), mr6, mr7 from STAR_MAPPING_GENE.join(STAR_MAPPING_GENEFULL)
     
     output:
@@ -794,7 +794,7 @@ process write_table {
     echo "${runId}\n
         \t\tMPR1\tMPR2\tMPR3\n 
         Alevin (%)\t${mr1}\t${mr2}\tNA\n
-        Alevin-fry (%)\t${mr8}\tNA\t${mr9}\n
+        Alevin-fry (%)\tNA\tNA\t${mr8}\n
         kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
         STARSolo (%)\t${mr6}\tNA\t${mr7}\n" > \
         \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' |\
