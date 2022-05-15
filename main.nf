@@ -323,7 +323,7 @@ CONFIG
 // run Alevin for splici 
 process alevin_splici {
     cache 'lenient'
-    memory { 20.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -364,7 +364,7 @@ process alevin_splici {
 // run alevin for cDNA
 process alevin_cDNA {
     cache 'lenient'
-    memory { 20.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -406,7 +406,7 @@ process alevin_cDNA {
 // build index to runSTARSolo
 process index_star {
     cache 'lenient'
-    memory { 50.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -432,7 +432,7 @@ process run_STARSolo {
    
     cache 'lenient'
 
-    memory { 50.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     cpus 10
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -501,7 +501,7 @@ process get_STAR_mapping {
 // build cDNA index for kb-tools 
 process index_kb_cDNA {
     cache 'lenient'
-    memory { 50.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     cpus 4
@@ -524,7 +524,7 @@ process index_kb_cDNA {
 // run kb tools count for cDNA reference
 process kb_count_cDNA {
     cache 'lenient'
-    memory { 20.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     conda "${baseDir}/envs/kb-tools.yml"
@@ -553,7 +553,7 @@ process kb_count_cDNA {
 // build index from splici for kb-tools
 process index_kb_splici {
     cache 'lenient'
-    memory { 50.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -576,7 +576,7 @@ process index_kb_splici {
 // run kb tools count for splici reference
 process kb_count_splici {
     cache 'lenient'
-    memory { 20.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     conda "${baseDir}/envs/kb-tools.yml"
@@ -602,7 +602,7 @@ process kb_count_splici {
 // index preRNA (from adapted gtf file) for kb_tools
 process index_kb_preRNA {
     cache 'lenient'
-    memory { 50.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     cpus 4
@@ -624,7 +624,7 @@ process index_kb_preRNA {
 // run kb count for preRNA 
 process kb_count_preRNA {
     cache 'lenient'
-    memory { 20.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     cpus 4
@@ -651,7 +651,7 @@ process kb_count_preRNA {
 // build salmon index for alevin-fry with splici
 process index_alevin_splici_for_fry {
     cache 'lenient'
-    memory { 40.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -673,7 +673,7 @@ process index_alevin_splici_for_fry {
 // run alevin-fry for quantification with splici index
  process alevin_fry_splici {
     cache 'lenient'
-    memory { 20.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     conda "${baseDir}/envs/alevin-fry_2.yml"
@@ -716,7 +716,7 @@ process index_alevin_splici_for_fry {
 
 // build salmon index for alevin-fry
  process index_alevin_cdna_for_fry {
-    memory { 20.GB * task.attempt }
+    memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     cpus 4
