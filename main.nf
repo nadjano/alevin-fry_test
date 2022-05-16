@@ -797,7 +797,7 @@ process index_alevin_transcript_for_fry {
         path reference from REFERENCE_CDNA
         
     output:
-        path "alevin_index_for_fry" into ALEVIN_INDEX_FOR_FRY_TRANSCRIPTOME
+        path "alevin_index_for_fry" into ALEVIN_INDEX_FOR_FRY_CDNA
 
     """
     salmon index --transcript ${reference}  -i alevin_index_for_fry -k 19
@@ -813,7 +813,7 @@ process alevin_fry_cdna {
     conda "${baseDir}/envs/alevin-fry_2.yml"
     input:
         set val(runId), file("cdna*.fastq.gz"), file("barcodes.*fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY_CDNA.join(ALEVIN_FRY_CONFIG_CDNA)
-        path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY
+        path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY_CDNA
        
     output:
         // publishDir path "${runId}_ALEVIN"
