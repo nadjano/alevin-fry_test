@@ -776,7 +776,7 @@ process index_alevin_transcript_for_fry {
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
-        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map t2g_cDNA.txt 
+        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map 
 
     if (${barcodeConfig} == "--chromium")
     then
