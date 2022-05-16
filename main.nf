@@ -158,6 +158,7 @@ FINAL_FASTQS.into{
     FINAL_FASTQS_FOR_KB_TOOLS_PRERNA
     FINAL_FASTQS_FOR_ALEVIN_FRY
     FINAL_FASTQS_FOR_ALEVIN_FRY_CDNA
+     FINAL_FASTQS_FOR_ALEVIN_FRY_TRANSCRIPTOME
 }
 
 
@@ -319,6 +320,7 @@ CONFIG
         KB_CONFIG_PRERNA
         ALEVIN_FRY_CONFIG
         ALEVIN_FRY_CONFIG_CDNA
+        ALEVIN_FRY_CONFIG_TRANSCRIPTOME
     }
 
 // run Alevin for splici 
@@ -747,7 +749,7 @@ process index_alevin_transcript_for_fry {
     maxRetries 10
     conda "${baseDir}/envs/alevin-fry_2.yml"
     input:
-        set val(runId), file("cdna*.fastq.gz"), file("barcodes.*fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY_CDNA.join(ALEVIN_FRY_CONFIG_CDNA)
+        set val(runId), file("cdna*.fastq.gz"), file("barcodes.*fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY_TRANSCRIPTOME.join(ALEVIN_FRY_CONFIG_TRANSCRIPTOME)
         path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY_TRANSCRIPTOME
        
     output:
