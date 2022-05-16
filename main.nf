@@ -52,6 +52,7 @@ process make_t2g_file {
     output:
         path "t2g_cDNA.txt" into T2G_CDNA
         path "t2g_cDNA.txt" into T2G_FOR_FRY
+        path "t2g_cDNA.txt" into T2G_FOR_FRY_TRANSCRIPTOME
 
 
     """
@@ -767,7 +768,7 @@ process index_alevin_transcript_for_fry {
     input:
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY_TRANSCRIPTOME.join(ALEVIN_FRY_CONFIG_TRANSCRIPTOME)
         path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY_TRANSCRIPTOME
-        path "t2g_transcriptome.txt" from T2G_TRANSCRIPTOME_FOR_ALEVIN_FRY
+        path "t2g_transcriptome.txt" from T2G_FOR_FRY_TRANSCRIPTOME
        
     output:
         // publishDir path "${runId}_ALEVIN"
