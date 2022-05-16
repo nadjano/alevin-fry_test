@@ -163,7 +163,7 @@ FINAL_FASTQS.into{
     FINAL_FASTQS_FOR_KB_TOOLS_PRERNA
     FINAL_FASTQS_FOR_ALEVIN_FRY
     FINAL_FASTQS_FOR_ALEVIN_FRY_CDNA
-     FINAL_FASTQS_FOR_ALEVIN_FRY_TRANSCRIPTOME
+    FINAL_FASTQS_FOR_ALEVIN_FRY_TRANSCRIPTOME
 }
 
 
@@ -246,6 +246,7 @@ process index_alevin_splici {
 
 // extract first two collumns from t2g file produced by pyroe
 process t2g_splici{
+    cache 'lenient'
     memory { 20.GB * task.attempt }
     cpus 4
     input:
@@ -263,6 +264,7 @@ process t2g_splici{
 // Derive Alevin barcodeconfig
 
 process alevin_config {
+    cache 'lenient'
     memory { 20.GB * task.attempt }
     cpus 4
 
@@ -485,7 +487,7 @@ process run_STARSolo {
 
 // extract mapping rates from star and turn them into percentages
 process get_STAR_mapping {
-    
+    cache 'lenient'
     input:
     set val(runId), path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
     
@@ -723,6 +725,7 @@ process index_alevin_splici_for_fry {
 }
 
 process index_alevin_transcript_for_fry {
+    cache 'lenient'
     memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -799,6 +802,7 @@ process index_alevin_transcript_for_fry {
 
 // build salmon index for alevin-fry
  process index_alevin_cdna_for_fry {
+    cache 'lenient'
     memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
