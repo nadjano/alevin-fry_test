@@ -1,7 +1,8 @@
-name: alevin-fry_2
+name: alevin-fry_gffread
 dependencies:
   - bioconda::salmon=1.8
   - bioconda::alevin-fry
+  - bioconda::gffread 
 
 
 
