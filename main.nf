@@ -6,7 +6,7 @@ referenceGenome = params.referenceGenome
 referencecDNA = params.referencecDNA
 referenceGtf = params.referenceGtf
 protocol = params.protocol
-outdir = "out_dir"
+
 
 REFERENCE_CDNA = Channel.fromPath(referencecDNA,checkIfExists: true).first()
 REFERENCE_GTF = Channel.fromPath( referenceGtf,checkIfExists: true ).first()
@@ -179,16 +179,17 @@ process build_splici {
         path referenceGtf from REFERENCE_GTF
 
     output:
-        // publishDir "${outdir}"
-        path("${outdir}/splici_fl45.fa") into SPLICI_FASTA
-        path("${outdir}/splici_fl45.fa") into SPLICI_FASTA_FOR_FRY
-        path("${outdir}/splici_fl45*.tsv") into T2G_3
-        path("${outdir}/splici_fl45*.tsv") into T2G_3_FOR_FRY
+        path("splici_out/splici_fl45.fa") into SPLICI_FASTA
+        path("splici_out/splici_fl45.fa") into SPLICI_FASTA_FOR_FRY
+        path("splici_out/splici_fl45*.tsv") into T2G_3
+        path("splici_out/splici_fl45*.tsv") into T2G_3_FOR_FRY
         
     """
-    pyroe make-splici ${referenceGenome} ${referenceGtf} 50 ${outdir}
+    pyroe make-splici ${referenceGenome} ${referenceGtf} 50 splici_out
     """
 }
+
+
 
 // build index for alevin with splici transcript
 process index_alevin_splici {
@@ -242,14 +243,14 @@ process t2g_splici{
     memory { 20.GB * task.attempt }
     cpus 4
     input:
-        file("${outdir}/splici_fl45*.tsv") from T2G_3
+        file("splici_out/splici_fl45*.tsv") from T2G_3
       
     
     output:
         path "t2g_splici.txt" into T2G_SPLICI
 
     """
-    cat ${outdir}/splici_fl45*.tsv | awk  '{print\$1"\t"\$2}'  > t2g_splici.txt
+    cat splici_out/splici_fl45*.tsv | awk  '{print\$1"\t"\$2}'  > t2g_splici.txt
     """
 
 }
@@ -784,7 +785,7 @@ process write_table {
    
     input:
     set val(runId), mr1, mr2, mr3, mr4, mr5, mr8 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(ALEVIN_FRY_MAPPING_SPLICI)
-    set val(runId), mr6, mr7 from STAR_MAPPING_GENE.join(STAR_MAPPING_GENEFULL)
+    set val(key), mr6, mr7 from STAR_MAPPING_GENE.join(STAR_MAPPING_GENEFULL)
     
     output:
     file("*_${runId}.txt") into RESULTS_FOR_COUNTING
@@ -797,8 +798,7 @@ process write_table {
         Alevin-fry (%)\tNA\tNA\t${mr8}\n
         kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
         STARSolo (%)\t${mr6}\tNA\t${mr7}\n" > \
-        \$(echo ${params.sdrf} | awk '{split(\$0, array, "/"); print array[2]}' |\
-         awk '{split(\$0, array, "."); print array[1]}')_${runId}.txt
+        ${params.name}_${runId}.txt
          
     """
 }
