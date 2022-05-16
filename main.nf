@@ -61,6 +61,12 @@ process make_t2g_file {
     """
 }
  
+T2G_CDNA.into {
+    T2G_CDNA_FOR_ALEVIN
+    T2G_CDNA_FOR_ALEVIN_FRY
+    T2G_TRANSCRIPTOME_FOR_ALEVIN_FRY
+}
+
 process download_fastqs {
     
     conda "${baseDir}/envs/atlas-fastq-provider.yml"
@@ -386,7 +392,7 @@ process alevin_cDNA {
     input:
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_CDNA.join(ALEVIN_CONFIG_CDNA)
         path "alevin_index_cDNA" from ALEVIN_INDEX_CDNA
-        path "t2g_cDNA.txt" from T2G_CDNA
+        path "t2g_cDNA.txt" from T2G_CDNA_FOR_ALEVIN
 
     output:
         // publishDir path "${runId}_ALEVIN"
@@ -751,6 +757,7 @@ process index_alevin_transcript_for_fry {
     input:
         set val(runId), file("cdna*.fastq.gz"), file("barcodes.*fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY_TRANSCRIPTOME.join(ALEVIN_FRY_CONFIG_TRANSCRIPTOME)
         path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY_TRANSCRIPTOME
+        path "t2g_cDNA.txt" from T2G_TRANSCRIPTOME_FOR_ALEVIN_FRY
        
     output:
         // publishDir path "${runId}_ALEVIN"
@@ -796,6 +803,7 @@ process index_alevin_transcript_for_fry {
     input:
         path reference from REFERENCE_CDNA
         
+        
     output:
         path "alevin_index_for_fry" into ALEVIN_INDEX_FOR_FRY_CDNA
 
@@ -814,6 +822,7 @@ process alevin_fry_cdna {
     input:
         set val(runId), file("cdna*.fastq.gz"), file("barcodes.*fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY_CDNA.join(ALEVIN_FRY_CONFIG_CDNA)
         path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY_CDNA
+        path "t2g_cDNA.txt" from T2G_CDNA_FOR_ALEVIN_FRY
        
     output:
         // publishDir path "${runId}_ALEVIN"
