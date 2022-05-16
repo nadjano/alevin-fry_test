@@ -743,7 +743,7 @@ process index_alevin_transcript_for_fry {
 
     gffread -F -w transcriptome -g ${reference} preRNA_referenceGtf.gtf
 
-    sed -i 's/"transcript://g' transcriptome
+    sed -i 's/transcript://g' transcriptome
 
     cat preRNA_referenceGtf.gtf | awk  '{print \$10"\t"\$12}' | awk  '{print \$2"\t"\$1}' > t2g_transcriptome.txt
     
@@ -873,7 +873,7 @@ process write_table {
     file("*_${runId}.txt") into RESULTS_FOR_COUNTING
     
     """
-    echo "tool\tMPR1\tMPR2\tMPR3\n \
+    echo "tool\tMPR1\tMPR2\tMPR3\n\
     Alevin (%)\t${mr1}\t${mr2}\tNA\n\
     Alevin-fry (%)\t${mr8}\t${mr9}\t${mr10}\n\
     kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n\
