@@ -742,7 +742,7 @@ process index_alevin_transcript_for_fry {
 
  }
 
- process alevin_fry_cdna {
+ process alevin_fry_transcriptome {
     cache 'lenient'
     memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
