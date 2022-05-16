@@ -64,7 +64,6 @@ process make_t2g_file {
 T2G_CDNA.into {
     T2G_CDNA_FOR_ALEVIN
     T2G_CDNA_FOR_ALEVIN_FRY
-    T2G_TRANSCRIPTOME_FOR_ALEVIN_FRY
 }
 
 process download_fastqs {
@@ -737,11 +736,16 @@ process index_alevin_transcript_for_fry {
         
     output:
         path "alevin_index_for_fry_transcriptome" into ALEVIN_INDEX_FOR_FRY_TRANSCRIPTOME
+        path "t2g_transcriptome.txt" into T2G_TRANSCRIPTOME_FOR_ALEVIN_FRY
 
     """
     awk 'BEGIN{FS="\t"; OFS="\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf}  > preRNA_referenceGtf.gtf
 
     gffread -F -w transcriptome -g ${reference} preRNA_referenceGtf.gtf
+
+    cat preRNA_referenceGtf.gtf | awk  '{print$10"\t"$12}' | awk  '{print$1"\t"$2}' > t2g_transcriptome.txt
+
+    cat t2g_transcriptome.txt | sed 's/"gene://g' | sed 's/"transcript://g' | sed -i 's/"//g' | sed -i 's/;//g' > t2g_transcriptome.txt
 
     salmon index --transcript transcriptome  -i alevin_index_for_fry_transcriptome -k 19
     """
