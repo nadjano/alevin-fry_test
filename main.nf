@@ -735,7 +735,7 @@ process index_alevin_transcript_for_fry {
     """
     awk 'BEGIN{FS="\t"; OFS="\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf}  > preRNA_referenceGtf.gtf
 
-    gffread -F -w transcriptome -g ${reference} ${referenceGtf}
+    gffread -F -w transcriptome -g ${reference} preRNA_referenceGtf.gtf
 
     salmon index --transcript transcriptome  -i alevin_index_for_fry_transcriptome -k 19
     """
