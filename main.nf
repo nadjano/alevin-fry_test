@@ -730,7 +730,7 @@ process index_alevin_transcript_for_fry {
         path referenceGtf from REFERENCE_GTF
         
     output:
-        path "alevin_index_for_fry_trancriptome" into ALEVIN_INDEX_FOR_FRY_TRANSCRIPTOME
+        path "alevin_index_for_fry_transcriptome" into ALEVIN_INDEX_FOR_FRY_TRANSCRIPTOME
 
     """
     awk 'BEGIN{FS="\t"; OFS="\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf}  > preRNA_referenceGtf.gtf
