@@ -743,9 +743,10 @@ process index_alevin_transcript_for_fry {
 
     gffread -F -w transcriptome -g ${reference} preRNA_referenceGtf.gtf
 
-    cat transciptome | awk '{if(\$1~/>/)print \$1"\t"\$4}' \\
-     > t2g_transcriptome.txt; sed -i 's/>//g' t2g_transcriptome.txt; sed -i 's/gene://g' t2g_transcriptome.txt; \\
-     sed -i 's/gene_symbol://g' t2g_transcriptome.txt
+    cat preRNA_referenceGtf.gtf | awk  '{print \$10"\t"\$12}' | awk  '{print \$1"\t"\$2}' > t2g_transcriptome.txt
+
+    cat t2g_transcriptome.txt | sed 's/"gene://g' | sed 's/"transcript://g' | sed -i 's/"//g' | sed -i 's/;//g' > t2g_transcriptome.txt
+    sed -i 's/"gene://g' t2g_transcriptome.txt; sed -i 's/"transcript://g' t2g_transcriptome.txt ; sed -i 's/"//g' t2g_transcriptome.txt ; sed -i 's/;//g' t2g_transcriptome.txt
 
     salmon index --transcript transcriptome  -i alevin_index_for_fry_transcriptome -k 19
     """
@@ -761,7 +762,7 @@ process index_alevin_transcript_for_fry {
     input:
         set val(runId), file("cdna*.fastq.gz"), file("barcodes.*fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN_FRY_TRANSCRIPTOME.join(ALEVIN_FRY_CONFIG_TRANSCRIPTOME)
         path "alevin_index_for_fry" from ALEVIN_INDEX_FOR_FRY_TRANSCRIPTOME
-        path "t2g_cDNA.txt" from T2G_TRANSCRIPTOME_FOR_ALEVIN_FRY
+        path "t2g_transcriptome.txt" from T2G_TRANSCRIPTOME_FOR_ALEVIN_FRY
        
     output:
         // publishDir path "${runId}_ALEVIN"
@@ -783,7 +784,7 @@ process index_alevin_transcript_for_fry {
     fi
 
     alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 16
-    alevin-fry quant -i ${runId}_ALEVIN_fry_quant -m t2g_cDNA.txt -t 16 -r cr-like -o ${runId}_ALEVIN_fry_quant --use-mtx
+    alevin-fry quant -i ${runId}_ALEVIN_fry_quant -m t2g_transcriptome.txt -t 16 -r cr-like -o ${runId}_ALEVIN_fry_quant --use-mtx
 
     TOTAL=\$(grep "num_processed" ${runId}_ALEVIN_fry_map/aux_info/meta_info.json |  awk '{split(\$0, array, ": "); print array[2]}'| sed 's/,//g')
 
