@@ -34,7 +34,7 @@ def bar_plot(data_list):
    # plt.savefig('bar_plot.png')
    
      
-   plot = sns.barplot(x = 'tool', y = 'percentage', hue = 'type', data=data_list, ci ="sd")
+   plot = sns.barplot(x = 'tool', y = 'percentage', hue = 'type', data=data_list)
    fig = plot.figure 
    fig.savefig('bar_plot.png')
 
