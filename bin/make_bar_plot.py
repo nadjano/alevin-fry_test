@@ -2,6 +2,9 @@
 
 import matplotlib.pyplot as plt
 
+def parse_table(results_folder):
+   
+
 
 def bar_plot():
    fig = plt.figure()
@@ -10,7 +13,7 @@ def bar_plot():
    students = [23,17,35,29,12]
    ax.bar(langs,students)
    plt.show()
-   plt.savefig('./bar_plot.png')
+   plt.savefig('snRNA-mapping-rate/bar_plot.png')
 
 
 #main 
