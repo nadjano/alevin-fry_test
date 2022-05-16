@@ -871,12 +871,11 @@ process write_table {
     file("*_${runId}.txt") into RESULTS_FOR_COUNTING
     
     """
-    "tool\tMPR1\tMPR2\tMPR3\n 
+    echo "tool\tMPR1\tMPR2\tMPR3\n
     Alevin (%)\t${mr1}\t${mr2}\tNA\n
     Alevin-fry (%)\t${mr8}\t${mr9}\t${mr10}\n
     kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
-    STARSolo (%)\t${mr6}\tNA\t${mr7}\n" > \
-    ${params.name}_${runId}.txt
+    STARSolo (%)\t${mr6}\tNA\t${mr7}\n" > ${params.name}_${runId}.txt
          
     """
 }
