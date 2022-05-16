@@ -1,9 +1,21 @@
 # packages
 
 import matplotlib.pyplot as plt
+import pandas as pd
+import glob
 
 def parse_table(results_folder):
+  
+
+   txtfiles = []
+   for file in glob.glob(str(results_folder)+"/*.txt"):
+      txtfiles.append(file)
+
+
+   for file in txtfiles: 
+      data=pd.read_csv(file,sep='\t')
    
+   print(data)
 
 
 def bar_plot():
@@ -18,5 +30,5 @@ def bar_plot():
 
 #main 
 if __name__ == "__main__":
-   bar_plot()
+   parse_table("results")
     

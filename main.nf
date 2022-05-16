@@ -745,7 +745,7 @@ process index_alevin_transcript_for_fry {
 
     cat preRNA_referenceGtf.gtf | awk  '{print \$10"\t"\$12}' | awk  '{print \$1"\t"\$2}' > t2g_transcriptome.txt
 
-    cat t2g_transcriptome.txt | sed 's/"gene://g' | sed 's/"transcript://g' | sed -i 's/"//g' | sed -i 's/;//g' > t2g_transcriptome.txt
+    
     sed -i 's/"gene://g' t2g_transcriptome.txt; sed -i 's/"transcript://g' t2g_transcriptome.txt ; sed -i 's/"//g' t2g_transcriptome.txt ; sed -i 's/;//g' t2g_transcriptome.txt
 
     salmon index --transcript transcriptome  -i alevin_index_for_fry_transcriptome -k 19
