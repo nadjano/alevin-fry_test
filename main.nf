@@ -736,7 +736,7 @@ process index_alevin_splici_for_fry {
 
  }
 
-run alevin-fry for cdna
+// run alevin-fry for cdna
 process alevin_fry_cdna {
     cache 'lenient'
     memory { 20.GB * task.attempt }
