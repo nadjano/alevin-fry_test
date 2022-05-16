@@ -784,7 +784,7 @@ process write_table {
     publishDir "$resultsRoot", mode: 'copy', overwrite: true
    
     input:
-    set val(runId), mr1, mr2, mr3, mr4, mr5, mr8 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(ALEVIN_FRY_MAPPING_SPLICI)
+    set val(runId), mr1, mr2, mr3, mr4, mr5, mr8, mr9 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(ALEVIN_FRY_MAPPING_CDNA).join(ALEVIN_FRY_MAPPING_SPLICI)
     set val(key), mr6, mr7 from STAR_MAPPING_GENE.join(STAR_MAPPING_GENEFULL)
     
     output:
@@ -795,7 +795,7 @@ process write_table {
     echo "${runId}\n
         \t\tMPR1\tMPR2\tMPR3\n 
         Alevin (%)\t${mr1}\t${mr2}\tNA\n
-        Alevin-fry (%)\tNA\tNA\t${mr8}\n
+        Alevin-fry (%)\t${mr8}\tNA\t${mr9}\n
         kb-tools (%)\t${mr3}\t${mr4}\t${mr5}\n
         STARSolo (%)\t${mr6}\tNA\t${mr7}\n" > \
         ${params.name}_${runId}.txt
