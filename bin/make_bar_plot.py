@@ -3,10 +3,17 @@
 import matplotlib.pyplot as plt
 
 
+def bar_plot():
+   fig = plt.figure()
+   ax = fig.add_axes([0,0,1,1])
+   langs = ['C', 'C++', 'Java', 'Python', 'PHP']
+   students = [23,17,35,29,12]
+   ax.bar(langs,students)
+   plt.show()
+   plt.savefig('./bar_plot.png')
 
-fig = plt.figure()
-ax = fig.add_axes([0,0,1,1])
-langs = ['C', 'C++', 'Java', 'Python', 'PHP']
-students = [23,17,35,29,12]
-ax.bar(langs,students)
-plt.show()
+
+#main 
+if __name__ == "__main__":
+   bar_plot()
+    
