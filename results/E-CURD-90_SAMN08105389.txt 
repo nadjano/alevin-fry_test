@@ -1,11 +1,5 @@
-SAMN08105389
-
-                        MPR1    MPR2    MPR3
-
-        Alevin (%)      14.5    23.5    NA
-
-        Alevin-fry (%)  NA      NA      36.61
-
-        kb-tools (%)    34.9    37.3    37.6
-
-        STARSolo (%)    29.00   NA      20.00
+tool  MPR1  MPR2  MPR3
+Alevin (%)  14.5  23.5   NA
+Alevin-fry (%) NA NA  36.61
+kb-tools (%)   34.9  37.3  37.6
+STARSolo (%)   29.00 NA 20.0
