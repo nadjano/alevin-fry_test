@@ -740,7 +740,7 @@ process index_alevin_transcript_for_fry {
         
     output:
         path "alevin_index_for_fry_transcriptome" into ALEVIN_INDEX_FOR_FRY_TRANSCRIPTOME
-        path "t2g_transcriptome.txt" into T2G_TRANSCRIPTOME_FOR_ALEVIN_FRY
+        path "t2g_transcriptome.txt" into T2G_FOR_FRY_TRANSCRIPTOME
 
     """
     awk 'BEGIN{FS="\\t"; OFS="\\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf} | sort | uniq -u > preRNA_referenceGtf.gtf
