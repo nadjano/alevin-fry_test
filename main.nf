@@ -879,7 +879,7 @@ process write_table {
     file("*_${runId}.txt") into RESULTS_FOR_COUNTING
     
     """
-    echo "tool\tMPR1\tMPR2\tMPR3\nAlevin (%)\t${mr1}\t${mr2}\tNA\nAlevin-fry (%)\t${mr8}\t${mr10}\t${mr9}\nkb-tools (%)\t${mr3}\t${mr4}\t${mr5}\nSTARSolo (%)\t${mr6}\tNA\t${mr7}\n" > ${params.name}_${runId}.txt
+    echo "tool\tMPR1\tMPR2\tMPR3\nAlevin (%)\t${mr1}\t${mr2}\tNA\nAlevin-fry (%)\t${mr8}\tNA\t${mr9}\nkb-tools (%)\t${mr3}\t${mr4}\t${mr5}\nSTARSolo (%)\t${mr6}\tNA\t${mr7}\n" > ${params.name}_${runId}.txt
          
     """
 }
