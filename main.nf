@@ -743,13 +743,13 @@ process index_alevin_transcript_for_fry {
         path "t2g_transcriptome.txt" into T2G_FOR_FRY_TRANSCRIPTOME
 
     """
-    awk 'BEGIN{FS="\\t"; OFS="\\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf} | sort | uniq -u > preRNA_referenceGtf.gtf
+    awk 'BEGIN{FS="\\t"; OFS="\\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf} > preRNA_referenceGtf.gtf
 
     gffread -w transcriptome -g ${reference} preRNA_referenceGtf.gtf
 
     sed -i 's/transcript://g' transcriptome
 
-    cat preRNA_referenceGtf.gtf | awk  '{print \$10"\\t"\$12}' | awk  '{print \$2"\\t"\$1}' | sort | uniq -u> t2g_transcriptome.txt
+    cat preRNA_referenceGtf.gtf | awk  '{print \$10"\\t"\$12}' | awk  '{print \$2"\\t"\$1}' > t2g_transcriptome.txt
     
     sed -i 's/"gene://g' t2g_transcriptome.txt; sed -i 's/"transcript://g' t2g_transcriptome.txt ; sed -i 's/"//g' t2g_transcriptome.txt ; sed -i 's/;//g' t2g_transcriptome.txt
 
