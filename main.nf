@@ -660,9 +660,7 @@ process index_kb_MR2 {
 
     output:
     set file("kb_index_preRNA"), file("t2g_kb_preRNA.txt"), file("cDNA_preRNA.fa") into KB_INDEX_PRERNA
-    env(AVG_MEM) into MEM_KB_MR2
-    env(RUN_TIME) into TIME_KB_MR2
-   
+    
     """
     awk 'BEGIN{FS="\t"; OFS="\t"} \$3 == "transcript"{ \$3="exon"; print}' ${referenceGtf}  > preRNA_referenceGtf.gtf
 
