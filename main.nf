@@ -198,7 +198,7 @@ process build_splici {
 
 
 // build index for alevin with splici transcript
-process index_alevin_splici {
+process index_alevin_MR2 {
     cache 'lenient'
 
     memory { 40.GB * task.attempt }
@@ -222,7 +222,7 @@ process index_alevin_splici {
  }
 
 // build index for alevin with cdDNA 
- process index_alevin_cDNA {
+ process index_alevin_MR1 {
     cache 'lenient'
     memory { 40.GB * task.attempt }
     cpus 4
@@ -331,7 +331,7 @@ CONFIG
     }
 
 // run Alevin for splici 
-process alevin_splici {
+process alevin_MR2 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     cpus 4
@@ -372,7 +372,7 @@ process alevin_splici {
 }
 
 // run alevin for cDNA
-process alevin_cDNA {
+process alevin_MR1 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     cpus 4
@@ -510,7 +510,7 @@ process get_STAR_mapping {
 }
 
 // build cDNA index for kb-tools 
-process index_kb_cDNA {
+process index_kb_MR1 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -533,7 +533,7 @@ process index_kb_cDNA {
     """
 }  
 // run kb tools count for cDNA reference
-process kb_count_cDNA {
+process kb_count_MR1 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -562,7 +562,7 @@ process kb_count_cDNA {
 }
 
 // build index from splici for kb-tools
-process index_kb_splici {
+process index_kb_MR3 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     cpus 4
@@ -585,7 +585,7 @@ process index_kb_splici {
     """
 }  
 // run kb tools count for splici reference
-process kb_count_splici {
+process kb_count_MR3 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -611,7 +611,7 @@ process kb_count_splici {
 
 }
 // index preRNA (from adapted gtf file) for kb_tools
-process index_kb_preRNA {
+process index_kb_MR2 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -633,7 +633,7 @@ process index_kb_preRNA {
     """     
 }
 // run kb count for preRNA 
-process kb_count_preRNA {
+process kb_count_MR2 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -660,7 +660,7 @@ process kb_count_preRNA {
 
 }
 // build salmon index for alevin-fry with splici
-process index_alevin_splici_for_fry {
+process index_alevin_fry_MR3 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     cpus 4
@@ -682,7 +682,7 @@ process index_alevin_splici_for_fry {
 
  }
 // run alevin-fry for quantification with splici index
- process alevin_fry_splici {
+ process alevin_fry_MR3 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -725,7 +725,7 @@ process index_alevin_splici_for_fry {
     """
 }
 
-process index_alevin_transcript_for_fry {
+process index_alevin_fry_MR2 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -760,7 +760,7 @@ process index_alevin_transcript_for_fry {
  }
 // cat preRNA_referenceGtf.gtf | awk  '{print \$10"\\t"\$12}' | awk  '{print \$2"\\t"\$1}' > t2g_transcriptome.txt
   
- process alevin_fry_transcriptome {
+ process alevin_fry_MR2 {
     cache 'lenient'
     memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -804,7 +804,7 @@ process index_alevin_transcript_for_fry {
 }
 
 // build salmon index for alevin-fry
- process index_alevin_cdna_for_fry {
+ process index_alevin_fry_MR1 {
     cache 'lenient'
     memory { 100.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -826,7 +826,7 @@ process index_alevin_transcript_for_fry {
  }
 
 // run alevin-fry for cdna
-process alevin_fry_cdna {
+process alevin_fry_MR1 {
     cache 'lenient'
     memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
