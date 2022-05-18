@@ -9,7 +9,7 @@ def parse_table(results_folder):
   
 
    txtfiles = []
-   for file in glob.glob(str(results_folder)+"/test*.txt"):
+   for file in glob.glob(str(results_folder)+"/*.txt"):
       txtfiles.append(file)
 
    print(txtfiles)
@@ -25,18 +25,10 @@ def parse_table(results_folder):
    return data_concat
 
 def bar_plot(data_list):
-   # fig = plt.figure()
-   # ax = fig.add_axes([0,0,1,1])
-   # langs = list(data['tool'])
-   # students = list(data['MPR1'])
-   # ax.bar(langs,students)
-   # plt.show()
-   # plt.savefig('bar_plot.png')
-   
      
-   plot = sns.barplot(x = 'tool', y = 'percentage', hue = 'type', data=data_list)
+   plot = sns.barplot(x = 'tool', y = 'percentage', hue = 'type', data=data_list, capsize=.1)
    fig = plot.figure 
-   fig.savefig('bar_plot.png')
+   fig.savefig('snRNA-mapping-rate/figures/bar_plot.png')
 
 
 #main 
