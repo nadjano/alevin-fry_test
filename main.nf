@@ -749,9 +749,9 @@ process index_alevin_transcript_for_fry {
 
     sed -i 's/transcript://g' transcriptome
 
-    cat *.gtf | grep -vE "^#" | awk '{split(\$0, array, "transcript_id"); print array[2]}' | awk '{split(\$0, array, ";"); print array[1]}' | sed 's/"//g' | sed 's/^ *//g' | sed 's/transcript://g' > t.txt
+    cat preRNA_referenceGtf.gtf | grep -vE "^#" | awk '{split(\$0, array, "transcript_id"); print array[2]}' | awk '{split(\$0, array, ";"); print array[1]}' | sed 's/"//g' | sed 's/^ *//g' | sed 's/transcript://g' > t.txt
 
-    cat *.gtf | grep -vE "^#" | awk '{split(\$0, array, "gene_id"); print array[2]}' | awk '{split(\$0, array, ";"); print array[1]}' | sed 's/"//g' | sed 's/^ *//g'| sed 's/gene://g'  > g.txt
+    cat preRNA_referenceGtf.gtf | grep -vE "^#" | awk '{split(\$0, array, "gene_id"); print array[2]}' | awk '{split(\$0, array, ";"); print array[1]}' | sed 's/"//g' | sed 's/^ *//g'| sed 's/gene://g'  > g.txt
 
     paste t.txt g.txt > t2g_transcriptome.txt
     salmon index --transcript transcriptome  -i alevin_index_for_fry_transcriptome -k 19
