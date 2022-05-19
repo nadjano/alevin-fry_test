@@ -185,10 +185,10 @@ process build_splici {
         path referenceGtf from REFERENCE_GTF
 
     output:
-        path("splici_out/splici_fl45.fa") into SPLICI_FASTA
-        path("splici_out/splici_fl45.fa") into SPLICI_FASTA_FOR_FRY
-        path("splici_out/splici_fl45*.tsv") into T2G_3
-        path("splici_out/splici_fl45*.tsv") into T2G_3_FOR_FRY
+        path("splici_out/splici_fl*.fa") into SPLICI_FASTA
+        path("splici_out/splici_fl*.fa") into SPLICI_FASTA_FOR_FRY
+        path("splici_out/splici_fl*.tsv") into T2G_3
+        path("splici_out/splici_fl*.tsv") into T2G_3_FOR_FRY
         
     """
     pyroe make-splici ${referenceGenome} ${referenceGtf} 90 splici_out
@@ -250,14 +250,14 @@ process t2g_splici{
     memory { 20.GB * task.attempt }
     cpus 4
     input:
-        file("splici_out/splici_fl45*.tsv") from T2G_3
+        file("splici_out/splici_fl*.tsv") from T2G_3
       
     
     output:
         path "t2g_splici.txt" into T2G_SPLICI
 
     """
-    cat splici_out/splici_fl45*.tsv | awk  '{print\$1"\t"\$2}'  > t2g_splici.txt
+    cat splici_out/splici_fl*.tsv | awk  '{print\$1"\t"\$2}'  > t2g_splici.txt
     """
 
 }
