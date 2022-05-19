@@ -191,7 +191,7 @@ process build_splici {
         path("splici_out/splici_fl45*.tsv") into T2G_3_FOR_FRY
         
     """
-    pyroe make-splici ${referenceGenome} ${referenceGtf} 50 splici_out
+    pyroe make-splici ${referenceGenome} ${referenceGtf} 90 splici_out
     """
 }
 
@@ -358,8 +358,8 @@ process alevin_MR2 {
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_splici_ALEVIN") into ALEVIN_RESULTS_SPLICI 
         set val(runId), stdout into ALEVIN_SPLICI_MAPPING
-        env(AVG_MEM) into MEM_ALEVIN_MR2
-        env(RUN_TIME) into TIME_ALEVIN_MR2
+        env AVG_MEM into MEM_ALEVIN_MR2
+        env RUN_TIME into TIME_ALEVIN_MR2
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -405,8 +405,8 @@ process alevin_MR1 {
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_cdna_ALEVIN") into ALEVIN_RESULTS_CDNA
         set val(runId), stdout into ALEVIN_CDNA_MAPPING
-        env(AVG_MEM) into MEM_ALEVIN_MR1
-        env(RUN_TIME) into TIME_ALEVIN_MR1      
+        env AVG_MEM into MEM_ALEVIN_MR1
+        env RUN_TIME into TIME_ALEVIN_MR1      
 
 
     """
@@ -468,8 +468,8 @@ process run_STARSolo {
 
     output:
     set val(runId), path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
-    env(AVG_MEM) into MEM_STAR
-    env(RUN_TIME) into TIME_STAR
+    env AVG_MEM into MEM_STAR
+    env RUN_TIME into TIME_STAR
 
     script:
     if( barcodeConfig == '10XV3' )
@@ -570,8 +570,8 @@ process kb_count_MR1 {
         val protocol
     output:
         set val(runId), stdout into KB_CDNA_MAPPING
-        env(AVG_MEM) into MEM_KB_MR1
-    env(RUN_TIME) into TIME_KB_MR1
+        env AVG_MEM into MEM_KB_MR1
+        env RUN_TIME into TIME_KB_MR1
 
 
     """
@@ -627,8 +627,8 @@ process kb_count_MR3 {
         val protocol
     output:
         set val(runId), stdout into KB_SPLICI_MAPPING
-        env(AVG_MEM) into MEM_KB_MR3
-        env(RUN_TIME) into TIME_KB_MR3
+        env AVG_MEM into MEM_KB_MR3
+        env RUN_TIME into TIME_KB_MR3
 
     """
     kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x $protocol \
@@ -682,8 +682,8 @@ process kb_count_MR2 {
         val protocol
     output:
         set val(runId), stdout into KB_PRERNA_MAPPING
-        env(AVG_MEM) into MEM_KB_MR2
-        env(RUN_TIME) into TIME_KB_MR2
+        env AVG_MEM into MEM_KB_MR2
+        env RUN_TIME into TIME_KB_MR2
 
 
     """
@@ -693,7 +693,7 @@ process kb_count_MR2 {
 
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_preRNA/run_info.json |sed 's/,//g'| awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
     echo -n "\$mapping_rate"
-    AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
+    AVG_MEM=$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
     RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
 
     """
@@ -737,8 +737,8 @@ process index_alevin_fry_MR3 {
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_SPLICI
         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_SPLICI
-        env(AVG_MEM) into MEM_ALEVIN_FRY_MR3
-        env(RUN_TIME) into TIME_ALEVIN_FRY_MR3
+        env AVG_MEM into MEM_ALEVIN_FRY_MR3
+        env RUN_TIME into TIME_ALEVIN_FRY_MR3
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -821,8 +821,8 @@ process index_alevin_fry_MR2 {
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_TRANSCRIPTOME
         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_TRANSCRIPTOME
-        env(AVG_MEM) into MEM_ALEVIN_FRY_MR2
-        env(RUN_TIME) into TIME_ALEVIN_FRY_MR2
+        env AVG_MEM into MEM_ALEVIN_FRY_MR2
+        env RUN_TIME into TIME_ALEVIN_FRY_MR2
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -890,8 +890,8 @@ process alevin_fry_MR1 {
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_CDNA
         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_CDNA
-        env(AVG_MEM) into MEM_ALEVIN_FRY_MR1
-        env(RUN_TIME) into TIME_ALEVIN_FRY_MR1
+        env AVG_MEM into MEM_ALEVIN_FRY_MR1
+        env RUN_TIME into TIME_ALEVIN_FRY_MR1
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
