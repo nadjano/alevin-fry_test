@@ -625,7 +625,7 @@ process kb_count_MR3 {
         val protocol
     output:
         set val(runId), stdout into KB_SPLICI_MAPPING
-        path ".command.log"  into MEM_KB_MR1
+        path ".command.log"  into MEM_KB_MR3
 
     """
     kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x $protocol \
