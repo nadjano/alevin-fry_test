@@ -358,7 +358,7 @@ process alevin_MR2 {
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_splici_ALEVIN") into ALEVIN_RESULTS_SPLICI 
         set val(runId), stdout into ALEVIN_SPLICI_MAPPING
-        path ".command.log"  into into MEM_ALEVIN_MR2
+        path ".command.log" into MEM_ALEVIN_MR2
     
 
     """
@@ -405,7 +405,7 @@ process alevin_MR1 {
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_cdna_ALEVIN") into ALEVIN_RESULTS_CDNA
         set val(runId), stdout into ALEVIN_CDNA_MAPPING
-        path ".command.log"   into  into MEM_ALEVIN_MR1
+        path ".command.log"   into MEM_ALEVIN_MR1
             
 
 
@@ -467,7 +467,7 @@ process run_STARSolo {
 
     output:
     set val(runId), path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
-    path ".command.log"   into  into MEM_STAR
+    path ".command.log"   into  MEM_STAR
     
 
     script:
@@ -679,7 +679,7 @@ process kb_count_MR2 {
         val protocol
     output:
         set val(runId), stdout into KB_PRERNA_MAPPING
-        path ".command.log"  into  into MEM_KB_MR2
+        path ".command.log"  into  MEM_KB_MR2
         
 
 
@@ -883,7 +883,7 @@ process alevin_fry_MR1 {
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_CDNA
         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_CDNA
-        path ".command.log"  into  into MEM_ALEVIN_FRY_MR1
+        path ".command.log" into MEM_ALEVIN_FRY_MR1
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
