@@ -358,8 +358,8 @@ process alevin_MR2 {
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_splici_ALEVIN") into ALEVIN_RESULTS_SPLICI 
         set val(runId), stdout into ALEVIN_SPLICI_MAPPING
-        env AVG_MEM into MEM_ALEVIN_MR2
-        env RUN_TIME into TIME_ALEVIN_MR2
+        file '.command.log' into  into MEM_ALEVIN_MR2
+    
 
     """
     salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -370,8 +370,8 @@ process alevin_MR2 {
     
     echo -n "\$mapping_rate"
 
-    AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+    
+    
   
     mv ${runId}_splici_ALEVIN_tmp ${runId}_splici_ALEVIN
     """
@@ -405,8 +405,8 @@ process alevin_MR1 {
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_cdna_ALEVIN") into ALEVIN_RESULTS_CDNA
         set val(runId), stdout into ALEVIN_CDNA_MAPPING
-        env AVG_MEM into MEM_ALEVIN_MR1
-        env RUN_TIME into TIME_ALEVIN_MR1      
+        file '.command.log' into  into MEM_ALEVIN_MR1
+            
 
 
     """
@@ -416,9 +416,8 @@ process alevin_MR1 {
     mapping_rate=\$(grep "mapping_rate" ${runId}_cdna_ALEVIN_tmp/aux_info/alevin_meta_info.json |\
      sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1 | cut -c 1-4)
     echo -n "\$mapping_rate" 
-    AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
-
+    
+    
     mv ${runId}_cdna_ALEVIN_tmp ${runId}_cdna_ALEVIN
     """
 }
@@ -468,8 +467,8 @@ process run_STARSolo {
 
     output:
     set val(runId), path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
-    env AVG_MEM into MEM_STAR
-    env RUN_TIME into TIME_STAR
+    file '.command.log' into  into MEM_STAR
+    
 
     script:
     if( barcodeConfig == '10XV3' )
@@ -480,8 +479,8 @@ process run_STARSolo {
          awk '{split(\$0, array, "|"); print array[2]}')
         echo  "\${mapping_rate}"
 
-        AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-        RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+        
+        
         """
     else if( barcodeConfig == '10XV2' )
   
@@ -492,8 +491,8 @@ process run_STARSolo {
          awk '{split(\$0, array, "|"); print array[2]}')
         echo  "\${mapping_rate}"
 
-        AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-        RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+        
+        
         """
     else
         """
@@ -504,8 +503,8 @@ process run_STARSolo {
         echo  "\${mapping_rate}"
 
 
-        AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-        RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+        
+        
         """
 }
 
@@ -570,8 +569,7 @@ process kb_count_MR1 {
         val protocol
     output:
         set val(runId), stdout into KB_CDNA_MAPPING
-        env AVG_MEM into MEM_KB_MR1
-        env RUN_TIME into TIME_KB_MR1
+        file '.command.log' into MEM_KB_MR1
 
 
     """
@@ -582,8 +580,8 @@ process kb_count_MR1 {
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | \
     awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
     echo -n "\$mapping_rate"
-    AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+    
+    
 
     """
 
@@ -627,8 +625,7 @@ process kb_count_MR3 {
         val protocol
     output:
         set val(runId), stdout into KB_SPLICI_MAPPING
-        env AVG_MEM into MEM_KB_MR3
-        env RUN_TIME into TIME_KB_MR3
+        file '.command.log' into MEM_KB_MR1
 
     """
     kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x $protocol \
@@ -639,8 +636,8 @@ process kb_count_MR3 {
     awk '{split(\$0, array, ":"); print array[2]}'| sed 's/^ *//g' | cut -c 1-4)
 
     echo -n  "\$mapping_rate"
-    AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+    
+    
 
     """
 
@@ -682,8 +679,8 @@ process kb_count_MR2 {
         val protocol
     output:
         set val(runId), stdout into KB_PRERNA_MAPPING
-        env AVG_MEM into MEM_KB_MR2
-        env RUN_TIME into TIME_KB_MR2
+        file '.command.log' into  into MEM_KB_MR2
+        
 
 
     """
@@ -693,8 +690,8 @@ process kb_count_MR2 {
 
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_preRNA/run_info.json |sed 's/,//g'| awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
     echo -n "\$mapping_rate"
-    AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+    
+    
 
     """
 
@@ -737,8 +734,7 @@ process index_alevin_fry_MR3 {
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_SPLICI
         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_SPLICI
-        env AVG_MEM into MEM_ALEVIN_FRY_MR3
-        env RUN_TIME into TIME_ALEVIN_FRY_MR3
+        file '.command.log' into MEM_ALEVIN_FRY_MR3
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -763,10 +759,8 @@ process index_alevin_fry_MR3 {
 
     FRY_MAPPING=\$(echo "scale=2;((\$MAPPED * 100) / \$TOTAL)"|bc)
 
-    AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )   
-
-
+    
+    
     
     """
 }
@@ -821,8 +815,7 @@ process index_alevin_fry_MR2 {
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_TRANSCRIPTOME
         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_TRANSCRIPTOME
-        env AVG_MEM into MEM_ALEVIN_FRY_MR2
-        env RUN_TIME into TIME_ALEVIN_FRY_MR2
+        file '.command.log' into MEM_ALEVIN_FRY_MR2
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -847,8 +840,8 @@ process index_alevin_fry_MR2 {
 
     FRY_MAPPING=\$(echo "scale=2;((\$MAPPED * 100) / \$TOTAL)"|bc)
 
-    AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+    
+    
     """
 }
 
@@ -890,8 +883,7 @@ process alevin_fry_MR1 {
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_CDNA
         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_CDNA
-        env AVG_MEM into MEM_ALEVIN_FRY_MR1
-        env RUN_TIME into TIME_ALEVIN_FRY_MR1
+        file '.command.log' into  into MEM_ALEVIN_FRY_MR1
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -916,8 +908,8 @@ process alevin_fry_MR1 {
 
     FRY_MAPPING=\$(echo "scale=2;((\$MAPPED * 100) / \$TOTAL)"|bc)
 
-    AVG_MEM=\$(grep "Average Memory : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+    
+    
 
     
     """
@@ -940,18 +932,18 @@ process write_table {
 }
 
 // MEM=MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
-TIME=TIME_ALEVIN_MR1.join(TIME_ALEVIN_MR2).join(TIME_ALEVIN_FRY_MR1).join(TIME_ALEVIN_FRY_MR2).join(TIME_ALEVIN_FRY_MR3).join(TIME_KB_MR1).join(TIME_KB_MR2).join(TIME_KB_MR3).join(TIME_STAR)
+// TIME=TIME_ALEVIN_MR1.join(TIME_ALEVIN_MR2).join(TIME_ALEVIN_FRY_MR1).join(TIME_ALEVIN_FRY_MR2).join(TIME_ALEVIN_FRY_MR3).join(TIME_KB_MR1).join(TIME_KB_MR2).join(TIME_KB_MR3).join(TIME_STAR)
 
-process write_table_benchmark {
-    publishDir "$resultsRoot", mode: 'copy', overwrite: true
+// process write_table_benchmark {
+//     publishDir "$resultsRoot", mode: 'copy', overwrite: true
    
-    input:
-    set  mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
-    // set val bench_type from ['memory', 'run_time']
-    output:
-    file("*_memeory.txt") into RESULTS_MEMORY
+//     input:
+//     set  mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
+//     // set val bench_type from ['memory', 'run_time']
+//     output:
+//     file("*_memeory.txt") into RESULTS_MEMORY
  
-    """
-    echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_memory.txt    
-    """
-}
+//     """
+//     echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_memory.txt    
+//     """
+// }
