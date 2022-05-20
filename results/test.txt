@@ -1,0 +1,5 @@
+tool	MPR1	MPR2	MPR3
+Alevin (%)	20	40.5	NA
+Alevin-fry (%)	20	60	50.61
+kb-tools (%)	30.9	80.3	80.6
+STARSolo (%)	29.00	NA	70.0

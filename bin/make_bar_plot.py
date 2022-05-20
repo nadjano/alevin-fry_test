@@ -26,14 +26,15 @@ def parse_table(results_folder):
 
 def bar_plot(data_list):
      
-   plot = sns.barplot(x = 'tool', y = 'percentage', hue = 'type', data=data_list, capsize=.1)
+   plot = sns.barplot(x = 'tool', y = 'percentage', hue = 'type', data=data_list, capsize=.1, palette = "pastel")
+   plot.set(title = "scRNA-seq")
    fig = plot.figure 
-   fig.savefig('snRNA-mapping-rate/figures/bar_plot.png')
+   fig.savefig('snRNA-mapping-rate/figures/bar_plot_sc.png')
 
 
 #main 
 if __name__ == "__main__":
-   data=parse_table("results")
+   data=parse_table("results_sc")
 
    bar_plot(data)
     

@@ -930,12 +930,12 @@ process write_table {
          
     """
 }
-
+MEM = Channel.from(MEM_ALEVIN_MR1, MEM_ALEVIN_MR2, MEM_ALEVIN_FRY_MR1, MEM_ALEVIN_FRY_MR2, MEM_ALEVIN_FRY_MR3, MEM_KB_MR1, MEM_KB_MR2, MEM_KB_MR3, MEM_STAR )
 // MEM = MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
 // MEM.view()
 process parse_command_log {
     input: 
-    file(".command.log") from MEM_ALEVIN_MR1
+    file(".command.log") from MEM
 
     output:
     env AVG_MEM into AVG_MEMORIES

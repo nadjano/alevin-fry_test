@@ -1,0 +1,5 @@
+run_time	MPR1	MPR2	MPR3
+Alevin	16812	18073	NA
+Alevin-fry	5063	9377	4108
+kb-tools	3867	4975	5539
+STARSolo	2407	NA	2407
