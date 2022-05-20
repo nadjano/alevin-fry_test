@@ -955,7 +955,7 @@ process parse_command_log {
 // TIME=TIME_ALEVIN_MR1.join(TIME_ALEVIN_MR2).join(TIME_ALEVIN_FRY_MR1).join(TIME_ALEVIN_FRY_MR2).join(TIME_ALEVIN_FRY_MR3).join(TIME_KB_MR1).join(TIME_KB_MR2).join(TIME_KB_MR3).join(TIME_STAR)
 
 process write_table_benchmark {
-    publishDir "$resultsRoot", mode: 'copy', overwrite: true
+    publishDir "$resultsRoot/memory", mode: 'copy', overwrite: true
    
     input:
     set  mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from AVG_MEMORIES
