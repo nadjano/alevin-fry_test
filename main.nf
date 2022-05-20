@@ -914,22 +914,24 @@ process alevin_fry_MR1 {
     
     """
 }
+GROUP = ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(ALEVIN_FRY_MAPPING_CDNA).join(ALEVIN_FRY_MAPPING_TRANSCRIPTOME).join(ALEVIN_FRY_MAPPING_SPLICI)
+GROUP.view()
 // make a table for the mapping rates for different tools
-process write_table {
-    publishDir "$resultsRoot", mode: 'copy', overwrite: true
+// process write_table {
+//     publishDir "$resultsRoot", mode: 'copy', overwrite: true
    
-    input:
-    set val(runId), mr1, mr2, mr3, mr4, mr5, mr8, mr9, mr10 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(ALEVIN_FRY_MAPPING_CDNA).join(ALEVIN_FRY_MAPPING_TRANSCRIPTOME).join(ALEVIN_FRY_MAPPING_SPLICI)
-    set val(key), mr6, mr7 from STAR_MAPPING_GENE.join(STAR_MAPPING_GENEFULL)
+//     input:
+//     set val(runId), mr1, mr2, mr3, mr4, mr5, mr8, mr9, mr10 from ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(ALEVIN_FRY_MAPPING_CDNA).join(ALEVIN_FRY_MAPPING_TRANSCRIPTOME).join(ALEVIN_FRY_MAPPING_SPLICI)
+//     set val(key), mr6, mr7 from STAR_MAPPING_GENE.join(STAR_MAPPING_GENEFULL)
     
-    output:
-    file("*_${runId}.txt") into RESULTS_FOR_COUNTING
+//     output:
+//     file("*_${runId}.txt") into RESULTS_FOR_COUNTING
     
-    """
-    echo "tool\tMPR1\tMPR2\tMPR3\nAlevin (%)\t${mr1}\t${mr2}\tNA\nAlevin-fry (%)\t${mr8}\t${mr9}\t${mr10}\nkb-tools (%)\t${mr3}\t${mr4}\t${mr5}\nSTARSolo (%)\t${mr6}\tNA\t${mr7}\n" > ${params.name}_${runId}.txt
+//     """
+//     echo "tool\tMPR1\tMPR2\tMPR3\nAlevin (%)\t${mr1}\t${mr2}\tNA\nAlevin-fry (%)\t${mr8}\t${mr9}\t${mr10}\nkb-tools (%)\t${mr3}\t${mr4}\t${mr5}\nSTARSolo (%)\t${mr6}\tNA\t${mr7}\n" > ${params.name}_${runId}.txt
          
-    """
-}
+//     """
+// }
 MEM = MEM_ALEVIN_MR1.concat(MEM_ALEVIN_MR2, MEM_ALEVIN_FRY_MR1, MEM_ALEVIN_FRY_MR2, MEM_ALEVIN_FRY_MR3, MEM_KB_MR1, MEM_KB_MR2, MEM_KB_MR3, MEM_STAR)
 // MEM = MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
 // MEM.view()
@@ -958,7 +960,7 @@ process write_table_benchmark {
     publishDir "$resultsRoot/memory", mode: 'copy', overwrite: true
    
     input:
-    set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9 from AVG_MEMORIES.join()
+    set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9 from AVG_MEMORIES.groupTuple()
     output:
     file("*_memory.txt") into RESULTS_MEMORY
  
