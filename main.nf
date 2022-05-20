@@ -978,7 +978,7 @@ process write_table_benchmark {
    
     input:
     set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from FLAT_MEMORIES
-    set val(runId), t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 from FLAT_MEMORIES
+    set val(runId), t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 from FLAT_TIME
     
     
     output:
