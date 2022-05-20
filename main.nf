@@ -952,7 +952,7 @@ process parse_command_log {
 
 }
 
-// AVG_MEMORIES.groupTuple().view()
+MEM_GROUP = AVG_MEMORIES.groupTuple()
 // MEM=MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
 // TIME=TIME_ALEVIN_MR1.join(TIME_ALEVIN_MR2).join(TIME_ALEVIN_FRY_MR1).join(TIME_ALEVIN_FRY_MR2).join(TIME_ALEVIN_FRY_MR3).join(TIME_KB_MR1).join(TIME_KB_MR2).join(TIME_KB_MR3).join(TIME_STAR)
 
@@ -960,7 +960,7 @@ process write_table_benchmark {
     publishDir "$resultsRoot/memory", mode: 'copy', overwrite: true
    
     input:
-    set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9 from AVG_MEMORIES.groupTuple().buffer( size:10)
+    set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9 from MEM_GROUP.buffer( size:10)
     output:
     file("*_memory.txt") into RESULTS_MEMORY
  
