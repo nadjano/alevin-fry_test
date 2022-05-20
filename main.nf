@@ -936,7 +936,7 @@ MEM = [MEM_ALEVIN_MR1, MEM_ALEVIN_MR2, MEM_ALEVIN_FRY_MR1, MEM_ALEVIN_FRY_MR2, M
 process parse_command_log {
 
     input: 
-    file("log_file_*") from MEM
+    path("log_file_*") from MEM
     output:
     env AVG_MEM into AVG_MEMORIES
     env RUN_TIME into RUN_TIMES
