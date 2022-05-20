@@ -935,7 +935,7 @@ process write_table {
 
 process parse_command_log {
     input: 
-    each "log_file"  from MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
+    each file("log_file")  from MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
 
 
     output:
@@ -943,8 +943,8 @@ process parse_command_log {
     env RUN_TIME into RUN_TIMES
     """
 
-    AVG_MEM=\$(grep "Average Memory : " log_file| awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " log_file | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+    AVG_MEM=\$(grep "Average Memory : " ${log_file}| awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
+    RUN_TIME=\$(grep "Run time : " ${log_file} | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
 
     """
 
