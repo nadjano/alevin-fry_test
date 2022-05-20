@@ -441,7 +441,7 @@ process index_star {
         path("STAR_index") into STAR_INDEX
     
     """
-    STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles ${referenceGenome} --sjdbGTFfile ${referenceGtf} --genomeSAindexNbases 12 
+    STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles ${referenceGenome} --sjdbGTFfile ${referenceGtf} --genomeSAindexNbases 12 --limitGenomeGenerateRAM 188632691637
 
     """
 }
