@@ -358,7 +358,7 @@ process alevin_MR2 {
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_splici_ALEVIN") into ALEVIN_RESULTS_SPLICI 
         set val(runId), stdout into ALEVIN_SPLICI_MAPPING
-        path ".command.log" into MEM_ALEVIN_MR2
+        set val(runId), path ".command.log" into MEM_ALEVIN_MR2
     
 
     """
@@ -405,7 +405,7 @@ process alevin_MR1 {
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_cdna_ALEVIN") into ALEVIN_RESULTS_CDNA
         set val(runId), stdout into ALEVIN_CDNA_MAPPING
-        path ".command.log"  into MEM_ALEVIN_MR1
+        set val(runId), path ".command.log"  into MEM_ALEVIN_MR1
             
 
 
@@ -467,7 +467,7 @@ process run_STARSolo {
 
     output:
     set val(runId), path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
-    path ".command.log"   into  MEM_STAR
+    set val(runId), path ".command.log"   into  MEM_STAR
     
 
     script:
@@ -569,7 +569,7 @@ process kb_count_MR1 {
         val protocol
     output:
         set val(runId), stdout into KB_CDNA_MAPPING
-        path ".command.log"   into MEM_KB_MR1
+        set val(runId), path ".command.log"   into MEM_KB_MR1
 
 
     """
@@ -625,7 +625,7 @@ process kb_count_MR3 {
         val protocol
     output:
         set val(runId), stdout into KB_SPLICI_MAPPING
-        path ".command.log"  into MEM_KB_MR3
+        set val(runId), path ".command.log"  into MEM_KB_MR3
 
     """
     kb count -i ${kb_index_splici} -t 2 -g ${t2g_kb_splici} -x $protocol \
@@ -679,7 +679,7 @@ process kb_count_MR2 {
         val protocol
     output:
         set val(runId), stdout into KB_PRERNA_MAPPING
-        path ".command.log"  into  MEM_KB_MR2
+        set val(runId), path ".command.log"  into  MEM_KB_MR2
         
 
 
@@ -734,7 +734,7 @@ process index_alevin_fry_MR3 {
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_SPLICI
         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_SPLICI
-        path ".command.log"  into MEM_ALEVIN_FRY_MR3
+        set val(runId), path ".command.log"  into MEM_ALEVIN_FRY_MR3
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -815,7 +815,7 @@ process index_alevin_fry_MR2 {
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_TRANSCRIPTOME
         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_TRANSCRIPTOME
-        path ".command.log"  into MEM_ALEVIN_FRY_MR2
+        set val(runId), path ".command.log"  into MEM_ALEVIN_FRY_MR2
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -883,7 +883,7 @@ process alevin_fry_MR1 {
         // publishDir path "${runId}_ALEVIN"
         set val(runId), file("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_CDNA
         set val(runId), env(FRY_MAPPING) into ALEVIN_FRY_MAPPING_CDNA
-        path ".command.log" into MEM_ALEVIN_FRY_MR1
+        set val(runId), path ".command.log" into MEM_ALEVIN_FRY_MR1
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
@@ -936,10 +936,10 @@ MEM = MEM_ALEVIN_MR1.concat(MEM_ALEVIN_MR2, MEM_ALEVIN_FRY_MR1, MEM_ALEVIN_FRY_M
 process parse_command_log {
 
     input: 
-    path "log_file_*" from MEM
+    set val(runId), path "log_file_*" from MEM
     output:
-    env AVG_MEM into AVG_MEMORIES
-    env RUN_TIME into RUN_TIMES
+    set val(runId), env AVG_MEM into AVG_MEMORIES
+    set val(runId), env RUN_TIME into RUN_TIMES
     
     """
 
@@ -950,18 +950,19 @@ process parse_command_log {
 
 }
 
+AVG_MEMORIES.groupTuple().view()
 // MEM=MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
 // TIME=TIME_ALEVIN_MR1.join(TIME_ALEVIN_MR2).join(TIME_ALEVIN_FRY_MR1).join(TIME_ALEVIN_FRY_MR2).join(TIME_ALEVIN_FRY_MR3).join(TIME_KB_MR1).join(TIME_KB_MR2).join(TIME_KB_MR3).join(TIME_STAR)
 
-process write_table_benchmark {
-    publishDir "$resultsRoot/memory", mode: 'copy', overwrite: true
+// process write_table_benchmark {
+//     publishDir "$resultsRoot/memory", mode: 'copy', overwrite: true
    
-    input:
-    set  mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from AVG_MEMORIES
-    output:
-    file("*_memory.txt") into RESULTS_MEMORY
+//     input:
+//     set val(runId),mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from AVG_MEMORIES.groupTuple()
+//     output:
+//     file("*_memory.txt") into RESULTS_MEMORY
  
-    """
-    echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_memory.txt    
-    """
-}
+//     """
+//     echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_${runId}_memory.txt    
+//     """
+// }
