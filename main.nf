@@ -358,7 +358,7 @@ process alevin_MR2 {
         // publishDir path "${runId}_ALEVIN"
         set stdout, val(runId), file("${runId}_splici_ALEVIN") into ALEVIN_RESULTS_SPLICI 
         set val(runId), stdout into ALEVIN_SPLICI_MAPPING
-        set val(runId), path ".command.log" into MEM_ALEVIN_MR2
+        set val(runId), path(".command.log" ) into MEM_ALEVIN_MR2
     
 
     """
@@ -467,7 +467,7 @@ process run_STARSolo {
 
     output:
     set val(runId), path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
-    set val(runId), path ".command.log"   into  MEM_STAR
+    set val(runId), path ".command.log"  into  MEM_STAR
     
 
     script:
