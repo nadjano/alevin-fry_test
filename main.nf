@@ -988,7 +988,7 @@ process write_table_benchmark {
  
     """
     echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_${runId}_memory.txt    
-    echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${t1}\t${t2}\tNA\nAlevin-fry\t${t3}\t${t4}\t${t5}\nkb-tools\t${t6}\t${t7}\t${t8}\nSTARSolo\t${t9}\tNA\t${mr9}\n" > ${params.name}_${runId}_time.txt    
+    echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${t1}\t${t2}\tNA\nAlevin-fry\t${t3}\t${t4}\t${t5}\nkb-tools\t${t6}\t${t7}\t${t8}\nSTARSolo\t${t9}\tNA\t${t9}\n" > ${params.name}_${runId}_time.txt    
    
     """
 }
