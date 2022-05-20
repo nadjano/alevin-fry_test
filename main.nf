@@ -938,8 +938,8 @@ process parse_command_log {
     input: 
     set val(runId), path("log_file_*") from MEM
     output:
-    set val(runId), env AVG_MEM into AVG_MEMORIES
-    set val(runId), env RUN_TIME into RUN_TIMES
+    set val(runId), env(AVG_MEM)into AVG_MEMORIES
+    set val(runId), env(RUN_TIME) into RUN_TIMES
     
     """
 
