@@ -936,15 +936,15 @@ MEM = [MEM_ALEVIN_MR1, MEM_ALEVIN_MR2, MEM_ALEVIN_FRY_MR1, MEM_ALEVIN_FRY_MR2, M
 process parse_command_log {
 
     input: 
-    each file("log_file") from MEM
+    file("log_file_*") from MEM
     output:
     env AVG_MEM into AVG_MEMORIES
     env RUN_TIME into RUN_TIMES
     
     """
 
-    AVG_MEM=\$(grep "Average Memory : " log_file | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " log_file | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+    AVG_MEM=\$(grep "Average Memory : " log_file_* | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
+    RUN_TIME=\$(grep "Run time : " log_file_* | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
 
     """
 
