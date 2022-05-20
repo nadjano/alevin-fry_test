@@ -950,19 +950,19 @@ process parse_command_log {
 
 }
 
-AVG_MEMORIES.groupTuple().view()
+// AVG_MEMORIES.groupTuple().view()
 // MEM=MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
 // TIME=TIME_ALEVIN_MR1.join(TIME_ALEVIN_MR2).join(TIME_ALEVIN_FRY_MR1).join(TIME_ALEVIN_FRY_MR2).join(TIME_ALEVIN_FRY_MR3).join(TIME_KB_MR1).join(TIME_KB_MR2).join(TIME_KB_MR3).join(TIME_STAR)
 
-// process write_table_benchmark {
-//     publishDir "$resultsRoot/memory", mode: 'copy', overwrite: true
+process write_table_benchmark {
+    publishDir "$resultsRoot/memory", mode: 'copy', overwrite: true
    
-//     input:
-//     set val(runId),mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from AVG_MEMORIES.groupTuple()
-//     output:
-//     file("*_memory.txt") into RESULTS_MEMORY
+    input:
+    set val(runId),mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from AVG_MEMORIES.groupTuple()
+    output:
+    file("*_memory.txt") into RESULTS_MEMORY
  
-//     """
-//     echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_${runId}_memory.txt    
-//     """
-// }
+    """
+    echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_${runId}_memory.txt    
+    """
+}
