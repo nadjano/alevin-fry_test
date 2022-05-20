@@ -916,7 +916,7 @@ process alevin_fry_MR1 {
 }
 // GROUP = ALEVIN_CDNA_MAPPING.join(ALEVIN_SPLICI_MAPPING).join(KB_CDNA_MAPPING).join(KB_PRERNA_MAPPING).join(KB_SPLICI_MAPPING).join(ALEVIN_FRY_MAPPING_CDNA).join(ALEVIN_FRY_MAPPING_TRANSCRIPTOME).join(ALEVIN_FRY_MAPPING_SPLICI)
 // GROUP.view()
-make a table for the mapping rates for different tools
+// make a table for the mapping rates for different tools
 process write_table {
     publishDir "$resultsRoot", mode: 'copy', overwrite: true
    
