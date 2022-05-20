@@ -960,8 +960,8 @@ process write_table_benchmark {
     publishDir "$resultsRoot/memory", mode: 'copy', overwrite: true
    
     input:
-    set val(runId), list from AVG_MEMORIES.groupTuple()
-    set mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9 from list 
+    set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9 from AVG_MEMORIES.groupTuple().collect()
+    
     output:
     file("*_memory.txt") into RESULTS_MEMORY
  
