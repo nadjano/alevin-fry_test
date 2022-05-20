@@ -960,12 +960,12 @@ process write_table_benchmark {
     publishDir "$resultsRoot/memory", mode: 'copy', overwrite: true
    
     input:
-    set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9 from AVG_MEMORIES.groupTuple().collect()
+    set val(runId), input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8], input[9]  from AVG_MEMORIES.groupTuple()
     
     output:
     file("*_memory.txt") into RESULTS_MEMORY
  
     """
-    echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_${runId}_memory.txt    
+    echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${input[1]}\t${input[2]}\tNA\nAlevin-fry\t${input[3]}\t${input[4]}\t${input[5]}\nkb-tools\t${input[6]}\t${input[7]}\t${input[8]}\nSTARSolo\t${input[9]}\tNA\t${input[9]}\n" > ${params.name}_${runId}_memory.txt    
     """
 }
