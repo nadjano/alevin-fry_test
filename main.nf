@@ -955,8 +955,7 @@ process parse_command_log {
 // AVG_MEMORIES.groupTuple().view()
 // MEM=MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
 // TIME=TIME_ALEVIN_MR1.join(TIME_ALEVIN_MR2).join(TIME_ALEVIN_FRY_MR1).join(TIME_ALEVIN_FRY_MR2).join(TIME_ALEVIN_FRY_MR3).join(TIME_KB_MR1).join(TIME_KB_MR2).join(TIME_KB_MR3).join(TIME_STAR)
-AVG_MEMORIES.groupTuple()
-   .flatMap { runID, input -> 
+FLAT_MEMORIES = AVG_MEMORIES.groupTuple().flatMap { runID, input -> 
 
   [ 
     [runID, input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8], input[9]],
@@ -972,7 +971,7 @@ process write_table_benchmark {
     publishDir "$resultsRoot/memory", mode: 'copy', overwrite: true
    
     input:
-    set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from AVG_MEMORIES
+    set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from FLAT_MEMORIES
     
     output:
     file("*_memory.txt") into RESULTS_MEMORY
