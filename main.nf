@@ -983,7 +983,7 @@ process write_table_benchmark {
     
     output:
     file("*_memory.txt") into RESULTS_MEMORY
-    file("*_time.txt") into RESULTS_MEMORY
+    file("*_time.txt") into RESULTS_TIME
  
  
     """
