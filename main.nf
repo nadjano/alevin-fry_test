@@ -935,15 +935,15 @@ MEM = Channel.from(MEM_ALEVIN_MR1, MEM_ALEVIN_MR2, MEM_ALEVIN_FRY_MR1, MEM_ALEVI
 // MEM.view()
 process parse_command_log {
     input: 
-    file(".command.log") from MEM
+    path ".command.log" from MEM
 
     output:
     env AVG_MEM into AVG_MEMORIES
     env RUN_TIME into RUN_TIMES
     """
 
-    AVG_MEM=\$(grep "Average Memory : " .command.log| awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " .command.log | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+    AVG_MEM=\$(grep "Average Memory : " ${.command.log}| awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
+    RUN_TIME=\$(grep "Run time : " ${.command.log} | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
 
     """
 
