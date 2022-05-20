@@ -936,7 +936,7 @@ MEM = Channel.of(MEM_ALEVIN_MR1, MEM_ALEVIN_MR2, MEM_ALEVIN_FRY_MR1, MEM_ALEVIN_
 process parse_command_log {
 
     input: 
-    file("log_file") from MEM
+    each file("log_file") from MEM
     output:
     env AVG_MEM into AVG_MEMORIES
     env RUN_TIME into RUN_TIMES
