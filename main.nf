@@ -442,77 +442,78 @@ process index_star {
     
     """
     STAR --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles ${referenceGenome} --sjdbGTFfile ${referenceGtf} --genomeSAindexNbases 12 --limitGenomeGenerateRAM 188632691637
-
+                                                                                                                                                                               
     """
 }
 
 // run STARSolo 
 
-process run_STARSolo {
+// process run_STARSolo {
    
-    cache 'lenient'
+//     cache 'lenient'
 
-    memory { 100.GB * task.attempt }
-    cpus 10
-    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
-    maxRetries 10
-
-
-    conda "${baseDir}/envs/star.yml"
+//     memory { 100.GB * task.attempt }
+//     cpus 10
+//     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+//     maxRetries 10
 
 
-    input:
-    set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(STAR_CONFIG)
-    path("STAR_index") from STAR_INDEX
+//     conda "${baseDir}/envs/star.yml"
 
-    output:
-    set val(runId), path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
-    set val(runId), path(".command.log")  into  MEM_STAR
+
+//     input:
+//     set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(STAR_CONFIG)
+//     path("STAR_index") from STAR_INDEX
+
+//     output:
+//     set val(runId), path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
+//     set val(runId), path(".command.log")  into  MEM_STAR
     
 
-    script:
-    if( barcodeConfig == '10XV3' )
-        """
-        STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --soloCBwhitelist '${baseDir}/whitelist/3M-february-2018.txt.gz' --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
+//     script:
+//     if( barcodeConfig == '10XV3' )
+//         """
+//         STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --soloCBwhitelist '${baseDir}/whitelist/3M-february-2018.txt.gz' --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
-        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out |\
-         awk '{split(\$0, array, "|"); print array[2]}')
-        echo  "\${mapping_rate}"
+//         mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out |\
+//          awk '{split(\$0, array, "|"); print array[2]}')
+//         echo  "\${mapping_rate}"
 
         
         
-        """
-    else if( barcodeConfig == '10XV2' )
+//         """
+//     else if( barcodeConfig == '10XV2' )
   
-        """
-        STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --soloCBwhitelist '${baseDir}/whitelist/737K-august-2016.txt' --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
+//         """
+//         STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --soloCBwhitelist '${baseDir}/whitelist/737K-august-2016.txt' --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
-        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out |\
-         awk '{split(\$0, array, "|"); print array[2]}')
-        echo  "\${mapping_rate}"
-
-        
-        
-        """
-    else
-        """
-        STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --readFilesCommand zcat --soloCBwhitelist None --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --soloBarcodeReadLength 0
-
-        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | \
-        awk '{split(\$0, array, "|"); print array[2]}')
-        echo  "\${mapping_rate}"
-
+//         mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out |\
+//          awk '{split(\$0, array, "|"); print array[2]}')
+//         echo  "\${mapping_rate}"
 
         
         
-        """
-}
+//         """
+//     else
+//         """
+//         STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --readFilesCommand zcat --soloCBwhitelist None --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --soloBarcodeReadLength 0
+
+//         mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | \
+//         awk '{split(\$0, array, "|"); print array[2]}')
+//         echo  "\${mapping_rate}"
+
+
+        
+        
+//         """
+// }
 
 // extract mapping rates from star and turn them into percentages
 process get_STAR_mapping {
     cache 'lenient'
     input:
-    set val(runId), path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
+    val(runId) from FINAL_FASTQS_FOR_STAR
+    // path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
     
     output:
     set val(runId), env(GENE_PERCENT) into STAR_MAPPING_GENE
@@ -523,11 +524,13 @@ process get_STAR_mapping {
     awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)
 
     GENE_PERCENT=\$(echo "scale=2;((\$GENE * 100))"|bc)
+    GENE_PERCENT="NA"
 
     GENEFULL=\$(grep "Reads Mapped to GeneFull: Unique GeneFull" ${runId}_STAR_tmpSolo.out/GeneFull/Summary.csv |\
      awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)
 
     GENEFULL_PERCENT=\$(echo "scale=2;((\$GENEFULL * 100))"|bc)
+    GENEFULL_PERCENT="NA"
     """
 }
 
@@ -580,7 +583,6 @@ process kb_count_MR1 {
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | \
     awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
     echo -n "\$mapping_rate"
-    
     
 
     """
