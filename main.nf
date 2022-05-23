@@ -937,60 +937,60 @@ process write_table {
 MEM = MEM_ALEVIN_MR1.concat(MEM_ALEVIN_MR2, MEM_ALEVIN_FRY_MR1, MEM_ALEVIN_FRY_MR2, MEM_ALEVIN_FRY_MR3, MEM_KB_MR1, MEM_KB_MR2, MEM_KB_MR3, MEM_STAR)
 // MEM = MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
 // MEM.view()
-process parse_command_log {
+// process parse_command_log {
 
-    input: 
-    set val(runId), path("log_file_*") from MEM
-    output:
-    set val(runId), env(AVG_MEM) into AVG_MEMORIES
-    set val(runId), env(RUN_TIME) into RUN_TIMES
+//     input: 
+//     set val(runId), path("log_file_*") from MEM
+//     output:
+//     set val(runId), env(AVG_MEM) into AVG_MEMORIES
+//     set val(runId), env(RUN_TIME) into RUN_TIMES
     
-    """
+//     """
 
-    AVG_MEM=\$(grep "Average Memory : " log_file_* | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-    RUN_TIME=\$(grep "Run time : " log_file_* | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+//     AVG_MEM=\$(grep "Average Memory : " log_file_* | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
+//     RUN_TIME=\$(grep "Run time : " log_file_* | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
 
-    """
+//     """
 
-}
+// }
 
-// AVG_MEMORIES.groupTuple().view()
-// MEM=MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
-// TIME=TIME_ALEVIN_MR1.join(TIME_ALEVIN_MR2).join(TIME_ALEVIN_FRY_MR1).join(TIME_ALEVIN_FRY_MR2).join(TIME_ALEVIN_FRY_MR3).join(TIME_KB_MR1).join(TIME_KB_MR2).join(TIME_KB_MR3).join(TIME_STAR)
-FLAT_MEMORIES = AVG_MEMORIES.groupTuple().flatMap { runID, input -> 
+// // AVG_MEMORIES.groupTuple().view()
+// // MEM=MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
+// // TIME=TIME_ALEVIN_MR1.join(TIME_ALEVIN_MR2).join(TIME_ALEVIN_FRY_MR1).join(TIME_ALEVIN_FRY_MR2).join(TIME_ALEVIN_FRY_MR3).join(TIME_KB_MR1).join(TIME_KB_MR2).join(TIME_KB_MR3).join(TIME_STAR)
+// FLAT_MEMORIES = AVG_MEMORIES.groupTuple().flatMap { runID, input -> 
 
-  [ 
-    [runID, input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8], input[9]],
-   ]
+//   [ 
+//     [runID, input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8], input[9]],
+//    ]
 
- }
+//  }
 
- FLAT_TIME = RUN_TIMES.groupTuple().flatMap { runID, input -> 
+//  FLAT_TIME = RUN_TIMES.groupTuple().flatMap { runID, input -> 
 
-  [ 
-    [runID, input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8], input[9]],
-   ]
+//   [ 
+//     [runID, input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8], input[9]],
+//    ]
 
- }
+//  }
 
 
 
-process write_table_benchmark {
-    publishDir "$resultsRoot/memory_time", mode: 'copy', overwrite: true
+// process write_table_benchmark {
+//     publishDir "$resultsRoot/memory_time", mode: 'copy', overwrite: true
    
-    input:
-    set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from FLAT_MEMORIES
-    set val(runId), t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 from FLAT_TIME
+//     input:
+//     set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from FLAT_MEMORIES
+//     set val(runId), t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 from FLAT_TIME
     
     
-    output:
-    file("*_memory.txt") into RESULTS_MEMORY
-    file("*_time.txt") into RESULTS_TIME
+//     output:
+//     file("*_memory.txt") into RESULTS_MEMORY
+//     file("*_time.txt") into RESULTS_TIME
  
  
-    """
-    echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_${runId}_memory.txt    
-    echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${t1}\t${t2}\tNA\nAlevin-fry\t${t3}\t${t4}\t${t5}\nkb-tools\t${t6}\t${t7}\t${t8}\nSTARSolo\t${t9}\tNA\t${t9}\n" > ${params.name}_${runId}_time.txt    
+//     """
+//     echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_${runId}_memory.txt    
+//     echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${t1}\t${t2}\tNA\nAlevin-fry\t${t3}\t${t4}\t${t5}\nkb-tools\t${t6}\t${t7}\t${t8}\nSTARSolo\t${t9}\tNA\t${t9}\n" > ${params.name}_${runId}_time.txt    
    
-    """
-}
+//     """
+// }
