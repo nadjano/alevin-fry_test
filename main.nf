@@ -448,72 +448,71 @@ process index_star {
 
 // run STARSolo 
 
-// process run_STARSolo {
+process run_STARSolo {
    
-//     cache 'lenient'
+    cache 'lenient'
 
-//     memory { 100.GB * task.attempt }
-//     cpus 10
-//     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
-//     maxRetries 10
-
-
-//     conda "${baseDir}/envs/star.yml"
+    memory { 100.GB * task.attempt }
+    cpus 10
+    errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
+    maxRetries 10
 
 
-//     input:
-//     set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(STAR_CONFIG)
-//     path("STAR_index") from STAR_INDEX
+    conda "${baseDir}/envs/star.yml"
 
-//     output:
-//     set val(runId), path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
-//     set val(runId), path(".command.log")  into  MEM_STAR
+
+    input:
+    set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_STAR.join(STAR_CONFIG)
+    path("STAR_index") from STAR_INDEX
+
+    output:
+    set val(runId), path("${runId}_STAR_tmpSolo.out") into STAR_RESULTS
+    set val(runId), path(".command.log")  into  MEM_STAR
     
 
-//     script:
-//     if( barcodeConfig == '10XV3' )
-//         """
-//         STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --soloCBwhitelist '${baseDir}/whitelist/3M-february-2018.txt.gz' --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
+    script:
+    if( barcodeConfig == '10XV3' )
+        """
+        STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --soloCBwhitelist '${baseDir}/whitelist/3M-february-2018.txt.gz' --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
-//         mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out |\
-//          awk '{split(\$0, array, "|"); print array[2]}')
-//         echo  "\${mapping_rate}"
+        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out |\
+         awk '{split(\$0, array, "|"); print array[2]}')
+        echo  "\${mapping_rate}"
 
         
         
-//         """
-//     else if( barcodeConfig == '10XV2' )
+        """
+    else if( barcodeConfig == '10XV2' )
   
-//         """
-//         STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --soloCBwhitelist '${baseDir}/whitelist/737K-august-2016.txt' --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
+        """
+        STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --soloCBwhitelist '${baseDir}/whitelist/737K-august-2016.txt' --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --readFilesCommand zcat --soloBarcodeReadLength 0
 
-//         mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out |\
-//          awk '{split(\$0, array, "|"); print array[2]}')
-//         echo  "\${mapping_rate}"
-
-        
-        
-//         """
-//     else
-//         """
-//         STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --readFilesCommand zcat --soloCBwhitelist None --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --soloBarcodeReadLength 0
-
-//         mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | \
-//         awk '{split(\$0, array, "|"); print array[2]}')
-//         echo  "\${mapping_rate}"
-
+        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out |\
+         awk '{split(\$0, array, "|"); print array[2]}')
+        echo  "\${mapping_rate}"
 
         
         
-//         """
-// }
+        """
+    else
+        """
+        STAR --genomeDir STAR_index --readFilesIn \$(ls cdna*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') \$(ls barcodes*.fastq.gz | tr '\\n' ', '| sed  's/,*\$//g') --soloType Droplet --readFilesCommand zcat --soloCBwhitelist None --soloUMIlen ${umiLength} --soloCBlen ${barcodeLength} --soloUMIstart \$(($barcodeLength+1)) --soloCBstart 1 --runThreadN 12 --soloFeatures Gene GeneFull --outFileNamePrefix ${runId}_STAR_tmp --soloBarcodeReadLength 0
+
+        mapping_rate=\$(grep "Uniquely mapped reads %" ${runId}_STAR_tmpLog.final.out | \
+        awk '{split(\$0, array, "|"); print array[2]}')
+        echo  "\${mapping_rate}"
+
+
+        
+        
+        """
+}
 
 // extract mapping rates from star and turn them into percentages
 process get_STAR_mapping {
     cache 'lenient'
     input:
-    val(runId) from FINAL_FASTQS_FOR_STAR
-    // path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
+    set val(runId), path("${runId}_STAR_tmpSolo.out") from STAR_RESULTS
     
     output:
     set val(runId), env(GENE_PERCENT) into STAR_MAPPING_GENE
@@ -524,13 +523,11 @@ process get_STAR_mapping {
     awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)
 
     GENE_PERCENT=\$(echo "scale=2;((\$GENE * 100))"|bc)
-    GENE_PERCENT="NA"
 
     GENEFULL=\$(grep "Reads Mapped to GeneFull: Unique GeneFull" ${runId}_STAR_tmpSolo.out/GeneFull/Summary.csv |\
      awk '{split(\$0, array, ","); print array[2]}' | cut -c 1-4)
 
     GENEFULL_PERCENT=\$(echo "scale=2;((\$GENEFULL * 100))"|bc)
-    GENEFULL_PERCENT="NA"
     """
 }
 
@@ -583,6 +580,7 @@ process kb_count_MR1 {
     mapping_rate=\$(grep "p_pseudoaligned" ${runId}_out_kb_cDNA/run_info.json |sed 's/,//g' | \
     awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' | cut -c 1-4) 
     echo -n "\$mapping_rate"
+    
     
 
     """
@@ -934,63 +932,63 @@ process write_table {
          
     """
 }
-// MEM = MEM_ALEVIN_MR1.concat(MEM_ALEVIN_MR2, MEM_ALEVIN_FRY_MR1, MEM_ALEVIN_FRY_MR2, MEM_ALEVIN_FRY_MR3, MEM_KB_MR1, MEM_KB_MR2, MEM_KB_MR3, MEM_STAR)
+MEM = MEM_ALEVIN_MR1.concat(MEM_ALEVIN_MR2, MEM_ALEVIN_FRY_MR1, MEM_ALEVIN_FRY_MR2, MEM_ALEVIN_FRY_MR3, MEM_KB_MR1, MEM_KB_MR2, MEM_KB_MR3, MEM_STAR)
 // MEM = MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
 // MEM.view()
-// process parse_command_log {
+process parse_command_log {
 
-//     input: 
-//     set val(runId), path("log_file_*") from MEM
-//     output:
-//     set val(runId), env(AVG_MEM) into AVG_MEMORIES
-//     set val(runId), env(RUN_TIME) into RUN_TIMES
+    input: 
+    set val(runId), path("log_file_*") from MEM
+    output:
+    set val(runId), env(AVG_MEM) into AVG_MEMORIES
+    set val(runId), env(RUN_TIME) into RUN_TIMES
     
-//     """
+    """
 
-//     AVG_MEM=\$(grep "Average Memory : " log_file_* | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
-//     RUN_TIME=\$(grep "Run time : " log_file_* | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
+    AVG_MEM=\$(grep "Average Memory : " log_file_* | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ MB//g' )
+    RUN_TIME=\$(grep "Run time : " log_file_* | awk '{split(\$0, array, ":"); print array[2]}' | sed 's/^ *//g' |sed 's/ sec.//g' )
 
-//     """
+    """
 
-// }
+}
 
-// // AVG_MEMORIES.groupTuple().view()
-// // MEM=MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
-// // TIME=TIME_ALEVIN_MR1.join(TIME_ALEVIN_MR2).join(TIME_ALEVIN_FRY_MR1).join(TIME_ALEVIN_FRY_MR2).join(TIME_ALEVIN_FRY_MR3).join(TIME_KB_MR1).join(TIME_KB_MR2).join(TIME_KB_MR3).join(TIME_STAR)
-// FLAT_MEMORIES = AVG_MEMORIES.groupTuple().flatMap { runID, input -> 
+// AVG_MEMORIES.groupTuple().view()
+// MEM=MEM_ALEVIN_MR1.join(MEM_ALEVIN_MR2).join(MEM_ALEVIN_FRY_MR1).join(MEM_ALEVIN_FRY_MR2).join(MEM_ALEVIN_FRY_MR3).join(MEM_KB_MR1).join(MEM_KB_MR2).join(MEM_KB_MR3).join(MEM_STAR)
+// TIME=TIME_ALEVIN_MR1.join(TIME_ALEVIN_MR2).join(TIME_ALEVIN_FRY_MR1).join(TIME_ALEVIN_FRY_MR2).join(TIME_ALEVIN_FRY_MR3).join(TIME_KB_MR1).join(TIME_KB_MR2).join(TIME_KB_MR3).join(TIME_STAR)
+FLAT_MEMORIES = AVG_MEMORIES.groupTuple().flatMap { runID, input -> 
 
-//   [ 
-//     [runID, input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8], input[9]],
-//    ]
+  [ 
+    [runID, input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8], input[9]],
+   ]
 
-//  }
+ }
 
-//  FLAT_TIME = RUN_TIMES.groupTuple().flatMap { runID, input -> 
+ FLAT_TIME = RUN_TIMES.groupTuple().flatMap { runID, input -> 
 
-//   [ 
-//     [runID, input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8], input[9]],
-//    ]
+  [ 
+    [runID, input[0], input[1], input[2], input[3], input[4], input[5], input[6], input[7], input[8], input[9]],
+   ]
 
-//  }
+ }
 
 
 
-// process write_table_benchmark {
-//     publishDir "$resultsRoot/memory_time", mode: 'copy', overwrite: true
+process write_table_benchmark {
+    publishDir "$resultsRoot/memory_time", mode: 'copy', overwrite: true
    
-//     input:
-//     set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from FLAT_MEMORIES
-//     set val(runId), t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 from FLAT_TIME
+    input:
+    set val(runId), mr1, mr2, mr3, mr4, mr5, mr6, mr7, mr8, mr9, mr10 from FLAT_MEMORIES
+    set val(runId), t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 from FLAT_TIME
     
     
-//     output:
-//     file("*_memory.txt") into RESULTS_MEMORY
-//     file("*_time.txt") into RESULTS_TIME
+    output:
+    file("*_memory.txt") into RESULTS_MEMORY
+    file("*_time.txt") into RESULTS_TIME
  
  
-//     """
-//     echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_${runId}_memory.txt    
-//     echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${t1}\t${t2}\tNA\nAlevin-fry\t${t3}\t${t4}\t${t5}\nkb-tools\t${t6}\t${t7}\t${t8}\nSTARSolo\t${t9}\tNA\t${t9}\n" > ${params.name}_${runId}_time.txt    
+    """
+    echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${mr1}\t${mr2}\tNA\nAlevin-fry\t${mr3}\t${mr4}\t${mr5}\nkb-tools\t${mr6}\t${mr7}\t${mr8}\nSTARSolo\t${mr9}\tNA\t${mr9}\n" > ${params.name}_${runId}_memory.txt    
+    echo "memory\tMPR1\tMPR2\tMPR3\nAlevin\t${t1}\t${t2}\tNA\nAlevin-fry\t${t3}\t${t4}\t${t5}\nkb-tools\t${t6}\t${t7}\t${t8}\nSTARSolo\t${t9}\tNA\t${t9}\n" > ${params.name}_${runId}_time.txt    
    
-//     """
-// }
+    """
+}
