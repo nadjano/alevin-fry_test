@@ -262,7 +262,7 @@ process alevin_config {
     conda "${baseDir}/envs/alevin-fry_2.yml"
     input:
         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
-        path "alevin_index_for_fry" from ALEVIN_FRY_INDEX_SPLICI
+        path "alevin_index_splici" from ALEVIN_FRY_INDEX_SPLICI
         path "t2g_cDNA.txt" from T2G_3_FOR_FRY
        
     output:
@@ -272,7 +272,7 @@ process alevin_config {
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
-        -i alevin_index_for_fry -p ${task.cpus} -o ${runId}_ALEVIN_fry_map t2g_cDNA.txt 
+        -i alevin_index_splici -p ${task.cpus} -o ${runId}_ALEVIN_fry_map t2g_cDNA.txt 
 
     if (${barcodeConfig} == "--chromium")
     then
