@@ -80,7 +80,7 @@ process make_splici {
 }
 
 process index_for_alevin_fry {
-    publishDir "index_alevin_fry/${species}", mode: 'copy', overwrite: true
+    // publishDir "index_alevin_fry/${species}", mode: 'copy', overwrite: true
     cache 'lenient'
     memory { 100.GB * task.attempt }
     cpus 8
