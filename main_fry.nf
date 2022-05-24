@@ -59,7 +59,6 @@ process make_splici {
     conda "${baseDir}/envs/pyroe.yml"
 
     memory { 20.GB * task.attempt }
-    cpus 4
 
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -83,7 +82,6 @@ process index_for_alevin_fry {
     // publishDir "index_alevin_fry/${species}", mode: 'copy', overwrite: true
     cache 'deep'
     memory { 20.GB * task.attempt }
-    cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     conda "${baseDir}/envs/alevin-fry_2.yml"
@@ -295,7 +293,7 @@ process mtx_alevin_fry_to_mtx {
     conda "${baseDir}/envs/parse_alevin_fry.yml"
 
     memory { 20.GB * task.attempt }
-    cpus 4
+   
 
     input:
     set val(runId), path("${runId}_ALEVIN_fry_quant") from ALEVIN_FRY_RESULTS_SPLICI
