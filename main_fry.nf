@@ -81,9 +81,9 @@ process make_splici {
 
 process index_for_alevin_fry {
     // publishDir "index_alevin_fry/${species}", mode: 'copy', overwrite: true
-    // cache 'lenient'
-    memory { 10.GB * task.attempt }
-    cpus 2
+    cache 'deep'
+    memory { 20.GB * task.attempt }
+    cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     conda "${baseDir}/envs/alevin-fry_2.yml"
@@ -109,7 +109,7 @@ process download_fastqs {
     conda "${baseDir}/envs/atlas-fastq-provider.yml"
     
     maxForks params.maxConcurrentDownloads
-    time { 10.hour * task.attempt }
+    time { 1.hour * task.attempt }
     memory { 20.GB * task.attempt }
 
     errorStrategy { task.attempt<=10 & task.exitStatus != 4 ? 'retry' : 'finish' } 
@@ -254,7 +254,7 @@ process alevin_config {
  process alevin_fry_MR3 {
     publishDir "${resultsRoot}/${name}", mode: 'copy', overwrite: true
     cache 'lenient'
-    memory { 100.GB * task.attempt }
+    memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     conda "${baseDir}/envs/alevin-fry_2.yml"
