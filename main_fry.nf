@@ -81,13 +81,11 @@ process make_splici {
 
 process index_for_alevin_fry {
     // publishDir "index_alevin_fry/${species}", mode: 'copy', overwrite: true
-    cache 'lenient'
-    memory { 50.GB * task.attempt }
-    cpus 4
+    // cache 'lenient'
+    memory { 10.GB * task.attempt }
+    cpus 2
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
-
-
     conda "${baseDir}/envs/alevin-fry_2.yml"
 
     input:
