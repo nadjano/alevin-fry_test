@@ -52,7 +52,7 @@ SDRF_FOR_FASTQS
 
 // generate splici index if it does not exits
 process make_splici {
-    publishDir "t2g_alevin_fry/${species}", mode: 'copy', overwrite: true
+    // publishDir "t2g_alevin_fry/${species}", mode: 'copy', overwrite: true
 
     cache 'lenient'
    
