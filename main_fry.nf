@@ -82,8 +82,8 @@ process make_splici {
 process index_for_alevin_fry {
     // publishDir "index_alevin_fry/${species}", mode: 'copy', overwrite: true
     cache 'lenient'
-    memory { 100.GB * task.attempt }
-    cpus 8
+    memory { 50.GB * task.attempt }
+    cpus 4
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
 
