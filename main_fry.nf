@@ -290,41 +290,31 @@ process alevin_config {
         
     """
 }
-// // Run Alevin per row
 
-// process alevin_fry {
+process mtx_alevin_fry_to_mtx {
+    publishDir "${resultsRoot}/${name}", mode: 'copy', overwrite: true
 
-//     conda "${baseDir}/envs/alevin.yml"
-    
-//     cache 'deep'
+    conda "${baseDir}/envs/parse_alevin_fry.yml"
 
-//     memory { 20.GB * task.attempt }
-//     cpus 12
+    memory { 20.GB * task.attempt }
+    cpus 4
 
-//     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
-//     maxRetries 10
+    input:
+    set val(runId), path("${runId}_ALEVIN_fry_quant") from ALEVIN_FRY_RESULTS_SPLICI
 
-//     input:
-//         set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
-//         file(transcriptToGene) from TRANSCRIPT_TO_GENE
+    output:
 
-//     output:
-//         set val(runId), file("${runId}"),  file("${runId}/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
+    set val(runId), path("counts_mtx") into ALEVIN_FRY_MTX
 
-//     """
-//     salmon alevin ${barcodeConfig} -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
-//         -i ${transcriptomeIndex} -p ${task.cpus} -o ${runId}_tmp --tgMap ${transcriptToGene} --dumpFeatures --keepCBFraction 1 \
-//         --freqThreshold ${params.minCbFreq} --dumpMtx
 
-//     min_mapping=\$(grep "percent_mapped" ${runId}_tmp/aux_info/meta_info.json | sed 's/,//g' | awk -F': ' '{print \$2}' | sort -n | head -n 1)   
-//     if [ "\${min_mapping%.*}" -lt "${params.minMappingRate}" ]; then
-//         echo "Minimum mapping rate (\$min_mapping) is less than the specified threshold of ${params.minMappingRate}" 1>&2
-//         exit 1 
-//     fi
- 
-//     mv ${runId}_tmp ${runId}
-//     """
-// }
+    """
+    alevinMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx
+    """      
+}
+
+
+
+
 
 // ALEVIN_RESULTS
 //     .into{
@@ -336,33 +326,15 @@ process alevin_config {
 // // Convert Alevin output to MTX. There will be one of these for every run, or
 // // technical replicate group of runs
 
-// process alevin_to_mtx {
 
-//     conda "${baseDir}/envs/parse_alevin.yml"
-    
-//     memory { 10.GB * task.attempt }
-//     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
-//     maxRetries 20
+ALEVIN_FRY_MTX
+    .into{
+        ALEVIN_MTX_FOR_QC
+        ALEVIN_MTX_FOR_EMPTYDROPS
+        ALEVIN_MTX_FOR_OUTPUT
+    }
 
-//     input:
-//         set val(runId), file(alevinResult), file(rawBarcodeFreq) from ALEVIN_RESULTS_FOR_PROCESSING
-
-//     output:
-//         set val(runId), file("counts_mtx") into ALEVIN_MTX
-
-//     """
-//     alevinMtxTo10x.py --cell_prefix ${runId}- $alevinResult counts_mtx
-//     """ 
-// }
-
-// ALEVIN_MTX
-//     .into{
-//         ALEVIN_MTX_FOR_QC
-//         ALEVIN_MTX_FOR_EMPTYDROPS
-//         ALEVIN_MTX_FOR_OUTPUT
-//     }
-
-// // Make a diagnostic plot
+// Make a diagnostic plot
 
 // ALEVIN_RESULTS_FOR_QC
 //     .join(ALEVIN_MTX_FOR_QC)
