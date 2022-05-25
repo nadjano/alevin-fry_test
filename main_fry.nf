@@ -71,10 +71,6 @@ process make_splici {
         path("splici_out/splici_fl*.fa") into SPLICI_FASTA_FOR_FRY
         path("splici_out/splici_fl*.tsv") into T2G_3_FOR_FRY
 
-    when:
-    transcriptomeIndex == "NA"
-
-
      
     """
     pyroe make-splici ${referenceGenome} ${referenceGtf} 90 splici_out
@@ -94,9 +90,6 @@ process index_for_alevin_fry {
         
     output:
         path "alevin_index_splici" into ALEVIN_FRY_INDEX_SPLICI
-
-    when
-    transcriptToGene == "NA"
     
   
     """
