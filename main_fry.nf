@@ -288,7 +288,7 @@ process alevin_config {
 }
 
 process mtx_alevin_fry_to_mtx {
-    publishDir "${resultsRoot}/${name}", mode: 'copy', overwrite: true
+    publishDir "${resultsRoot}/${params.name}/mtx", mode: 'copy', overwrite: true
     conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
 
     // conda "${baseDir}/envs/parse_alevin_fry.yml"
