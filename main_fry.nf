@@ -287,26 +287,26 @@ process alevin_config {
     """
 }
 
-process mtx_alevin_fry_to_mtx {
-    publishDir "${resultsRoot}/${name}", mode: 'copy', overwrite: true
+// process mtx_alevin_fry_to_mtx {
+//     publishDir "${resultsRoot}/${name}", mode: 'copy', overwrite: true
 
-    conda "${baseDir}/envs/parse_alevin_fry.yml"
+//     conda "${baseDir}/envs/parse_alevin_fry.yml"
 
-    memory { 20.GB * task.attempt }
+//     memory { 20.GB * task.attempt }
    
 
-    input:
-    set val(runId), path("${runId}_ALEVIN_fry_quant") from ALEVIN_FRY_RESULTS_SPLICI
+//     input:
+//     set val(runId), path("${runId}_ALEVIN_fry_quant") from ALEVIN_FRY_RESULTS_SPLICI
 
-    output:
+//     output:
 
-    set val(runId), path("counts_mtx") into ALEVIN_FRY_MTX
+//     set val(runId), path("counts_mtx") into ALEVIN_FRY_MTX
 
 
-    """
-    alevinMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx
-    """      
-}
+//     """
+//     alevinMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx
+//     """      
+// }
 
 
 
@@ -323,12 +323,12 @@ process mtx_alevin_fry_to_mtx {
 // // technical replicate group of runs
 
 
-ALEVIN_FRY_MTX
-    .into{
-        ALEVIN_MTX_FOR_QC
-        ALEVIN_MTX_FOR_EMPTYDROPS
-        ALEVIN_MTX_FOR_OUTPUT
-    }
+// ALEVIN_FRY_MTX
+//     .into{
+//         ALEVIN_MTX_FOR_QC
+//         ALEVIN_MTX_FOR_EMPTYDROPS
+//         ALEVIN_MTX_FOR_OUTPUT
+//     }
 
 // Make a diagnostic plot
 
