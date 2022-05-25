@@ -313,23 +313,23 @@ process mtx_alevin_fry_to_mtx {
 
 
 
-ALEVIN_FRY_RESULTS_SPLICI
-    .into{
-        ALEVIN_RESULTS_FOR_QC
-        ALEVIN_RESULTS_FOR_PROCESSING
-        ALEVIN_RESULTS_FOR_OUTPUT
-    }
+// ALEVIN_FRY_RESULTS_SPLICI
+//     .into{
+//         ALEVIN_RESULTS_FOR_QC
+//         ALEVIN_RESULTS_FOR_PROCESSING
+//         ALEVIN_RESULTS_FOR_OUTPUT
+//     }
 
 // // Convert Alevin output to MTX. There will be one of these for every run, or
 // // technical replicate group of runs
 
 
-// ALEVIN_FRY_MTX
-//     .into{
-//         ALEVIN_MTX_FOR_QC
-//         ALEVIN_MTX_FOR_EMPTYDROPS
-//         ALEVIN_MTX_FOR_OUTPUT
-//     }
+ALEVIN_FRY_MTX
+    .into{
+        ALEVIN_MTX_FOR_QC
+        ALEVIN_MTX_FOR_EMPTYDROPS
+        ALEVIN_MTX_FOR_OUTPUT
+    }
 
 // Make a diagnostic plot
 
