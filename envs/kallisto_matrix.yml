@@ -1,0 +1,11 @@
+name: kallisto_matrix
+dependencies:
+  - bioconductor-genomeinfodbdata
+  - bioconductor-tximport
+  - r-optparse
+  - r-readr
+  - r-rjson
+  - r-workflowscriptscommon
+  - r-matrix
+  - bioconductor-dropletutils
+  - tximport-scripts

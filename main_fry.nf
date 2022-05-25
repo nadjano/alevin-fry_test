@@ -71,7 +71,10 @@ process make_splici {
         path("splici_out/splici_fl*.fa") into SPLICI_FASTA_FOR_FRY
         path("splici_out/splici_fl*.tsv") into T2G_3_FOR_FRY
 
-   
+    when:
+    transcriptomeIndex == "NA"
+
+
      
     """
     pyroe make-splici ${referenceGenome} ${referenceGtf} 90 splici_out
@@ -91,6 +94,9 @@ process index_for_alevin_fry {
         
     output:
         path "alevin_index_splici" into ALEVIN_FRY_INDEX_SPLICI
+        
+    when
+    transcriptToGene == "NA"
     
   
     """
@@ -288,7 +294,7 @@ process alevin_config {
 }
 
 process mtx_alevin_fry_to_mtx {
-    publishDir "${resultsRoot}/${params.name}/${runId}", mode: 'copy', overwrite: true
+    publishDir "${resultsRoot}/${params.name}/", mode: 'copy', overwrite: true
     conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
 
     // conda "${baseDir}/envs/parse_alevin_fry.yml"
@@ -301,16 +307,14 @@ process mtx_alevin_fry_to_mtx {
 
     output:
 
-    set val(runId), path("counts_mtx") into ALEVIN_FRY_MTX
+    path("counts_mtx_${runId}") into ALEVIN_FRY_MTX
+    // file("counts_mtx_${protocol}") into PROTOCOL_COUNT_MATRICES
 
 
     """
-    alevinFryMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx
+    alevinFryMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx_${runId}
     """      
 }
-
-
-
 
 
 // ALEVIN_FRY_RESULTS_SPLICI
@@ -331,6 +335,37 @@ ALEVIN_FRY_MTX
         ALEVIN_MTX_FOR_OUTPUT
     }
 
+process merge_protocol_count_matrices {
+    
+    conda "${baseDir}/envs/kallisto_matrix.yml"
+
+    cache 'lenient'
+    
+    memory { 5.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
+    
+    publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
+    
+    input:
+        file('*') from ALEVIN_FRY_MTX.collect()
+
+    output:
+        file("counts_mtx.zip") into EXP_COUNT_MATRICES
+
+    """
+        find \$(pwd) -name 'counts_mtx_*' > dirs.txt
+        
+        ndirs=\$(cat dirs.txt | wc -l)
+        if [ "\$ndirs" -gt 1 ]; then 
+            mergeMtx.R dirs.txt counts_mtx
+        else
+            ln -s \$(cat dirs.txt) counts_mtx
+        fi
+        rm -f dirs.txt
+        zip -r counts_mtx.zip counts_mtx
+    """
+}
 // Make a diagnostic plot
 
 // ALEVIN_RESULTS_FOR_QC
