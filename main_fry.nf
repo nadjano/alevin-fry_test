@@ -58,7 +58,7 @@ process make_splici {
    
     conda "${baseDir}/envs/pyroe.yml"
 
-    memory { 20.GB * task.attempt }
+    memory { 10.GB * task.attempt }
 
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
@@ -80,7 +80,7 @@ process make_splici {
 process index_for_alevin_fry {
     publishDir "index_alevin_fry/${species}", mode: 'copy', overwrite: true
     cache 'deep'
-    memory { 20.GB * task.attempt }
+    memory { 10.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     conda "${baseDir}/envs/alevin-fry_2.yml"
@@ -106,8 +106,7 @@ process download_fastqs {
     conda "${baseDir}/envs/atlas-fastq-provider.yml"
     
     maxForks params.maxConcurrentDownloads
-    time { 1.hour * task.attempt }
-    memory { 20.GB * task.attempt }
+    memory { 10.GB * task.attempt }
 
     errorStrategy { task.attempt<=10 & task.exitStatus != 4 ? 'retry' : 'finish' } 
     
@@ -292,7 +291,7 @@ process mtx_alevin_fry_to_mtx {
 
     // conda "${baseDir}/envs/parse_alevin_fry.yml"
 
-    memory { 20.GB * task.attempt }
+    memory { 10.GB * task.attempt }
    
 
     input:
