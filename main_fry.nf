@@ -287,37 +287,38 @@ process alevin_config {
     """
 }
 
-// process mtx_alevin_fry_to_mtx {
-//     publishDir "${resultsRoot}/${name}", mode: 'copy', overwrite: true
+process mtx_alevin_fry_to_mtx {
+    publishDir "${resultsRoot}/${name}", mode: 'copy', overwrite: true
+    conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
 
-//     conda "${baseDir}/envs/parse_alevin_fry.yml"
+    conda "${baseDir}/envs/parse_alevin_fry.yml"
 
-//     memory { 20.GB * task.attempt }
+    memory { 20.GB * task.attempt }
    
 
-//     input:
-//     set val(runId), path("${runId}_ALEVIN_fry_quant") from ALEVIN_FRY_RESULTS_SPLICI
+    input:
+    set val(runId), path("${runId}_ALEVIN_fry_quant") from ALEVIN_FRY_RESULTS_SPLICI
 
-//     output:
+    output:
 
-//     set val(runId), path("counts_mtx") into ALEVIN_FRY_MTX
-
-
-//     """
-//     alevinMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx
-//     """      
-// }
+    set val(runId), path("counts_mtx") into ALEVIN_FRY_MTX
 
 
+    """
+    alevinMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx
+    """      
+}
 
 
 
-// ALEVIN_RESULTS
-//     .into{
-//         ALEVIN_RESULTS_FOR_QC
-//         ALEVIN_RESULTS_FOR_PROCESSING
-//         ALEVIN_RESULTS_FOR_OUTPUT
-//     }
+
+
+ALEVIN_RESULTS
+    .into{
+        ALEVIN_RESULTS_FOR_QC
+        ALEVIN_RESULTS_FOR_PROCESSING
+        ALEVIN_RESULTS_FOR_OUTPUT
+    }
 
 // // Convert Alevin output to MTX. There will be one of these for every run, or
 // // technical replicate group of runs
