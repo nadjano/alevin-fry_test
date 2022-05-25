@@ -321,12 +321,12 @@ process mtx_alevin_fry_to_mtx {
 // // technical replicate group of runs
 
 
-ALEVIN_FRY_MTX
-    .into{
-        ALEVIN_MTX_FOR_QC
-        ALEVIN_MTX_FOR_EMPTYDROPS
-        ALEVIN_MTX_FOR_OUTPUT
-    }
+// ALEVIN_FRY_MTX
+//     .into{
+//         ALEVIN_MTX_FOR_QC
+//         ALEVIN_MTX_FOR_EMPTYDROPS
+//         ALEVIN_MTX_FOR_OUTPUT
+//     }
 
 process merge_protocol_count_matrices {
     
