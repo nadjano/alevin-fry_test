@@ -305,7 +305,7 @@ process mtx_alevin_fry_to_mtx {
 
 
     """
-    alevinMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx
+    alevinFryMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx
     """      
 }
 
