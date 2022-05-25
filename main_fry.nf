@@ -313,7 +313,7 @@ process mtx_alevin_fry_to_mtx {
 
 
 
-ALEVIN_RESULTS
+ALEVIN_FRY_RESULTS_SPLICI
     .into{
         ALEVIN_RESULTS_FOR_QC
         ALEVIN_RESULTS_FOR_PROCESSING
