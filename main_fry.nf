@@ -52,7 +52,7 @@ SDRF_FOR_FASTQS
 
 // generate splici index if it does not exits
 process make_splici {
-    // publishDir "t2g_alevin_fry/${species}", mode: 'copy', overwrite: true
+    publishDir "t2g_alevin_fry/${species}", mode: 'copy', overwrite: true
 
     cache 'lenient'
    
@@ -82,7 +82,7 @@ process make_splici {
 }
 
 process index_for_alevin_fry {
-    // publishDir "index_alevin_fry/${species}", mode: 'copy', overwrite: true
+    publishDir "index_alevin_fry/${species}", mode: 'copy', overwrite: true
     cache 'deep'
     memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
@@ -94,7 +94,7 @@ process index_for_alevin_fry {
         
     output:
         path "alevin_index_splici" into ALEVIN_FRY_INDEX_SPLICI
-        
+
     when
     transcriptToGene == "NA"
     
