@@ -329,10 +329,11 @@ process mtx_alevin_fry_to_mtx {
 
 process merge_protocol_count_matrices {
     
-    conda "${baseDir}/envs/kallisto_matrix.yml"
+    // conda "${baseDir}/envs/kallisto_matrix.yml"
+    conda "/nfs/production/irene/ma/users/nnolte/conda/envs/dropletutils"
 
     cache 'lenient'
-    
+    yes
     memory { 5.GB * task.attempt }
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 20
