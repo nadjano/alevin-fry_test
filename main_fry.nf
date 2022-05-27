@@ -250,8 +250,8 @@ process alevin_config {
  process alevin_fry_MR3 {
     publishDir "${resultsRoot}/${params.name}", mode: 'copy', overwrite: true
     cache 'lenient'
-    cpus 4
-    memory { 10.GB * task.attempt }
+    cpus 8
+    memory { 20.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
     conda "${baseDir}/envs/alevin-fry_2.yml"
@@ -267,7 +267,7 @@ process alevin_config {
 
     """
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
-        -i alevin_index_splici -p ${task.cpus} -o ${runId}_ALEVIN_fry_map t2g_cDNA.txt 
+        -i alevin_index_splici -p ${task.cpus} -o ${runId}_ALEVIN_fry_map 
 
     if (${barcodeConfig} == "--chromium")
     then
