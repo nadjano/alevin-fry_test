@@ -96,7 +96,7 @@ plots <- lapply(names(barcode_results), function(name){
   
   list(
     dropletutils = barcode_rank_plot(br.out, roryk_count_cutoff, dropletutils_knee, dropletutils_inflection, name = paste(label, name)),
-    roryk = barcode_density_plot(batcodes, roryk_count_cutoff, dropletutils_knee, dropletutils_inflection, name = paste(label, name))
+    roryk = barcode_density_plot(barcodes, roryk_count_cutoff, dropletutils_knee, dropletutils_inflection, name = paste(label, name))
   )
 })
 names(plots) <- names(barcode_results)
