@@ -81,10 +81,12 @@ barcode_results <- list(
 
 plots <- lapply(names(barcode_results), function(name){
   
-  barcodes <- barcode_results[[name]]  
-  print(log10(as.numeric(unlist(barcodes['MappedReads']))))
+  barcodes <- barcode_results[[name]] 
+  
+  barcodes = as.numeric(unlist(barcodes['MappedReads'])))
+  
   # Get the roryk cutoff
-  roryk_count_cutoff <- pick_roryk_cutoff(as.numeric(unlist(barcodes['MappedReads'])))
+  roryk_count_cutoff <- pick_roryk_cutoff(barcodes)
   
   # Run dropletUtils' barcodeRanks to get knee etc
   br.out <- barcodeRanks(t(barcodes[,2,drop=FALSE]))
