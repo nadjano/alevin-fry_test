@@ -82,7 +82,7 @@ barcode_results <- list(
 plots <- lapply(names(barcode_results), function(name){
   
   barcodes <- barcode_results[[name]]  
-  print(barcodes)
+  print(barcodes['MappedReads'])
   # Get the roryk cutoff
   roryk_count_cutoff <- pick_roryk_cutoff(barcodes$V2)
   
