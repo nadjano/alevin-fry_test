@@ -87,7 +87,7 @@ plots <- lapply(names(barcode_results), function(name){
   
   # Get the roryk cutoff
   roryk_count_cutoff <- pick_roryk_cutoff(barcodes)
-  
+  print(roryk_count_cutoff )
   # Run dropletUtils' barcodeRanks to get knee etc
   br.out <- barcodeRanks(t(barcodes))
   print(br.out)
