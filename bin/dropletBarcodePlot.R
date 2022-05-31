@@ -90,7 +90,7 @@ plots <- lapply(names(barcode_results), function(name){
   
   # Run dropletUtils' barcodeRanks to get knee etc
   br.out <- barcodeRanks(t(barcodes))
-  
+  print(br.out)
   dropletutils_knee <- metadata(br.out)$knee
   dropletutils_inflection <- metadata(br.out)$inflection
   
