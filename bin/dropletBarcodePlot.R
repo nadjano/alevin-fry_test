@@ -68,7 +68,7 @@ barcode_rank_plot <- function(br.out, roryk_total_cutoff, knee, inflection, name
 
 # Plot the different plots and threshold statistics alongside one another
 
-raw_barcodes <- read.delim(barcode_file, header = TRUE)
+raw_barcodes <- read.delim(barcode_file, header = FALSE)
 result_matrix <- read10xCounts(result_matrix)  
 processed_barcode_counts <- data.frame(V1 = colData(result_matrix)$Barcode, V2=colSums(assays(result_matrix)[[1]]))
 processed_barcode_counts <- processed_barcode_counts[order(processed_barcode_counts$V2, decreasing = TRUE), ]
