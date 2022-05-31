@@ -93,13 +93,13 @@ plots <- lapply(names(barcode_results), function(name){
   print(br.out)
   dropletutils_knee <- metadata(br.out)$knee
   dropletutils_inflection <- metadata(br.out)$inflection
-  
+  print(dropletutils_inflection)
   list(
     dropletutils = barcode_rank_plot(br.out, roryk_count_cutoff, dropletutils_knee, dropletutils_inflection, name = paste(label, name)),
     roryk = barcode_density_plot(barcodes, roryk_count_cutoff, dropletutils_knee, dropletutils_inflection, name = paste(label, name))
   )
 })
-# names(plots) <- names(barcode_results)
+names(plots) <- names(barcode_results)
 
 png(width = 1000, height = 800, file=output_plot_file)
 grid.arrange(plots$raw$dropletutils, plots$raw$roryk, plots$processed$dropletutils, plots$processed$roryk, nrow=2)
