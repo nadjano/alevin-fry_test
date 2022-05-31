@@ -78,6 +78,7 @@ barcode_results <- list(
     processed = processed_barcode_counts
 )
 
+print(barcodes$V2)
 plots <- lapply(names(barcode_results), function(name){
   
   barcodes <- barcode_results[[name]]  
