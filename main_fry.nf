@@ -303,7 +303,7 @@ process mtx_alevin_fry_to_mtx {
    
 
     input:
-    set val(runId), path("${runId}_ALEVIN_fry_quant") from ALEVIN_RESULTS_FOR_PROCESSING
+    set val(runId), path("${runId}_ALEVIN_fry_quant"), file(rawBarcodeFreq) from ALEVIN_RESULTS_FOR_PROCESSING
 
     output:
 
