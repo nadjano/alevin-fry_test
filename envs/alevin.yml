@@ -1,6 +1,11 @@
 name: alevin
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+  - r
 dependencies:
-   - bioconda::salmon
-   - bioconda::bioconductor-dropletutils
-   - bioconda::r-gridextra
-   - bioconda::r-ggplot2
+   - salmon
+   - bioconductor-dropletutils
+   - r-gridextra
+   - r-ggplot2
