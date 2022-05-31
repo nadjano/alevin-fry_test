@@ -361,7 +361,7 @@ process merge_protocol_count_matrices {
             ln -s \$(cat dirs.txt) counts_mtx
         fi
         rm -f dirs.txt
-        zip -r counts_mtx.zip counts_mtx
+        zip -r ${params.name}_counts_mtx.zip ${params.name}_counts_mtx
     """
 }
 // Make a diagnostic plot
