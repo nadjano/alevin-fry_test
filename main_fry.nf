@@ -262,7 +262,7 @@ process alevin_config {
        
     output:
         // publishDir path "${runId}_ALEVIN"
-        set val(runId), path("${runId}_ALEVIN_fry_quant"), path("${runId}_ALEVIN_fry_quant/alevin/quants_mat_rows.txt") into ALEVIN_FRY_RESULTS_SPLICI
+        set val(runId), path("${runId}_ALEVIN_fry_quant"), path("${runId}_ALEVIN_fry_quant/featureDump.txt") into ALEVIN_FRY_RESULTS_SPLICI
       
 
     """
