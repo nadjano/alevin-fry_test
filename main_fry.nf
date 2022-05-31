@@ -262,7 +262,7 @@ process alevin_config {
        
     output:
         // publishDir path "${runId}_ALEVIN"
-        set val(runId), path("${runId}_ALEVIN_fry_quant") into ALEVIN_FRY_RESULTS_SPLICI
+        set val(runId), path("${runId}_ALEVIN_fry_quant"), path("${runId}_ALEVIN_fry_quant/alevin/quants_mat_rows.txt") into ALEVIN_FRY_RESULTS_SPLICI
       
 
     """
@@ -300,7 +300,7 @@ process mtx_alevin_fry_to_mtx {
 
     output:
 
-    path("counts_mtx_${runId}") into ALEVIN_FRY_MTX
+    set val(runId), path("counts_mtx_${runId}") into ALEVIN_FRY_MTX
     // file("counts_mtx_${protocol}") into PROTOCOL_COUNT_MATRICES
 
 
@@ -310,23 +310,25 @@ process mtx_alevin_fry_to_mtx {
 }
 
 
-// ALEVIN_FRY_RESULTS_SPLICI
-//     .into{
-//         ALEVIN_RESULTS_FOR_QC
-//         ALEVIN_RESULTS_FOR_PROCESSING
-//         ALEVIN_RESULTS_FOR_OUTPUT
-//     }
+ALEVIN_FRY_RESULTS_SPLICI
+    .into{
+        ALEVIN_RESULTS_FOR_QC
+        ALEVIN_RESULTS_FOR_PROCESSING
+        ALEVIN_RESULTS_FOR_OUTPUT
+    }
 
 // // Convert Alevin output to MTX. There will be one of these for every run, or
 // // technical replicate group of runs
 
 
-// ALEVIN_FRY_MTX
-//     .into{
-//         ALEVIN_MTX_FOR_QC
-//         ALEVIN_MTX_FOR_EMPTYDROPS
-//         ALEVIN_MTX_FOR_OUTPUT
-//     }
+ALEVIN_FRY_MTX
+    .into{
+        ALEVIN_MTX_FOR_QC
+        ALEVIN_MTX_FOR_EMPTYDROPS
+        ALEVIN_MTX_FOR_OUTPUT
+        ALEVIN_MTX_FOR_MERGE
+
+    }
 
 process merge_protocol_count_matrices {
     
@@ -342,10 +344,10 @@ process merge_protocol_count_matrices {
     publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
     
     input:
-        file('*') from ALEVIN_FRY_MTX.collect()
+        file('*') from ALEVIN_MTX_FOR_MERGE.collect()
 
     output:
-        file("counts_mtx.zip") into EXP_COUNT_MATRICES
+        file("${params.name}_counts_mtx.zip") into EXP_COUNT_MATRICES
 
     """
         find \$(pwd) -name 'counts_mtx_*' > dirs.txt
@@ -362,130 +364,130 @@ process merge_protocol_count_matrices {
 }
 // Make a diagnostic plot
 
-// ALEVIN_RESULTS_FOR_QC
-//     .join(ALEVIN_MTX_FOR_QC)
-//     .set{
-//         ALEVIN_QC_INPUTS
-//     }
+ALEVIN_RESULTS_FOR_QC
+    .join(ALEVIN_MTX_FOR_QC)
+    .set{
+        ALEVIN_QC_INPUTS
+    }
 
-// process droplet_qc_plot{
+process droplet_qc_plot{
     
-//     conda "${baseDir}/envs/alevin.yml"
+    conda "${baseDir}/envs/alevin.yml"
     
-//     memory { 10.GB * task.attempt }
-//     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
-//     maxRetries 20
+    memory { 10.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
 
-//     input:
-//         set val(runId), file(alevinResult), file(rawBarcodeFreq), file(mtx) from ALEVIN_QC_INPUTS
+    input:
+        set val(runId), file(alevinResult), file(rawBarcodeFreq), file(mtx) from ALEVIN_QC_INPUTS
 
-//     output:
-//         set val(runId), file("${runId}.png") into ALEVIN_QC_PLOTS
+    output:
+        set val(runId), file("${runId}.png") into ALEVIN_QC_PLOTS
 
-//     """
-//     dropletBarcodePlot.R $rawBarcodeFreq $mtx $runId ${runId}.png
-//     """ 
-// }
+    """
+    dropletBarcodePlot.R $rawBarcodeFreq $mtx $runId ${runId}.png
+    """ 
+}
 
 // // Remove empty droplets from Alevin results
 
-// process remove_empty_drops {
+process remove_empty_drops {
     
-//     conda "${baseDir}/envs/dropletutils.yml"
+    conda "${baseDir}/envs/dropletutils.yml"
 
-//     memory { 10.GB * task.attempt }
-//     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'ignore' }
-//     maxRetries 20
+    memory { 10.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'ignore' }
+    maxRetries 20
    
-//     input:
-//         set val(runId), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS
+    input:
+        set val(runId), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS
 
-//     output:
-//         set val(runId), file('nonempty.rds') into NONEMPTY_RDS
+    output:
+        set val(runId), file('nonempty.rds') into NONEMPTY_RDS
 
-//     """
-//         dropletutils-read-10x-counts.R -s counts_mtx -c TRUE -o matrix.rds
-//         dropletutils-empty-drops.R -i matrix.rds --lower ${params.emptyDrops.lower} --niters ${params.emptyDrops.nIters} --filter-empty ${params.emptyDrops.filterEmpty} \
-//             --filter-fdr ${params.emptyDrops.filterFdr} --ignore ${params.minCbFreq} -o nonempty.rds -t nonempty.txt
-//     """
-// }
+    """
+        dropletutils-read-10x-counts.R -s counts_mtx -c TRUE -o matrix.rds
+        dropletutils-empty-drops.R -i matrix.rds --lower ${params.emptyDrops.lower} --niters ${params.emptyDrops.nIters} --filter-empty ${params.emptyDrops.filterEmpty} \
+            --filter-fdr ${params.emptyDrops.filterFdr} --ignore ${params.minCbFreq} -o nonempty.rds -t nonempty.txt
+    """
+}
 
 // // Convert R matrix object with filtered cells back to .mtx
 
-// process rds_to_mtx{
+process rds_to_mtx{
 
-//     conda "${baseDir}/envs/dropletutils.yml"
+    conda "${baseDir}/envs/dropletutils.yml"
 
-//     memory { 10.GB * task.attempt }
-//     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
-//     maxRetries 20
+    memory { 10.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
    
-//     input:
-//         set val(runId), file(rds) from NONEMPTY_RDS
+    input:
+        set val(runId), file(rds) from NONEMPTY_RDS
 
-//     output:
-//         set val(runId), file("counts_mtx_nonempty") into NONEMPTY_MTX
+    output:
+        set val(runId), file("counts_mtx_nonempty") into NONEMPTY_MTX
 
-//     """ 
-//         #!/usr/bin/env Rscript
+    """ 
+        #!/usr/bin/env Rscript
         
-//         suppressPackageStartupMessages(require(DropletUtils))
+        suppressPackageStartupMessages(require(DropletUtils))
 
-//         counts_sce <- readRDS('$rds')
-//         write10xCounts(assays(counts_sce)[[1]], path = 'counts_mtx_nonempty', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce))
-//     """
-// }
+        counts_sce <- readRDS('$rds')
+        write10xCounts(assays(counts_sce)[[1]], path = 'counts_mtx_nonempty', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce))
+    """
+}
 
 // // Compile raw results with raw and emptyDrops-filtered MTX
 
-// ALEVIN_RESULTS_FOR_OUTPUT
-//     .join(ALEVIN_MTX_FOR_OUTPUT)
-//     .join(NONEMPTY_MTX)
-//     .join(ALEVIN_QC_PLOTS)
-//     .set{ COMPILED_RESULTS }
+ALEVIN_RESULTS_FOR_OUTPUT
+    .join(ALEVIN_MTX_FOR_OUTPUT)
+    .join(NONEMPTY_MTX)
+    .join(ALEVIN_QC_PLOTS)
+    .set{ COMPILED_RESULTS }
 
-// process compile_results{
+process compile_results{
 
-//     publishDir "$resultsRoot/alevin", mode: 'copy', overwrite: true
+    publishDir "$resultsRoot/alevin", mode: 'copy', overwrite: true
     
-//     input:
-//         set val(runId), file('raw_alevin'), file(rawBarcodeFreq), file(countsMtx), file(countsMtxNonempty), file(qcPlot) from COMPILED_RESULTS
+    input:
+        set val(runId), file('raw_alevin'), file(rawBarcodeFreq), file(countsMtx), file(countsMtxNonempty), file(qcPlot) from COMPILED_RESULTS
 
-//     output:
-//         set val(runId), file("$runId") into RESULTS_FOR_COUNTING
+    output:
+        set val(runId), file("$runId") into RESULTS_FOR_COUNTING
 
-//     """
-//         mkdir -p raw_alevin/alevin/mtx
-//         cp -P $countsMtx $countsMtxNonempty raw_alevin/alevin/mtx 
-//         mkdir -p raw_alevin/alevin/qc
-//         cp -P $qcPlot raw_alevin/alevin/qc
-//         cp -P raw_alevin $runId
-//     """
-// }
+    """
+        mkdir -p raw_alevin/alevin/mtx
+        cp -P $countsMtx $countsMtxNonempty raw_alevin/alevin/mtx 
+        mkdir -p raw_alevin/alevin/qc
+        cp -P $qcPlot raw_alevin/alevin/qc
+        cp -P raw_alevin $runId
+    """
+}
 
 // // Check the total number of runs we have 
 
-// RESULTS_FOR_COUNTING
-//     .count()
-//     .set{ ALEVIN_RESULTS_COUNT } 
+RESULTS_FOR_COUNTING
+    .count()
+    .set{ ALEVIN_RESULTS_COUNT } 
 
-// process validate_results {
+process validate_results {
     
-//     executor 'local'
+    executor 'local'
     
-//     input:
-//         val(kallistoResultCount) from ALEVIN_RESULTS_COUNT 
-//         val(targetCount) from TARGET_RESULT_COUNT
+    input:
+        val(kallistoResultCount) from ALEVIN_RESULTS_COUNT 
+        val(targetCount) from TARGET_RESULT_COUNT
 
-//     output:
-//         stdout DONE
+    output:
+        stdout DONE
 
-//     """
-//     if [ "$kallistoResultCount" -ne "$targetCount" ]; then
-//         echo "Alevin results count of $kallistoResultCount does not match expected results number ($targetCount)" 1>&2
-//         exit 1
-//     else
-//         echo "Alevin results count of $kallistoResultCount matches expected results number ($targetCount)"
-//     fi
-//     """
-// }   
+    """
+    if [ "$kallistoResultCount" -ne "$targetCount" ]; then
+        echo "Alevin results count of $kallistoResultCount does not match expected results number ($targetCount)" 1>&2
+        exit 1
+    else
+        echo "Alevin results count of $kallistoResultCount matches expected results number ($targetCount)"
+    fi
+    """
+}   

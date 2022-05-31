@@ -1,3 +1,6 @@
 name: alevin
 dependencies:
    - bioconda::salmon
+   - bioconda::bioconductor-dropletutils
+   - bioconda::r-gridextra
+   - bioconda::r-ggplot2
