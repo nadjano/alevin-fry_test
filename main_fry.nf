@@ -286,6 +286,13 @@ process alevin_config {
     """
 }
 
+ALEVIN_FRY_RESULTS_SPLICI
+    .into{
+        ALEVIN_RESULTS_FOR_QC
+        ALEVIN_RESULTS_FOR_PROCESSING
+        ALEVIN_RESULTS_FOR_OUTPUT
+    }
+
 process mtx_alevin_fry_to_mtx {
     publishDir "${resultsRoot}/${params.name}/", mode: 'copy', overwrite: true
     conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
@@ -296,7 +303,7 @@ process mtx_alevin_fry_to_mtx {
    
 
     input:
-    set val(runId), path("${runId}_ALEVIN_fry_quant") from ALEVIN_FRY_RESULTS_SPLICI
+    set val(runId), path("${runId}_ALEVIN_fry_quant") from ALEVIN_RESULTS_FOR_PROCESSING
 
     output:
 
@@ -310,12 +317,7 @@ process mtx_alevin_fry_to_mtx {
 }
 
 
-ALEVIN_FRY_RESULTS_SPLICI
-    .into{
-        ALEVIN_RESULTS_FOR_QC
-        ALEVIN_RESULTS_FOR_PROCESSING
-        ALEVIN_RESULTS_FOR_OUTPUT
-    }
+
 
 // // Convert Alevin output to MTX. There will be one of these for every run, or
 // // technical replicate group of runs
