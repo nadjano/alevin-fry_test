@@ -1,4 +1,4 @@
-name: alevin
+name: alevin_1_5_1
 channels:
   - conda-forge
   - bioconda

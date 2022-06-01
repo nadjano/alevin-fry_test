@@ -104,7 +104,7 @@ process index_for_alevin {
     memory { 10.GB * task.attempt }
     errorStrategy { task.exitStatus !=2 && (task.exitStatus == 130 || task.exitStatus == 137 || task.attempt < 3)  ? 'retry' : 'ignore' }
     maxRetries 10
-    conda "${baseDir}/envs/alevin_1_5_1.yml"
+    conda "${baseDir}/envs/alevin.yml"
 
     input:
         path reference from CUSTOM_CDNA
