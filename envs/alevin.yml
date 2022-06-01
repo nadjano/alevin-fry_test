@@ -5,7 +5,7 @@ channels:
   - defaults
   - r
 dependencies:
-   - salmon
+   - salmon=1.5.1
    - bioconductor-dropletutils
    - r-gridextra
    - r-ggplot2
