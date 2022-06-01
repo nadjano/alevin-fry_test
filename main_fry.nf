@@ -332,38 +332,7 @@ ALEVIN_FRY_MTX
 
     }
 
-process merge_protocol_count_matrices {
-    
-    // conda "${baseDir}/envs/kallisto_matrix.yml"
-    conda "/nfs/production/irene/ma/users/nnolte/conda/envs/dropletutils"
 
-    cache 'lenient'
-    
-    memory { 5.GB * task.attempt }
-    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 20
-    
-    publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
-    
-    input:
-        file('*') from ALEVIN_MTX_FOR_MERGE.collect()
-
-    output:
-        file("${params.name}_counts_mtx.zip") into EXP_COUNT_MATRICES
-
-    """
-        find \$(pwd) -name 'counts_mtx_*' > dirs.txt
-        
-        ndirs=\$(cat dirs.txt | wc -l)
-        if [ "\$ndirs" -gt 1 ]; then 
-            mergeMtx.R dirs.txt counts_mtx
-        else
-            ln -s \$(cat dirs.txt) counts_mtx
-        fi
-        rm -f dirs.txt
-        zip -r ${params.name}_counts_mtx.zip ${params.name}_counts_mtx
-    """
-}
 // Make a diagnostic plot
 
 ALEVIN_RESULTS_FOR_QC
@@ -372,24 +341,24 @@ ALEVIN_RESULTS_FOR_QC
         ALEVIN_QC_INPUTS
     }
 
-process droplet_qc_plot{
+// process droplet_qc_plot{
     
-    conda "${baseDir}/envs/alevin.yml"
+//     conda "${baseDir}/envs/alevin.yml"
     
-    memory { 10.GB * task.attempt }
-    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 20
+//     memory { 10.GB * task.attempt }
+//     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+//     maxRetries 20
 
-    input:
-        set val(runId), file(alevinResult), file(rawBarcodeFreq), file(mtx) from ALEVIN_QC_INPUTS
+//     input:
+//         set val(runId), file(alevinResult), file(rawBarcodeFreq), file(mtx) from ALEVIN_QC_INPUTS
 
-    output:
-        set val(runId), file("${runId}.png") into ALEVIN_QC_PLOTS
+//     output:
+//         set val(runId), file("${runId}.png") into ALEVIN_QC_PLOTS
 
-    """
-    dropletBarcodePlot.R $rawBarcodeFreq $mtx $runId ${runId}.png
-    """ 
-}
+//     """
+//     dropletBarcodePlot.R $rawBarcodeFreq $mtx $runId ${runId}.png
+//     """ 
+// }
 
 // // Remove empty droplets from Alevin results
 
@@ -440,56 +409,89 @@ process rds_to_mtx{
     """
 }
 
-// // Compile raw results with raw and emptyDrops-filtered MTX
+process merge_protocol_count_matrices {
+    
+    // conda "${baseDir}/envs/kallisto_matrix.yml"
+    conda "/nfs/production/irene/ma/users/nnolte/conda/envs/dropletutils"
 
-ALEVIN_RESULTS_FOR_OUTPUT
-    .join(ALEVIN_MTX_FOR_OUTPUT)
-    .join(NONEMPTY_MTX)
-    .join(ALEVIN_QC_PLOTS)
-    .set{ COMPILED_RESULTS }
-
-process compile_results{
-
-    publishDir "$resultsRoot/alevin", mode: 'copy', overwrite: true
+    cache 'lenient'
+    
+    memory { 5.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
+    
+    publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
     
     input:
-        set val(runId), file('raw_alevin'), file(rawBarcodeFreq), file(countsMtx), file(countsMtxNonempty), file(qcPlot) from COMPILED_RESULTS
+        file('*') from NONEMPTY_MTX.collect()
 
     output:
-        set val(runId), file("$runId") into RESULTS_FOR_COUNTING
+        file("${params.name}_counts_mtx_no_empty.zip") into EXP_COUNT_MATRICES
 
     """
-        mkdir -p raw_alevin/alevin/mtx
-        cp -P $countsMtx $countsMtxNonempty raw_alevin/alevin/mtx 
-        mkdir -p raw_alevin/alevin/qc
-        cp -P $qcPlot raw_alevin/alevin/qc
-        cp -P raw_alevin $runId
+        find \$(pwd) -name 'counts_mtx_*' > dirs.txt
+        
+        ndirs=\$(cat dirs.txt | wc -l)
+        if [ "\$ndirs" -gt 1 ]; then 
+            mergeMtx.R dirs.txt ${params.name}_counts_mtx
+        else
+            ln -s \$(cat dirs.txt) ${params.name}_counts_mtx
+        fi
+        rm -f dirs.txt
+        zip -r ${params.name}_counts_mtx_no_empty.zip ${params.name}_counts_mtx
     """
 }
 
+// // Compile raw results with raw and emptyDrops-filtered MTX
+
+// ALEVIN_RESULTS_FOR_OUTPUT
+//     .join(ALEVIN_MTX_FOR_OUTPUT)
+//     .join(NONEMPTY_MTX)
+//     .join(ALEVIN_QC_PLOTS)
+//     .set{ COMPILED_RESULTS }
+
+// process compile_results{
+
+//     publishDir "$resultsRoot/alevin", mode: 'copy', overwrite: true
+    
+//     input:
+//         set val(runId), file('raw_alevin'), file(rawBarcodeFreq), file(countsMtx), file(countsMtxNonempty), file(qcPlot) from COMPILED_RESULTS
+
+//     output:
+//         set val(runId), file("$runId") into RESULTS_FOR_COUNTING
+
+//     """
+//         mkdir -p raw_alevin/alevin/mtx
+//         cp -P $countsMtx $countsMtxNonempty raw_alevin/alevin/mtx 
+//         mkdir -p raw_alevin/alevin/qc
+//         cp -P $qcPlot raw_alevin/alevin/qc
+//         cp -P raw_alevin $runId
+//     """
+// }
+
 // // Check the total number of runs we have 
 
-RESULTS_FOR_COUNTING
-    .count()
-    .set{ ALEVIN_RESULTS_COUNT } 
+// RESULTS_FOR_COUNTING
+//     .count()
+//     .set{ ALEVIN_RESULTS_COUNT } 
 
-process validate_results {
+// process validate_results {
     
-    executor 'local'
+//     executor 'local'
     
-    input:
-        val(kallistoResultCount) from ALEVIN_RESULTS_COUNT 
-        val(targetCount) from TARGET_RESULT_COUNT
+//     input:
+//         val(kallistoResultCount) from ALEVIN_RESULTS_COUNT 
+//         val(targetCount) from TARGET_RESULT_COUNT
 
-    output:
-        stdout DONE
+//     output:
+//         stdout DONE
 
-    """
-    if [ "$kallistoResultCount" -ne "$targetCount" ]; then
-        echo "Alevin results count of $kallistoResultCount does not match expected results number ($targetCount)" 1>&2
-        exit 1
-    else
-        echo "Alevin results count of $kallistoResultCount matches expected results number ($targetCount)"
-    fi
-    """
-}   
+//     """
+//     if [ "$kallistoResultCount" -ne "$targetCount" ]; then
+//         echo "Alevin results count of $kallistoResultCount does not match expected results number ($targetCount)" 1>&2
+//         exit 1
+//     else
+//         echo "Alevin results count of $kallistoResultCount matches expected results number ($targetCount)"
+//     fi
+//     """
+// }   
