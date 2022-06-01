@@ -397,7 +397,7 @@ process rds_to_mtx{
         set val(runId), file(rds) from NONEMPTY_RDS
 
     output:
-        set val(runId), file("counts_mtx_nonempty") into NONEMPTY_MTX
+        set val(runId), file("counts_mtx_nonempty_${runId}") into NONEMPTY_MTX
 
     """ 
         #!/usr/bin/env Rscript
@@ -405,7 +405,7 @@ process rds_to_mtx{
         suppressPackageStartupMessages(require(DropletUtils))
 
         counts_sce <- readRDS('$rds')
-        write10xCounts(assays(counts_sce)[[1]], path = 'counts_mtx_nonempty', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce))
+        write10xCounts(assays(counts_sce)[[1]], path = 'counts_mtx_nonempty_${runId}', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce))
     """
 }
 
@@ -426,10 +426,10 @@ process merge_protocol_count_matrices {
         file('*') from NONEMPTY_MTX.collect()
 
     output:
-        file("${params.name}_counts_mtx_no_empty.zip") into EXP_COUNT_MATRICES
+        file("${params.name}_counts_mtx_nonempty.zip") into EXP_COUNT_MATRICES
 
     """
-        find \$(pwd) -name 'counts_mtx_*' > dirs.txt
+        find \$(pwd) -name 'counts_mtx_nonempty*' > dirs.txt
         
         ndirs=\$(cat dirs.txt | wc -l)
         if [ "\$ndirs" -gt 1 ]; then 
@@ -438,7 +438,7 @@ process merge_protocol_count_matrices {
             ln -s \$(cat dirs.txt) ${params.name}_counts_mtx
         fi
         rm -f dirs.txt
-        zip -r ${params.name}_counts_mtx_no_empty.zip ${params.name}_counts_mtx
+        zip -r ${params.name}_counts_mtx_nonempty.zip ${params.name}_counts_mtx
     """
 }
 
