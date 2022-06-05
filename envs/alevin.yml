@@ -3,9 +3,6 @@ channels:
   - conda-forge
   - bioconda
   - defaults
-  - r
 dependencies:
-   - salmon=1.5.1
+   - salmon==1.5.1
    - bioconductor-dropletutils
-   - r::r-gridextra
-   - r::r-ggplot2
