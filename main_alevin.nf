@@ -272,7 +272,7 @@ process alevin_config {
 
     conda "${baseDir}/envs/alevin.yml"
     
-    cache 'deep'
+    cache 'lenient'
 
     memory { 20.GB * task.attempt }
     cpus 12
