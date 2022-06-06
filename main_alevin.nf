@@ -383,13 +383,13 @@ process remove_empty_drops {
     maxRetries 20
    
     input:
-        set val(runId), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS
+        set val(runId), file("${runId}_counts_mtx") from ALEVIN_MTX_FOR_EMPTYDROPS
 
     output:
         set val(runId), file('nonempty.rds') into NONEMPTY_RDS
 
     """
-        dropletutils-read-10x-counts.R -s counts_mtx_${runId} -c TRUE -o matrix.rds
+        dropletutils-read-10x-counts.R -s ${runId}_counts_mtx -c TRUE -o matrix.rds
         dropletutils-empty-drops.R -i matrix.rds --lower ${params.emptyDrops.lower} --niters ${params.emptyDrops.nIters} --filter-empty ${params.emptyDrops.filterEmpty} \
             --filter-fdr ${params.emptyDrops.filterFdr} --ignore ${params.minCbFreq} -o nonempty.rds -t nonempty.txt
     """
