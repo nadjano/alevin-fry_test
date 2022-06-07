@@ -412,7 +412,7 @@ process rds_to_mtx{
 process merge_protocol_count_matrices {
     
     // conda "${baseDir}/envs/kallisto_matrix.yml"
-    conda "/nfs/production/irene/ma/users/nnolte/conda/envs/dropletutils"
+    conda "${baseDir}/envs/dropletutilsaggregation.yml"
 
     cache 'lenient'
     
