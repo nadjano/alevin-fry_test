@@ -1,0 +1,7 @@
+name: dropletutils_agg
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bioconductor-dropletutils=1.2.1
