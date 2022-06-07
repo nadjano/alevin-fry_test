@@ -295,9 +295,9 @@ ALEVIN_FRY_RESULTS_SPLICI
 
 process mtx_alevin_fry_to_mtx {
     publishDir "${resultsRoot}/${params.name}/", mode: 'copy', overwrite: true
-    conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
+    // conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
 
-    // conda "${baseDir}/envs/parse_alevin_fry.yml"
+    conda "${baseDir}/envs/parse_alevin.yml"
 
     memory { 10.GB * task.attempt }
    

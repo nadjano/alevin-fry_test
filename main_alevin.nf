@@ -8,6 +8,7 @@ species = params.species
 transcriptToGene = params.transcriptToGene
 transcriptomeIndex = params.transcriptomeIndex
 protocol = params.protocol
+configFile = params.configFile
 
 manualDownloadFolder =''
 if ( params.containsKey('manualDownloadFolder')){
@@ -35,6 +36,8 @@ Channel
 // TRANSCRIPT_TO_GENE = Channel.fromPath( transcriptToGene, checkIfExists: true ).first()
 REFERENCE_GENOME = Channel.fromPath(referenceFasta, checkIfExists: true ).first()
 REFERENCE_GTF = Channel.fromPath(referenceGtf, checkIfExists: true ).first()
+CONFIG_FILE = Channel.fromPath(confFile, checkIfExists: true ).first()
+
 
 
 // Read URIs from SDRF, generate target file names, and barcode locations
@@ -509,3 +512,117 @@ process merge_protocol_count_matrices {
 //     fi
 //     """
 // }   
+
+// generate cell metadata file
+
+process cell_run_mapping {
+   
+    cache 'deep'
+    
+    input:
+        set file(countMatrix), file(confFile) from EXP_COUNT_MATRICES.join(CONFIG_FILE)
+ 
+    output:
+        file('cell_to_library.txt') into CONDENSE_INPUTS
+ 
+    """
+    makeCellLibraryMapping.sh $countMatrix $confFile cell_to_library.txt 
+    """
+}
+
+// Now make a condensed SDRF file. For this to operate correctly with droplet
+// data, the cell-library mappings file must be present
+
+ES_TAGS_FOR_CONDENSE
+    .join(SMART_CELL_TO_LIB.concat(DROPLET_CELL_TO_LIB))
+    .join(META_WITH_SPECIES_FOR_TERTIARY)
+    .set{
+       CONDENSE_INPUTS
+   }
+
+process condense_sdrf {
+        
+    // publishDir "$SCXA_RESULTS/$expName/$species/metadata", mode: 'copy', overwrite: true
+    
+    cache 'deep'
+        
+    maxForks 2
+    
+    conda "${baseDir}/envs/atlas-experiment-metadata.yml"
+    
+    memory { 4.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus ==  255 ? 'retry' : 'ignore' }
+    maxRetries 10
+
+    input:
+        set file(cell_to_lib), file(idfFile), file(origSdrfFile), file(cellsFile) from CONDENSE_INPUTS 
+
+    output:
+        file("condensed-sdrf.tsv") into CONDENSED 
+
+    """
+    cellTypeFields=
+    if [ -n "$params.cellTypeField" ]; then
+        cellTypeFields="-t \\"$params.cellTypeField\\""
+    fi
+    echo -e "exclusions: $ZOOMA_EXCLUSIONS"
+    eval "single_cell_condensed_sdrf.sh -e $name -f $idfFile -o \$(pwd) -z $ZOOMA_EXCLUSIONS \$cellTypeFields"
+    mv condensed-sdrf.tsv "condensed-sdrf.tsv"
+    """        
+}
+
+CONDENSED.into{
+    CONDENSED_FOR_META
+    CONDENSED_FOR_BUNDLING
+}
+
+// 'unmelt' the condensed SDRF to get a metadata table to pass for tertiary
+// analysis
+
+process unmelt_condensed_sdrf {
+        
+    conda "${baseDir}/envs/atlas-experiment-metadata.yml"
+    
+    cache 'deep'
+    
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    
+    memory { 4.GB * task.attempt }
+    
+    maxRetries 20
+    
+    input:
+        set val(esTag), file(condensedSdrf) from CONDENSED_FOR_META
+
+    output:
+       set val(esTag), file("${esTag}.metadata.tsv") into UNMELTED_META 
+        
+    """
+    unmelt_condensed.R -i $condensedSdrf -o ${esTag}.metadata.tsv --retain-types --has-ontology
+    """        
+}
+
+// Match the cell metadata to the expression matrix 
+
+process match_metadata_to_cells {
+    
+    publishDir "$SCXA_RESULTS/$expName/$species/metadata", mode: 'copy', overwrite: true
+    
+    cache 'deep'
+    
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    
+    memory { 4.GB * task.attempt }
+    
+    maxRetries 20
+
+    input:
+        set val(esTag), file(cellMeta), val(expName), val(species), file(countMatrix) from UNMELTED_META.join(ES_TAGS_FOR_META_MATCHING).join(NEW_COUNT_MATRICES_FOR_META_MATCHING)
+
+    output:
+       set val(esTag), file("${esTag}.metadata.matched.tsv") into NEW_MATCHED_META 
+
+    """
+    matchMetadataToCells.sh $cellMeta $countMatrix ${esTag}.metadata.matched.tsv 
+    """
+}
