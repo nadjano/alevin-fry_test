@@ -54,7 +54,7 @@ umi_counts = ad.X
 # identifiers. Matrix itself needs to have genes by row, so we transpose. 
 
 pathlib.Path(mtx_out).mkdir(parents=True, exist_ok=True)
-mmwrite('%s/matrix.mtx' % mtx_out, umi_counts.transpose(), field='integer') 
+mmwrite('%s/matrix.mtx' % mtx_out, umi_counts.transpose(), field='real') 
 
 genes_frame = pd.DataFrame(zip(gene_names, gene_names))
 genes_frame.to_csv(path_or_buf='%s/genes.tsv' % mtx_out, index=False, sep="\t", header = False)
