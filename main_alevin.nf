@@ -534,7 +534,7 @@ process cell_metadata {
     publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
 
     input:
-        set file("${params.name}_counts_mtx_nonempty"), file("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_MATRICES.join(EXP_COUNT_MATRICES)
+        set file("${params.name}_counts_mtx_nonempty"), file("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_MATRICES.join(EXP_COUNT_BARCODES)
     
     output:
         set file("${params.name}_counts_mtx_nonempty"), file("${params.name}.cell_metadata.tsv") into FINAL_OUTPUT

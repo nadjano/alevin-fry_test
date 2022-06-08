@@ -427,8 +427,8 @@ process merge_protocol_count_matrices {
         file('*') from NONEMPTY_MTX.collect()
 
     output:
-        file("${params.name}_counts_mtx_nonempty") into EXP_COUNT_MATRICES
-        file("${params.name}_counts_mtx_nonempty/barcodes.tsv") into EXP_COUNT_BARCODES
+        path("${params.name}_counts_mtx_nonempty") into EXP_COUNT_MATRICES
+        path("${params.name}_counts_mtx_nonempty/barcodes.tsv") into EXP_COUNT_BARCODES
 
     """
         find \$(pwd) -name 'counts_mtx_nonempty*' > dirs.txt
@@ -513,7 +513,7 @@ process cell_metadata {
     publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
 
     input:
-        set file("${params.name}_counts_mtx_nonempty"), file("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_MATRICES.join(EXP_COUNT_BARCODES)
+        set path("${params.name}_counts_mtx_nonempty"), path("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_MATRICES.join(EXP_COUNT_BARCODES)
     
     output:
         set file("${params.name}_counts_mtx_nonempty"), file("${params.name}.cell_metadata.tsv") into FINAL_OUTPUT
