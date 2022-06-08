@@ -535,10 +535,9 @@ process cell_metadata {
 
     input:
         set file("${params.name}_counts_mtx_nonempty"), file("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_MATRICES.join(EXP_COUNT_MATRICES)
-        
-
+    
     output:
-        file("${params.name}_counts_mtx_nonempty"), "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
+        set file("${params.name}_counts_mtx_nonempty"), "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
 
     """
     alevinMtxTo10x.py --cell_prefix ${runId}- $alevinResult ${runId}_counts_mtx
