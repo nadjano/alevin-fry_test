@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
-import padas as pd
+import pandas as pd
 
 
 parser = argparse.ArgumentParser(description= 'Produce cell medadata file from barcodes.tsv sdrf.file and cells.file.')
