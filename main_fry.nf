@@ -382,7 +382,7 @@ process merge_protocol_count_matrices {
 
     output:
         path("${params.name}_counts_mtx") into RAW_COUNT_MATRICES
-        path("${params.name}_counts_mtx/barcodes.tsv") into EXP_COUNT_BARCODES
+        
 
     """
         find \$(pwd) -name 'counts_mtx*' > dirs.txt
