@@ -434,9 +434,9 @@ process merge_protocol_count_matrices {
         
         ndirs=\$(cat dirs.txt | wc -l)
         if [ "\$ndirs" -gt 1 ]; then 
-            mergeMtx.R dirs.txt ${params.name}_counts_mtx
+            mergeMtx.R dirs.txt ${params.name}_counts_mtx_nonempty
         else
-            ln -s \$(cat dirs.txt) ${params.name}_counts_mtx
+            ln -s \$(cat dirs.txt) ${params.name}_counts_mtx_nonempty
         fi
         rm -f dirs.txt
         
