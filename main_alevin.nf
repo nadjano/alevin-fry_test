@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
 sdrfFile = params.sdrf
+sdrfMeta = params.meta
 cellsFile = params.cells
 resultsRoot = params.resultsRoot
 referenceFasta = params.referenceFasta
@@ -540,7 +541,7 @@ process cell_metadata {
     file("${params.name}.cell_metadata.tsv") into FINAL_META
 
     """
-    make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
+    make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfMeta $cellsFile ${params.name}.cell_metadata.tsv
     """ 
   
 }

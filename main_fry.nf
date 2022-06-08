@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
 sdrfFile = params.sdrf
+sdrfMeta = params.meta
 cellsFile = params.cells
 resultsRoot = params.resultsRoot
 referenceFasta = params.referenceFasta
@@ -516,11 +517,11 @@ process cell_metadata {
     path("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_BARCODES
     
     output:
-        // file("${params.name}_counts_mtx_nonempty") into FINAL_MATRIX
+    file("${params.name}_counts_mtx_nonempty") into FINAL_MATRIX
     path "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
 
     """
-    make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
+    make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfMeta $cellsFile ${params.name}.cell_metadata.tsv
     """ 
   
 }
