@@ -38,4 +38,4 @@ cell_meta = pd.merge(merge, cells, how = 'left',on="Cell ID").drop_duplicates(su
 cell_meta.columns = ["id", "run", "individual", "inferred_cell_type_-_ontology_labels"]
 
 #write file
-cell_meta.to_csv("test_meta.tsv", sep='\t')
+cell_meta.to_csv("test_meta.tsv", sep='\t', index = False)
