@@ -540,7 +540,6 @@ process cell_metadata {
         set file("${params.name}_counts_mtx_nonempty"), "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
 
     """
-    alevinMtxTo10x.py --cell_prefix ${runId}- $alevinResult ${runId}_counts_mtx
     make_cell_metadata.py "${params.name}_counts_mtx_nonempty/barcodes.tsv" $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
     """ 
   
