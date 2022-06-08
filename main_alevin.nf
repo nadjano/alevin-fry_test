@@ -442,7 +442,6 @@ process merge_protocol_count_matrices {
     maxRetries 20
     
     
-    
     input:
         file('*') from NONEMPTY_MTX.collect()
 
