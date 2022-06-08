@@ -36,7 +36,7 @@ Channel
 // TRANSCRIPT_TO_GENE = Channel.fromPath( transcriptToGene, checkIfExists: true ).first()
 REFERENCE_GENOME = Channel.fromPath(referenceFasta, checkIfExists: true ).first()
 REFERENCE_GTF = Channel.fromPath(referenceGtf, checkIfExists: true ).first()
-CONFIG_FILE = Channel.fromPath(configFile, checkIfExists: true ).first()
+// CONFIG_FILE = Channel.fromPath(configFile, checkIfExists: true ).first()
 
 
 
@@ -520,13 +520,13 @@ process cell_run_mapping {
     cache 'deep'
     
     input:
-        set file(countMatrix), file(confFile) from EXP_COUNT_MATRICES.join(CONFIG_FILE)
+        file(countMatrix) from EXP_COUNT_MATRICES
  
     output:
         file('cell_to_library.txt') into CONDENSE_INPUTS
  
     """
-    makeCellLibraryMapping.sh $countMatrix $confFile cell_to_library.txt 
+    makeCellLibraryMapping.sh $countMatrix $configFile cell_to_library.txt 
     """
 }
 
