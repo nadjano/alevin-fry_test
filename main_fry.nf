@@ -555,7 +555,7 @@ process cell_metadata_raw {
     set path("${params.name}_counts_mtx_raw"), path("${params.name}.cell_metadata_raw.tsv") into FINAL_OUTPUT_RAW
     
     """
-    make_cell_metadata.py ${params.name}_counts_mtx_raw/barcodes.tsv $sdrfMeta $cellsFile ${params.name}.cell_metadata.tsv
+    make_cell_metadata.py ${params.name}_counts_mtx_raw/barcodes.tsv $sdrfMeta $cellsFile ${params.name}.cell_metadata_raw.tsv
     """ 
   
 }
