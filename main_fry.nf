@@ -364,6 +364,40 @@ ALEVIN_RESULTS_FOR_QC
 
 // // Remove empty droplets from Alevin results
 
+process merge_protocol_count_matrices {
+    
+    // conda "${baseDir}/envs/kallisto_matrix.yml"
+    conda "${baseDir}/envs/dropletutilsaggregation.yml"
+
+    cache 'lenient'
+    
+    memory { 5.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
+    
+    // publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
+    
+    input:
+        file('*') from ALEVIN_MTX_FOR_MERGE.collect()
+
+    output:
+        path("${params.name}_counts_mtx") into RAW_COUNT_MATRICES
+        path("${params.name}_counts_mtx/barcodes.tsv") into EXP_COUNT_BARCODES
+
+    """
+        find \$(pwd) -name 'counts_mtx*' > dirs.txt
+        
+        ndirs=\$(cat dirs.txt | wc -l)
+        if [ "\$ndirs" -gt 1 ]; then 
+            mergeMtx.R dirs.txt ${params.name}_counts_mtx_nonempty
+        else
+            ln -s \$(cat dirs.txt) ${params.name}_counts_mtx_nonempty
+        fi
+        rm -f dirs.txt
+        
+    """
+}
+
 process remove_empty_drops {
     
     conda "${baseDir}/envs/dropletutils.yml"
@@ -411,7 +445,7 @@ process rds_to_mtx{
     """
 }
 
-process merge_protocol_count_matrices {
+process merge_protocol_count_matrices_nonempty {
     
     // conda "${baseDir}/envs/kallisto_matrix.yml"
     conda "${baseDir}/envs/dropletutilsaggregation.yml"
@@ -454,6 +488,7 @@ process merge_protocol_count_matrices {
 //     .set{ COMPILED_RESULTS }
 
 // process compile_results{
+
 
 //     publishDir "$resultsRoot/alevin", mode: 'copy', overwrite: true
     
@@ -516,10 +551,12 @@ process cell_metadata {
     input:
     path("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_BARCODES
     path("${params.name}_counts_mtx_nonempty") from EXP_COUNT_MATRICES
+    path("${params.name}_counts_mtx") from RAW_COUNT_MATRICES
     
     output:
     path "${params.name}_counts_mtx_nonempty" into FINAL_MATRIX
     path "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
+    path("${params.name}_counts_mtx") into RAW_FINAL_MATRIX
 
     """
     make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfMeta $cellsFile ${params.name}.cell_metadata.tsv
