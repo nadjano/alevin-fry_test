@@ -8,16 +8,18 @@ parser = argparse.ArgumentParser(description= 'Produce cell medadata file from b
 parser.add_argument('barcodes_file', help = 'barcodes.tsv file')
 parser.add_argument('sdrfFile', help = 'sdrfFile')
 parser.add_argument('cells_txt', help = 'file with cell_type information per cell')
+parser.add_argument('out_file', help = 'name of output')
 args = parser.parse_args() 
 
 barcodes_file =args.barcodes_file
 sdrfFile=args.sdrfFile
 cells_txt=args.cells_txt
+out = args.out_file
 
 #read in files
-barcodes = pd.read_csv(barcodes_file, header=None)
-sdrf = pd.read_txt(sdrfFile, header=None)
-cells = pd.read_txt(cells_txt, header=None)
+barcodes = pd.read_csv(barcodes_file, header=None, names = ["Cell ID"])
+sdrf = pd.read_csv(sdrfFile,header=0,  delimiter="\t")
+cells = pd.read_csv(cells_txt, header=0,  delimiter="\t")
 
 #seperate run ID and barcode
 f = lambda x: x[0].split("-")[0]
@@ -38,4 +40,4 @@ cell_meta = pd.merge(merge, cells, how = 'left',on="Cell ID").drop_duplicates(su
 cell_meta.columns = ["id", "run", "individual", "inferred_cell_type_-_ontology_labels"]
 
 #write file
-cell_meta.to_csv("test_meta.tsv", sep='\t', index = False)
+cell_meta.to_csv(out, sep='\t', index = False)

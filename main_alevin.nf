@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
 sdrfFile = params.sdrf
+cellsFile = params.cells
 resultsRoot = params.resultsRoot
 referenceFasta = params.referenceFasta
 referenceGtf = params.referenceGtf
@@ -8,6 +9,7 @@ species = params.species
 transcriptToGene = params.transcriptToGene
 transcriptomeIndex = params.transcriptomeIndex
 protocol = params.protocol
+
 // configFile = params.configFile
 
 manualDownloadFolder =''
@@ -426,6 +428,8 @@ process rds_to_mtx{
     """
 }
 
+
+
 process merge_protocol_count_matrices {
     
     // conda "${baseDir}/envs/kallisto_matrix.yml"
@@ -437,13 +441,14 @@ process merge_protocol_count_matrices {
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 20
     
-    publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
+    
     
     input:
         file('*') from NONEMPTY_MTX.collect()
 
     output:
-        file("${params.name}_counts_mtx_nonempty.zip") into EXP_COUNT_MATRICES
+        file("${params.name}_counts_mtx_nonempty") into EXP_COUNT_MATRICES
+        file("${params.name}_counts_mtx_nonempty/barcodes.tsv") into EXP_COUNT_BARCODES
 
     """
         find \$(pwd) -name 'counts_mtx_nonempty*' > dirs.txt
@@ -455,7 +460,7 @@ process merge_protocol_count_matrices {
             ln -s \$(cat dirs.txt) ${params.name}_counts_mtx
         fi
         rm -f dirs.txt
-        zip -r ${params.name}_counts_mtx_nonempty.zip ${params.name}_counts_mtx
+       
     """
 }
 
@@ -515,114 +520,30 @@ process merge_protocol_count_matrices {
 
 // generate cell metadata file
 
-process cell_run_mapping {
-   
-    cache 'deep'
+process cell_metadata {
+
+
+    conda "${baseDir}/envs/parse_alevin_fry.yml"
+
+    // conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
     
+    memory { 10.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
+
+    publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
+
     input:
-        file(countMatrix) from EXP_COUNT_MATRICES
- 
+        set file("${params.name}_counts_mtx_nonempty"), file("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_MATRICES.join(EXP_COUNT_MATRICES)
+        
+
     output:
-        file('cell_to_library.txt') into CONDENSE_INPUTS
- 
+        file("${params.name}_counts_mtx_nonempty"), "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
+
     """
-    makeCellLibraryMapping.sh $countMatrix $config cell_to_library.txt 
-    """
+    alevinMtxTo10x.py --cell_prefix ${runId}- $alevinResult ${runId}_counts_mtx
+    make_cell_metadata.py "${params.name}_counts_mtx_nonempty/barcodes.tsv" $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
+    """ 
+  
 }
 
-// Now make a condensed SDRF file. For this to operate correctly with droplet
-// data, the cell-library mappings file must be present
-
-// ES_TAGS_FOR_CONDENSE
-//     .join(SMART_CELL_TO_LIB.concat(DROPLET_CELL_TO_LIB))
-//     .join(META_WITH_SPECIES_FOR_TERTIARY)
-//     .set{
-//        CONDENSE_INPUTS
-//    }
-
-// process condense_sdrf {
-        
-//     // publishDir "$SCXA_RESULTS/$expName/$species/metadata", mode: 'copy', overwrite: true
-    
-//     cache 'deep'
-        
-//     maxForks 2
-    
-//     conda "${baseDir}/envs/atlas-experiment-metadata.yml"
-    
-//     memory { 4.GB * task.attempt }
-//     errorStrategy { task.exitStatus == 130 || task.exitStatus ==  255 ? 'retry' : 'ignore' }
-//     maxRetries 10
-
-//     input:
-//         set file(cell_to_lib), file(idfFile), file(origSdrfFile), file(cellsFile) from CONDENSE_INPUTS 
-
-//     output:
-//         file("condensed-sdrf.tsv") into CONDENSED 
-
-//     """
-//     cellTypeFields=
-//     if [ -n "$params.cellTypeField" ]; then
-//         cellTypeFields="-t \\"$params.cellTypeField\\""
-//     fi
-//     echo -e "exclusions: $ZOOMA_EXCLUSIONS"
-//     eval "single_cell_condensed_sdrf.sh -e $name -f $idfFile -o \$(pwd) -z $ZOOMA_EXCLUSIONS \$cellTypeFields"
-//     mv condensed-sdrf.tsv "condensed-sdrf.tsv"
-//     """        
-// }
-
-// CONDENSED.into{
-//     CONDENSED_FOR_META
-//     CONDENSED_FOR_BUNDLING
-// }
-
-// // 'unmelt' the condensed SDRF to get a metadata table to pass for tertiary
-// // analysis
-
-// process unmelt_condensed_sdrf {
-        
-//     conda "${baseDir}/envs/atlas-experiment-metadata.yml"
-    
-//     cache 'deep'
-    
-//     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
-    
-//     memory { 4.GB * task.attempt }
-    
-//     maxRetries 20
-    
-//     input:
-//         set val(esTag), file(condensedSdrf) from CONDENSED_FOR_META
-
-//     output:
-//        set val(esTag), file("${esTag}.metadata.tsv") into UNMELTED_META 
-        
-//     """
-//     unmelt_condensed.R -i $condensedSdrf -o ${esTag}.metadata.tsv --retain-types --has-ontology
-//     """        
-// }
-
-// // Match the cell metadata to the expression matrix 
-
-// process match_metadata_to_cells {
-    
-//     publishDir "$SCXA_RESULTS/$expName/$species/metadata", mode: 'copy', overwrite: true
-    
-//     cache 'deep'
-    
-//     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
-    
-//     memory { 4.GB * task.attempt }
-    
-//     maxRetries 20
-
-//     input:
-//         set val(esTag), file(cellMeta), val(expName), val(species), file(countMatrix) from UNMELTED_META.join(ES_TAGS_FOR_META_MATCHING).join(NEW_COUNT_MATRICES_FOR_META_MATCHING)
-
-//     output:
-//        set val(esTag), file("${esTag}.metadata.matched.tsv") into NEW_MATCHED_META 
-
-//     """
-//     matchMetadataToCells.sh $cellMeta $countMatrix ${esTag}.metadata.matched.tsv 
-//     """
-// }
