@@ -21,6 +21,7 @@ barcodes = pd.read_csv(barcodes_file, header=None, names = ["Cell ID"])
 sdrf = pd.read_csv(sdrfFile,header=0,  delimiter="\t")
 cells = pd.read_csv(cells_txt, header=0,  delimiter="\t")
 
+print(sdrf)
 #seperate run ID and barcode
 f = lambda x: x[0].split("-")[0]
 barcodes["Comment [BioSD_SAMPLE]"] = barcodes.apply(f, axis=1)
