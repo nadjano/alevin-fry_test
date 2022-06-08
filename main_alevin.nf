@@ -314,7 +314,7 @@ ALEVIN_RESULTS
 
 process alevin_to_mtx {
 
-    conda "${baseDir}/envs/parse_alevin.yml"
+    conda "${baseDir}/envs/parse_alevin_fry.yml"
 
     // conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
     
