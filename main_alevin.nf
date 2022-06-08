@@ -36,7 +36,7 @@ Channel
 // TRANSCRIPT_TO_GENE = Channel.fromPath( transcriptToGene, checkIfExists: true ).first()
 REFERENCE_GENOME = Channel.fromPath(referenceFasta, checkIfExists: true ).first()
 REFERENCE_GTF = Channel.fromPath(referenceGtf, checkIfExists: true ).first()
-CONFIG_FILE = Channel.fromPath(confFile, checkIfExists: true ).first()
+CONFIG_FILE = Channel.fromPath(configFile, checkIfExists: true ).first()
 
 
 
