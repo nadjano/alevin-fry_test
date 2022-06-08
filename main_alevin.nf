@@ -534,7 +534,6 @@ process cell_metadata {
     publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
 
     input:
-    input:
     path("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_BARCODES
     path("${params.name}_counts_mtx_nonempty") from EXP_COUNT_MATRICES
 
