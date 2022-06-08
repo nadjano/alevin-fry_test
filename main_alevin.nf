@@ -8,7 +8,7 @@ species = params.species
 transcriptToGene = params.transcriptToGene
 transcriptomeIndex = params.transcriptomeIndex
 protocol = params.protocol
-configFile = params.configFile
+// configFile = params.configFile
 
 manualDownloadFolder =''
 if ( params.containsKey('manualDownloadFolder')){
@@ -526,7 +526,7 @@ process cell_run_mapping {
         file('cell_to_library.txt') into CONDENSE_INPUTS
  
     """
-    makeCellLibraryMapping.sh $countMatrix $configFile cell_to_library.txt 
+    makeCellLibraryMapping.sh $countMatrix $config cell_to_library.txt 
     """
 }
 
