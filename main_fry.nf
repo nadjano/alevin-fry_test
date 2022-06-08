@@ -421,7 +421,7 @@ process merge_protocol_count_matrices {
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 20
     
-    publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
+    // publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
     
     input:
         file('*') from NONEMPTY_MTX.collect()
@@ -516,7 +516,8 @@ process cell_metadata {
         set path("${params.name}_counts_mtx_nonempty"), path("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_MATRICES.join(EXP_COUNT_BARCODES)
     
     output:
-        set file("${params.name}_counts_mtx_nonempty"), file("${params.name}.cell_metadata.tsv") into FINAL_OUTPUT
+        file("${params.name}_counts_mtx_nonempty") into FINAL_MATRIX
+        file("${params.name}.cell_metadata.tsv") into FINAL_OUTPUT
 
     """
 
