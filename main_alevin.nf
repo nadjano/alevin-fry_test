@@ -536,11 +536,11 @@ process cell_metadata {
         set file("${params.name}_counts_mtx_nonempty"), file("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_MATRICES.join(EXP_COUNT_BARCODES)
     
     output:
-        file("${params.name}_counts_mtx_nonempty") into FINAL_MATRIX
+        // file("${params.name}_counts_mtx_nonempty") into FINAL_MATRIX
         file("${params.name}.cell_metadata.tsv") into FINAL_META
 
     """
-    python make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
+    make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
     """ 
   
 }

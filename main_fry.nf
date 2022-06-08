@@ -517,11 +517,10 @@ process cell_metadata {
     
     output:
         // file("${params.name}_counts_mtx_nonempty") into FINAL_MATRIX
-        file("${params.name}.cell_metadata.tsv") into FINAL_OUTPUT
+        path "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
 
     """
-
-    python make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
+    make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
     """ 
   
 }
