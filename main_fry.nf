@@ -297,7 +297,7 @@ process mtx_alevin_fry_to_mtx {
     publishDir "${resultsRoot}/${params.name}/", mode: 'copy', overwrite: true
     // conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
 
-    conda "${baseDir}/envs/parse_alevin.yml"
+    conda "${baseDir}/envs/parse_alevin_fry.yml"
 
     memory { 10.GB * task.attempt }
    
@@ -426,7 +426,8 @@ process merge_protocol_count_matrices {
         file('*') from NONEMPTY_MTX.collect()
 
     output:
-        file("${params.name}_counts_mtx_nonempty.zip") into EXP_COUNT_MATRICES
+        file("${params.name}_counts_mtx_nonempty") into EXP_COUNT_MATRICES
+        file("${params.name}_counts_mtx_nonempty/barcodes.tsv") into EXP_COUNT_BARCODES
 
     """
         find \$(pwd) -name 'counts_mtx_nonempty*' > dirs.txt
@@ -438,7 +439,7 @@ process merge_protocol_count_matrices {
             ln -s \$(cat dirs.txt) ${params.name}_counts_mtx
         fi
         rm -f dirs.txt
-        zip -r ${params.name}_counts_mtx_nonempty.zip ${params.name}_counts_mtx
+        
     """
 }
 
@@ -495,3 +496,30 @@ process merge_protocol_count_matrices {
 //     fi
 //     """
 // }   
+
+
+process cell_metadata {
+
+
+    conda "${baseDir}/envs/parse_alevin_fry.yml"
+
+    // conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
+    
+    memory { 10.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
+
+    publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
+
+    input:
+        set file("${params.name}_counts_mtx_nonempty"), file("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_MATRICES.join(EXP_COUNT_MATRICES)
+    
+    output:
+        set file("${params.name}_counts_mtx_nonempty"), "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
+
+    """
+
+    make_cell_metadata.py "${params.name}_counts_mtx_nonempty/barcodes.tsv" $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
+    """ 
+  
+}
