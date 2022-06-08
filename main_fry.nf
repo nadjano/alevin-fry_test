@@ -381,7 +381,8 @@ process merge_protocol_count_matrices {
         file('*') from ALEVIN_MTX_FOR_MERGE.collect()
 
     output:
-        path("${params.name}_counts_mtx") into RAW_COUNT_MATRICES
+        path("${params.name}_counts_mtx_raw") into RAW_COUNT_MATRICES
+        
         
 
     """
@@ -389,9 +390,9 @@ process merge_protocol_count_matrices {
         
         ndirs=\$(cat dirs.txt | wc -l)
         if [ "\$ndirs" -gt 1 ]; then 
-            mergeMtx.R dirs.txt ${params.name}_counts_mtx_nonempty
+            mergeMtx.R dirs.txt ${params.name}_counts_mtx_raw
         else
-            ln -s \$(cat dirs.txt) ${params.name}_counts_mtx_nonempty
+            ln -s \$(cat dirs.txt) ${params.name}_counts_mtx_raw
         fi
         rm -f dirs.txt
         
@@ -534,6 +535,30 @@ process merge_protocol_count_matrices_nonempty {
 //     """
 // }   
 
+process cell_metadata_raw {
+
+
+    conda "${baseDir}/envs/parse_alevin_fry.yml"
+
+    // conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
+    
+    memory { 10.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
+
+    publishDir "$resultsRoot/raw", mode: 'copy', overwrite: true
+
+    input:
+    path("${params.name}_counts_mtx_raw") from RAW_COUNT_MATRICES
+    
+    output:
+    set path("${params.name}_counts_mtx_raw"), path("${params.name}.cell_metadata_raw.tsv") into FINAL_OUTPUT_RAW
+    
+    """
+    make_cell_metadata.py ${params.name}_counts_mtx_raw/barcodes.tsv $sdrfMeta $cellsFile ${params.name}.cell_metadata.tsv
+    """ 
+  
+}
 
 process cell_metadata {
 
@@ -546,17 +571,17 @@ process cell_metadata {
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 20
 
-    publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
+    publishDir "$resultsRoot/nonempty", mode: 'copy', overwrite: true
 
     input:
     path("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_BARCODES
     path("${params.name}_counts_mtx_nonempty") from EXP_COUNT_MATRICES
-    path("${params.name}_counts_mtx") from RAW_COUNT_MATRICES
+    
     
     output:
-    path "${params.name}_counts_mtx_nonempty" into FINAL_MATRIX
-    path "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
-    path("${params.name}_counts_mtx") into RAW_FINAL_MATRIX
+    set path "${params.name}_counts_mtx_nonempty", path "${params.name}.cell_metadata_nonempty.tsv" into FINAL_OUTPUT_NONEMPTY
+
+    
 
     """
     make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfMeta $cellsFile ${params.name}.cell_metadata.tsv
