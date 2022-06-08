@@ -515,6 +515,7 @@ process cell_metadata {
 
     input:
     path("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_BARCODES
+    path("${params.name}_counts_mtx_nonempty") from EXP_COUNT_MATRICES
     
     output:
     file("${params.name}_counts_mtx_nonempty") into FINAL_MATRIX
