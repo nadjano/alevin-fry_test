@@ -428,7 +428,7 @@ process merge_protocol_count_matrices {
         file('*') from NONEMPTY_MTX.collect()
 
     output:
-        // path("${params.name}_counts_mtx_nonempty") into EXP_COUNT_MATRICES
+        path("${params.name}_counts_mtx_nonempty") into EXP_COUNT_MATRICES
         path("${params.name}_counts_mtx_nonempty/barcodes.tsv") into EXP_COUNT_BARCODES
 
     """
@@ -518,7 +518,7 @@ process cell_metadata {
     path("${params.name}_counts_mtx_nonempty") from EXP_COUNT_MATRICES
     
     output:
-    file("${params.name}_counts_mtx_nonempty") into FINAL_MATRIX
+    path "${params.name}_counts_mtx_nonempty" into FINAL_MATRIX
     path "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
 
     """
