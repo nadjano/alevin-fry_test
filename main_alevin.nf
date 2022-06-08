@@ -447,8 +447,8 @@ process merge_protocol_count_matrices {
         file('*') from NONEMPTY_MTX.collect()
 
     output:
-        file("${params.name}_counts_mtx_nonempty") into EXP_COUNT_MATRICES
-        file("${params.name}_counts_mtx_nonempty/barcodes.tsv") into EXP_COUNT_BARCODES
+        path("${params.name}_counts_mtx_nonempty") into EXP_COUNT_MATRICES
+        path("${params.name}_counts_mtx_nonempty/barcodes.tsv") into EXP_COUNT_BARCODES
 
     """
         find \$(pwd) -name 'counts_mtx_nonempty*' > dirs.txt
@@ -534,11 +534,13 @@ process cell_metadata {
     publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
 
     input:
-    set file("${params.name}_counts_mtx_nonempty"), file("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_MATRICES.join(EXP_COUNT_BARCODES)
-    
+    input:
+    path("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_BARCODES
+    path("${params.name}_counts_mtx_nonempty") from EXP_COUNT_MATRICES
+
     output:
-    file("${params.name}_counts_mtx_nonempty") into FINAL_MATRIX
-    file("${params.name}.cell_metadata.tsv") into FINAL_META
+    path "${params.name}_counts_mtx_nonempty" into FINAL_MATRIX
+    path "${params.name}.cell_metadata.tsv" into FINAL_META
 
     """
     make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfMeta $cellsFile ${params.name}.cell_metadata.tsv
