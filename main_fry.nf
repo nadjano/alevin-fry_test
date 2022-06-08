@@ -427,7 +427,7 @@ process merge_protocol_count_matrices {
         file('*') from NONEMPTY_MTX.collect()
 
     output:
-        path("${params.name}_counts_mtx_nonempty") into EXP_COUNT_MATRICES
+        // path("${params.name}_counts_mtx_nonempty") into EXP_COUNT_MATRICES
         path("${params.name}_counts_mtx_nonempty/barcodes.tsv") into EXP_COUNT_BARCODES
 
     """
@@ -510,14 +510,14 @@ process cell_metadata {
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 20
 
-    // publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
+    publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
 
     input:
-        set path("${params.name}_counts_mtx_nonempty"), path("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_MATRICES.join(EXP_COUNT_BARCODES)
+    path("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_BARCODES
     
     output:
         // file("${params.name}_counts_mtx_nonempty") into FINAL_MATRIX
-        path "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
+    path "${params.name}.cell_metadata.tsv" into FINAL_OUTPUT
 
     """
     make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
