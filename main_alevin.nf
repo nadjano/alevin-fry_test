@@ -540,7 +540,7 @@ process cell_metadata {
         set file("${params.name}_counts_mtx_nonempty"), file("${params.name}.cell_metadata.tsv") into FINAL_OUTPUT
 
     """
-    make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
+    python make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfFile $cellsFile ${params.name}.cell_metadata.tsv
     """ 
   
 }
