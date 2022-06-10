@@ -276,7 +276,7 @@ process alevin_config {
         alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt' --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
     elif (${barcodeConfig} == "--chromiumV3")
     then
-        alevin-fry generate-permit-list  -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
+        alevin-fry generate-permit-list  -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 0
     else
         alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
     fi
