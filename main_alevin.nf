@@ -399,7 +399,7 @@ process merge_protocol_count_matrices {
         file('*') from ALEVIN_MTX_FOR_MERGE.collect()
 
     output:
-        path("${params.name}_counts_mtx_raw") into RAW_COUNT_MATRICES
+        file("${params.name}_counts_mtx_raw") into RAW_COUNT_MATRICES
         
         
 
