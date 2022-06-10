@@ -399,13 +399,13 @@ process merge_protocol_count_matrices {
         file('*') from ALEVIN_MTX_FOR_MERGE.collect()
 
     output:
-        file("${params.name}_counts_mtx_raw") into RAW_COUNT_MATRICES
+        path("${params.name}_counts_mtx_raw") into RAW_COUNT_MATRICES
         
         
 
     """
-        find \$(pwd) -name 'counts_mtx*' > dirs.txt
-        
+        find \$(pwd) -name '*_counts_mtx' > dirs.txt
+    
         ndirs=\$(cat dirs.txt | wc -l)
         if [ "\$ndirs" -gt 1 ]; then 
             mergeMtx.R dirs.txt ${params.name}_counts_mtx_raw
