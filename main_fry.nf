@@ -271,14 +271,14 @@ process alevin_config {
     salmon alevin ${barcodeConfig} --sketch -1 \$(ls barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls cdna*.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_splici -p ${task.cpus} -o ${runId}_ALEVIN_fry_map 
 
-    if (${barcodeConfig} == "--chromium")
+    if (${params.protocol} == "10XV2")
     then
-        alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt' --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
-    elif (${barcodeConfig} == "--chromiumV3")
+        alevin-fry generate-permit-list --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt' --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 0
+    elif (${params.protocol} == "10XV3")
     then
-        alevin-fry generate-permit-list  -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 0
+        alevin-fry generate-permit-list --unfiltered-pl ${baseDir}/whitelist/3M-february-2018.txt.gz  -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 0
     else
-        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 1
+        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 0
     fi
 
     alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 16
