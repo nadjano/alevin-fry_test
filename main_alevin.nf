@@ -382,6 +382,41 @@ ALEVIN_RESULTS_FOR_QC
 
 // // Remove empty droplets from Alevin results
 
+process merge_protocol_count_matrices {
+    
+    // conda "${baseDir}/envs/kallisto_matrix.yml"
+    conda "${baseDir}/envs/dropletutilsaggregation.yml"
+
+    cache 'lenient'
+    
+    memory { 5.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
+    
+    // publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
+    
+    input:
+        file('*') from ALEVIN_MTX_FOR_MERGE.collect()
+
+    output:
+        path("${params.name}_counts_mtx_raw") into RAW_COUNT_MATRICES
+        
+        
+
+    """
+        find \$(pwd) -name 'counts_mtx*' > dirs.txt
+        
+        ndirs=\$(cat dirs.txt | wc -l)
+        if [ "\$ndirs" -gt 1 ]; then 
+            mergeMtx.R dirs.txt ${params.name}_counts_mtx_raw
+        else
+            ln -s \$(cat dirs.txt) ${params.name}_counts_mtx_raw
+        fi
+        rm -f dirs.txt
+        
+    """
+}
+
 process remove_empty_drops {
     
     conda "${baseDir}/envs/dropletutils.yml"
@@ -431,7 +466,7 @@ process rds_to_mtx{
 
 
 
-process merge_protocol_count_matrices {
+process merge_protocol_count_matrices_nonempty {
     
     // conda "${baseDir}/envs/kallisto_matrix.yml"
     conda "${baseDir}/envs/dropletutilsaggregation.yml"
@@ -442,6 +477,7 @@ process merge_protocol_count_matrices {
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 20
     
+    // publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
     
     input:
         file('*') from NONEMPTY_MTX.collect()
@@ -460,7 +496,7 @@ process merge_protocol_count_matrices {
             ln -s \$(cat dirs.txt) ${params.name}_counts_mtx_nonempty
         fi
         rm -f dirs.txt
-       
+        
     """
 }
 
@@ -520,6 +556,31 @@ process merge_protocol_count_matrices {
 
 // generate cell metadata file
 
+process cell_metadata_raw {
+
+
+    conda "${baseDir}/envs/parse_alevin_fry.yml"
+
+    // conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
+    
+    memory { 10.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
+
+    publishDir "$resultsRoot/raw", mode: 'copy', overwrite: true
+
+    input:
+    path("${params.name}_counts_mtx_raw") from RAW_COUNT_MATRICES
+    
+    output:
+    set path("${params.name}_counts_mtx_raw"), path("${params.name}.cell_metadata_raw.tsv") into FINAL_OUTPUT_RAW
+    
+    """
+    make_cell_metadata.py ${params.name}_counts_mtx_raw/barcodes.tsv $sdrfMeta $cellsFile ${params.name}.cell_metadata_raw.tsv
+    """ 
+  
+}
+
 process cell_metadata {
 
 
@@ -531,19 +592,20 @@ process cell_metadata {
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 20
 
-    publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
+    publishDir "$resultsRoot/nonempty", mode: 'copy', overwrite: true
 
     input:
     path("${params.name}_counts_mtx_nonempty/barcodes.tsv") from EXP_COUNT_BARCODES
     path("${params.name}_counts_mtx_nonempty") from EXP_COUNT_MATRICES
-
+    
+    
     output:
-    path "${params.name}_counts_mtx_nonempty" into FINAL_MATRIX
-    path "${params.name}.cell_metadata.tsv" into FINAL_META
+    set path("${params.name}_counts_mtx_nonempty"), path("${params.name}.cell_metadata_nonempty.tsv") into FINAL_OUTPUT_NONEMPTY
+
+    
 
     """
-    make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfMeta $cellsFile ${params.name}.cell_metadata.tsv
+    make_cell_metadata.py ${params.name}_counts_mtx_nonempty/barcodes.tsv $sdrfMeta $cellsFile ${params.name}.cell_metadata_nonempty.tsv
     """ 
   
 }
-
