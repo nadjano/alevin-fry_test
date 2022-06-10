@@ -426,7 +426,7 @@ process remove_empty_drops {
     maxRetries 20
    
     input:
-        set val(runId), file("${runId}_counts_mtx") from ALEVIN_MTX_FOR_EMPTYDROPS
+        set val(runId), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS
 
     output:
         set val(runId), file('nonempty.rds') into NONEMPTY_RDS
