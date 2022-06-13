@@ -276,7 +276,7 @@ process alevin_config {
         alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt'  --output-dir ${runId}_ALEVIN_fry_quant  --min-reads 0
     elif [ "${params.protocol}" = "10XV3" ]
     then
-        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --unfiltered-pl ${baseDir}/whitelist/3M-february-2018.txt  --output-dir ${runId}_ALEVIN_fry_quant  --min-reads 0
+        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --unfiltered-pl whitelist/3M-february-2018.txt  --output-dir ${runId}_ALEVIN_fry_quant  --min-reads 0
     else
         alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant  --min-reads 0
     fi
