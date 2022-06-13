@@ -273,12 +273,12 @@ process alevin_config {
 
     if [ "${params.protocol}" = "10XV2" ]
     then
-        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt'  --output-dir ${runId}_ALEVIN_fry_quant  --min-reads 0
+        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt'  --output-dir ${runId}_ALEVIN_fry_quant  --min-reads 0
     elif [ "${params.protocol}" = "10XV3" ]
     then
-        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --unfiltered-pl ${baseDir}/whitelist/3M-february-2018.txt.gz  --output-dir ${runId}_ALEVIN_fry_quant  --min-reads 0
+        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --unfiltered-pl ${baseDir}/whitelist/3M-february-2018.txt  --output-dir ${runId}_ALEVIN_fry_quant  --min-reads 0
     else
-        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant -k --min-reads 0
+        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant  --min-reads 0
     fi
 
     alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 16
