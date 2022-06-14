@@ -28,7 +28,7 @@ barcodes["Comment [BioSD_SAMPLE]"] = barcodes.apply(f, axis=1)
 
 
 #select relevant fields from sdrf  and cells file
-sdrf_short = pd.DataFrame(sdrf[["Comment [BioSD_SAMPLE]", "Characteristics[individual]"]]).drop_duplicates()
+sdrf_short = pd.DataFrame(sdrf[["Comment[BioSD_SAMPLE]", "Characteristics[individual]"]]).drop_duplicates()
 cells = pd.DataFrame(cells[["Cell ID", "Inferred cell type - ontology labels"]])
 
 #merge matching runs to get batch
