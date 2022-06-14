@@ -414,7 +414,7 @@ process remove_empty_drops {
         set val(runId), file('nonempty.rds') into NONEMPTY_RDS
 
     """
-        dropletutils-read-10x-counts.R -s counts_mtx_${runId} -c TRUE -o matrix.rds
+        dropletutils-read-10x-counts.R -s counts_mtx -c TRUE -o matrix.rds
         dropletutils-empty-drops.R -i matrix.rds --lower ${params.emptyDrops.lower} --niters ${params.emptyDrops.nIters} --filter-empty ${params.emptyDrops.filterEmpty} \
             --filter-fdr ${params.emptyDrops.filterFdr} --ignore ${params.minCbFreq} -o nonempty.rds -t nonempty.txt
     """
@@ -434,7 +434,7 @@ process rds_to_mtx{
         set val(runId), file(rds) from NONEMPTY_RDS
 
     output:
-        set val(runId), file("counts_mtx_nonempty_${runId}") into NONEMPTY_MTX
+        set val(runId), file("counts_mtx_nonempty") into NONEMPTY_MTX
 
     """ 
         #!/usr/bin/env Rscript
