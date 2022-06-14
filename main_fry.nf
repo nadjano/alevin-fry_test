@@ -314,7 +314,7 @@ process mtx_alevin_fry_to_mtx {
 
 
     """
-    alevinFryMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx_${runId}
+    alevinFryMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx
     """      
 }
 
@@ -378,7 +378,7 @@ process merge_protocol_count_matrices {
     // publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
     
     input:
-        file('*') from ALEVIN_MTX_FOR_MERGE.collect()
+        file('counts_mtx') from ALEVIN_MTX_FOR_MERGE.collect()
 
     output:
         path("${params.name}_counts_mtx_raw") into RAW_COUNT_MATRICES
@@ -442,7 +442,7 @@ process rds_to_mtx{
         suppressPackageStartupMessages(require(DropletUtils))
 
         counts_sce <- readRDS('$rds')
-        write10xCounts(assays(counts_sce)[[1]], path = 'counts_mtx_nonempty_${runId}', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce))
+        write10xCounts(assays(counts_sce)[[1]], path = 'counts_mtx_nonempty', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce))
     """
 }
 
