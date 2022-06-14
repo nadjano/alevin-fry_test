@@ -545,7 +545,7 @@ process cell_metadata_raw {
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 20
 
-    publishDir "$resultsRoot/${params.name}/", mode: 'copy', overwrite: true
+    publishDir "$resultsRoot/${params.name}/emptydrops", mode: 'copy', overwrite: true
 
     input:
     path("${params.name}_counts_mtx_raw") from RAW_COUNT_MATRICES
@@ -570,7 +570,7 @@ process cell_metadata {
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 20
 
-    publishDir "$resultsRoot/${params.name}", mode: 'copy', overwrite: true
+    publishDir "$resultsRoot/${params.name}/raw", mode: 'copy', overwrite: true
 
     input:
     path("${params.name}_counts_mtx_nonempty") from EXP_COUNT_MATRICES
