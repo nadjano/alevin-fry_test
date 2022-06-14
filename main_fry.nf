@@ -378,7 +378,7 @@ process merge_protocol_count_matrices {
     // publishDir "$resultsRoot/matrices", mode: 'copy', overwrite: true
     
     input:
-        file('counts_mtx') from ALEVIN_MTX_FOR_MERGE.collect()
+        file('*') from ALEVIN_MTX_FOR_MERGE.collect()
 
     output:
         path("${params.name}_counts_mtx_raw") into RAW_COUNT_MATRICES
