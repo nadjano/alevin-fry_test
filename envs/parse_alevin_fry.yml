@@ -1,4 +1,4 @@
-name: parse_alevin_fry
+name: parse_alevin_fry_5
 channels:
   - conda-forge
   - bioconda
@@ -7,7 +7,7 @@ dependencies:
   - pandas
   - scipy
   - numpy
-  - bioconda::pyroe=0.4.0
+  - bioconda::pyroe=0.5.0
 
 
   
