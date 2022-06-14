@@ -274,11 +274,11 @@ process alevin_config {
     if [ "${params.protocol}" = "10XV2" ]
     then
         alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --unfiltered-pl '${baseDir}/whitelist/737K-august-2016.txt'  --output-dir ${runId}_ALEVIN_fry_quant 
-    elif [ "${params.protocol}" = "10XV3" ]
+    elif [ "${params.protocol}" = "10XV3_non" ]
     then
         alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --unfiltered-pl /nfs/production/irene/ma/users/nnolte/whitelist/3M-february-2018.txt  --output-dir ${runId}_ALEVIN_fry_quant
     else
-        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant  --force-cells 1000000
+        alevin-fry generate-permit-list --input ${runId}_ALEVIN_fry_map -d fw --output-dir ${runId}_ALEVIN_fry_quant  --force-cells 50000
     fi
 
     alevin-fry collate -i ${runId}_ALEVIN_fry_quant -r ${runId}_ALEVIN_fry_map -t 16
