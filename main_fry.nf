@@ -309,12 +309,12 @@ process mtx_alevin_fry_to_mtx {
 
     output:
 
-    set val(runId), path("counts_mtx") into ALEVIN_FRY_MTX
+    set val(runId), path("counts_mtx_${runId}") into ALEVIN_FRY_MTX
     // file("counts_mtx_${protocol}") into PROTOCOL_COUNT_MATRICES
 
 
     """
-    alevinFryMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx
+    alevinFryMtxTo10x.py --cell_prefix ${runId}- ${runId}_ALEVIN_fry_quant counts_mtx_${runId}
     """      
 }
 
