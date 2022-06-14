@@ -466,7 +466,7 @@ process merge_protocol_count_matrices_nonempty {
         path("${params.name}_counts_mtx_nonempty/barcodes.tsv") into EXP_COUNT_BARCODES
 
     """
-        find \$(pwd) -name 'counts_mtx_nonempty_*' > dirs.txt
+        find \$(pwd) -name 'counts_mtx_nonempty__${runId}' > dirs.txt
         
         ndirs=\$(cat dirs.txt | wc -l)
         if [ "\$ndirs" -gt 1 ]; then 
