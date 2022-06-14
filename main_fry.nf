@@ -250,7 +250,7 @@ process alevin_config {
 }
 // run alevin-fry for quantification with splici index
  process alevin_fry_MR3 {
-    publishDir "${resultsRoot}/${params.name}", mode: 'copy', overwrite: true
+    
     cache 'lenient'
     cpus 8
     memory { 20.GB * task.attempt }
@@ -263,7 +263,6 @@ process alevin_config {
         path "t2g_cDNA.txt" from T2G_3_FOR_FRY
        
     output:
-        // publishDir path "${runId}_ALEVIN"
         set val(runId), path("${runId}_ALEVIN_fry_quant"), path("${runId}_ALEVIN_fry_quant/featureDump.txt") into ALEVIN_FRY_RESULTS_SPLICI
       
 
@@ -546,7 +545,7 @@ process cell_metadata_raw {
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 20
 
-    publishDir "$resultsRoot/${params.name}/raw", mode: 'copy', overwrite: true
+    publishDir "$resultsRoot/${params.name}/", mode: 'copy', overwrite: true
 
     input:
     path("${params.name}_counts_mtx_raw") from RAW_COUNT_MATRICES
@@ -571,7 +570,7 @@ process cell_metadata {
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
     maxRetries 20
 
-    publishDir "$resultsRoot/${params.name}/nonempty", mode: 'copy', overwrite: true
+    publishDir "$resultsRoot/${params.name}", mode: 'copy', overwrite: true
 
     input:
     path("${params.name}_counts_mtx_nonempty") from EXP_COUNT_MATRICES
