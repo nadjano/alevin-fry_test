@@ -386,7 +386,7 @@ process merge_protocol_count_matrices {
         
 
     """
-        find \$(pwd) -name 'counts_mtx*' > dirs.txt
+        find \$(pwd) -name 'counts_mtx_*' > dirs.txt
         
         ndirs=\$(cat dirs.txt | wc -l)
         if [ "\$ndirs" -gt 1 ]; then 
