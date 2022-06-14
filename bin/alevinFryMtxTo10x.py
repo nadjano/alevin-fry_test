@@ -38,7 +38,7 @@ if not os.path.isdir(alevin_out):
     sys.exit(1)
 
 # Read mtx from alevin_fry_quant 
-ad = pyroe.load_fry(alevin_out, output_format='snRNA')
+ad = pyroe.load_fry(alevin_out, output_format='scRNA')
 
 #pd.DataFrame(ad.var.index).to_csv(os.path.join(destination, "genes.tsv" ),   sep = "\t", index_col = False)
 #pd.DataFrame(ad.obs.index).to_csv(os.path.join(destination, "barcodes.tsv"), sep = "\t", index_col = False)
