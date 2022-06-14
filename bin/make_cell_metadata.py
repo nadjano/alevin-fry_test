@@ -24,7 +24,7 @@ cells = pd.read_csv(cells_txt, header=0,  delimiter="\t")
 print(sdrf)
 #seperate run ID and barcode
 f = lambda x: x[0].split("-")[0]
-barcodes["Comment [BioSD_SAMPLE]"] = barcodes.apply(f, axis=1)
+barcodes["Comment[BioSD_SAMPLE]"] = barcodes.apply(f, axis=1)
 
 
 #select relevant fields from sdrf  and cells file
@@ -32,7 +32,7 @@ sdrf_short = pd.DataFrame(sdrf[["Comment[BioSD_SAMPLE]", "Characteristics[indivi
 cells = pd.DataFrame(cells[["Cell ID", "Inferred cell type - ontology labels"]])
 
 #merge matching runs to get batch
-merge = pd.merge(barcodes, sdrf_short, how = 'left',on="Comment [BioSD_SAMPLE]").drop_duplicates()
+merge = pd.merge(barcodes, sdrf_short, how = 'left',on="Comment[BioSD_SAMPLE]").drop_duplicates()
 
 #merge matching Cell ID to get cell types
 cell_meta = pd.merge(merge, cells, how = 'left',on="Cell ID").drop_duplicates(subset = "Cell ID")
