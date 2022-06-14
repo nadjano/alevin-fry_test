@@ -295,7 +295,7 @@ ALEVIN_FRY_RESULTS_SPLICI
     }
 
 process mtx_alevin_fry_to_mtx {
-    publishDir "${resultsRoot}/${params.name}/", mode: 'copy', overwrite: true
+    // publishDir "${resultsRoot}/${params.name}/", mode: 'copy', overwrite: true
     // conda "/nfs/production/irene/ma/users/nnolte/conda/envs/parse_alevin_fry"
 
     conda "${baseDir}/envs/parse_alevin_fry.yml"
@@ -407,10 +407,10 @@ process remove_empty_drops {
     maxRetries 20
    
     input:
-        set val(runId), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS
+        set val(runId), file("counts_mtx_${runId}") from ALEVIN_MTX_FOR_EMPTYDROPS
 
     output:
-        set val(runId), file('nonempty.rds') into NONEMPTY_RDS
+        set val(runId), file("${runId}_nonempty.rds") into NONEMPTY_RDS
 
     """
         dropletutils-read-10x-counts.R -s counts_mtx_${runId} -c TRUE -o matrix.rds
@@ -430,7 +430,7 @@ process rds_to_mtx{
     maxRetries 20
    
     input:
-        set val(runId), file(rds) from NONEMPTY_RDS
+        set val(runId), file("${runId}_nonempty.rds") from NONEMPTY_RDS
 
     output:
         set val(runId), file("counts_mtx_nonempty_${runId}") into NONEMPTY_MTX
@@ -440,7 +440,7 @@ process rds_to_mtx{
         
         suppressPackageStartupMessages(require(DropletUtils))
 
-        counts_sce <- readRDS('$rds')
+        counts_sce <- readRDS("${runId}_nonempty.rds")
         write10xCounts(assays(counts_sce)[[1]], path = 'counts_mtx_nonempty_${runId}', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce))
     """
 }
