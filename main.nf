@@ -304,7 +304,7 @@ process remove_empty_drops {
         set val(type), file("${type}_nonempty.rds") into NONEMPTY_RDS
 
     """
-        dropletutils-read-10x-counts.R -s counts_mtx -c TRUE -o matrix.rds
+        dropletutils-read-10x-counts.R -s test_counts_mtx -c TRUE -o matrix.rds
         dropletutils-empty-drops.R -i matrix.rds --lower ${params.emptyDrops.lower} --niters ${params.emptyDrops.nIters} --filter-empty ${params.emptyDrops.filterEmpty} \
         --filter-fdr ${params.emptyDrops.filterFdr} --ignore ${params.minCbFreq} -o ${type}_nonempty.rds -t nonempty.txt
     """
