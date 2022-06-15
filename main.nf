@@ -135,7 +135,7 @@ process index_for_alevin_fry {
         path "t2g_cDNA.txt" from T2G_3_FOR_FRY
        
     output:
-        set path("test_ALEVIN_fry_quant"), path("test_ALEVIN_fry_quant/featureDump.txt") into ALEVIN_FRY_RESULTS_SPLICI
+        set path("test_ALEVIN_fry_quant"), path("test_ALEVIN_fry_quant/featureDump.txt") into ALEVIN_FRY_RESULTS
       
 
     """
