@@ -135,7 +135,7 @@ process index_for_alevin_fry {
         path "t2g_cDNA.txt" from T2G_3_FOR_FRY
        
     output:
-        set val(runId), path("test_ALEVIN_fry_quant"), path("test_ALEVIN_fry_quant/featureDump.txt") into ALEVIN_FRY_RESULTS_SPLICI
+        set path("test_ALEVIN_fry_quant"), path("test_ALEVIN_fry_quant/featureDump.txt") into ALEVIN_FRY_RESULTS_SPLICI
       
 
     """
@@ -178,7 +178,7 @@ process mtx_alevin_fry_to_mtx {
     """      
 }
 ALEVIN_FRY_MTX
-    .into{
+    .into{ 
         ALEVIN_FRY_MTX_FOR_QC
         ALEVIN_FRY_MTX_FOR_EMPTYDROPS
         ALEVIN_FRY_MTX_FOR_OUTPUT
