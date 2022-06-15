@@ -1,4 +1,0 @@
-name: kb-tools
-dependencies:
-  - conda-forge::scanpy 
-  - bioconda::kb-python 

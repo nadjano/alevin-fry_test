@@ -1,3 +1,0 @@
-name: kallisto_matrix
-dependencies:
-  - bioconda::bioconductor-dropletutils

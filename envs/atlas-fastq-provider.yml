@@ -1,4 +1,0 @@
-name: atlas-fastq-provider-2
-dependencies:
-  - ebi-gene-expression-group::atlas-fastq-provider=0.4.0
-  - bioconda::sra-tools

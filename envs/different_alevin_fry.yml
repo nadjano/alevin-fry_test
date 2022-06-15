@@ -1,4 +1,0 @@
-name: different-alevin-fry
-dependencies:
-  - bioconda::alevin-fry
-  - bioconda::salmon=1.7.0

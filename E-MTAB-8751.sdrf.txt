@@ -1,3 +1,0 @@
-Comment[ENA_RUN]	Comment[LIBRARY_LAYOUT]	Comment[technical replicate group]	cdna_uri	cell_barcode_uri	umi_barcode_uri	Comment[cDNA read offset]	Comment[cell barcode offset]	Comment[umi barcode offset]	Comment[cDNA read size]	Comment[cell barcode size]	Comment[umi barcode size]	end	Comment[cell count]
-SRR11430248	PAIRED	GSM4435253	ftp://ftp.sra.ebi.ac.uk/vol1/srr/SRR114/048/SRR11430248/SRR11430248_2.fastq.gz	ftp://ftp.sra.ebi.ac.uk/vol1/srr/SRR114/048/SRR11430248/SRR11430248_1.fastq.gz	ftp://ftp.sra.ebi.ac.uk/vol1/srr/SRR114/048/SRR11430248/SRR11430248_1.fastq.gz	0	0	16	57	16	10	10000
-                           
