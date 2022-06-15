@@ -1,7 +1,4 @@
 #!/usr/bin/env nextflow
-sdrfFile = params.sdrf
-sdrfMeta = params.meta
-cellsFile = params.cells
 resultsRoot = params.resultsRoot
 referenceFasta = params.referenceFasta
 referenceGtf = params.referenceGtf
