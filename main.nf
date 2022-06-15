@@ -383,7 +383,7 @@ process rds_to_mtx{
     """
 }
 
-process rds_to_mtx{
+process rds_to_mtx_fry {
     publishDir "$resultsRoot/mtx/", mode: 'copy', overwrite: true
 
     conda "${baseDir}/envs/dropletutils.yml"
