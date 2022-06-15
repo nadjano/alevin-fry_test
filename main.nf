@@ -151,11 +151,11 @@ process index_for_alevin_fry {
     """
 }
 
-ALEVIN_FRY_RESULTS_SPLICI
+ALEVIN_FRY_RESULTS
     .into{
-        ALEVIN_RESULTS_FOR_QC
-        ALEVIN_RESULTS_FOR_PROCESSING
-        ALEVIN_RESULTS_FOR_OUTPUT
+        ALEVIN_FRY_RESULTS_FOR_QC
+        ALEVIN_FRY_RESULTS_FOR_PROCESSING
+        ALEVIN_FRY_RESULTS_FOR_OUTPUT
     }
 
 process mtx_alevin_fry_to_mtx {
@@ -166,7 +166,8 @@ process mtx_alevin_fry_to_mtx {
    
 
     input:
-    set val("alevin-fry"), path("test_ALEVIN_fry_quant"), file(rawBarcodeFreq) from ALEVIN_RESULTS_FOR_PROCESSING
+    set path("test_ALEVIN_fry_quant"), file(rawBarcodeFreq) from ALEVIN_FRY_RESULTS_FOR_PROCESSING
+    val("alevin-fry")
 
     output:
     set val("alevin-fry"), path("counts_mtx_test") into ALEVIN_FRY_MTX
