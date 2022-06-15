@@ -332,7 +332,7 @@ process rds_to_mtx{
         suppressPackageStartupMessages(require(DropletUtils))
 
         counts_sce <- readRDS('$rds')
-        write10xCounts(assays(counts_sce)[[1]], path = '${type}_counts_mtx_nonempty', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce), version = 3)
+        write10xCounts(assays(counts_sce)[[1]], path = '${type}_counts_mtx_nonempty', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce), version = '3')
     """
 }
 
