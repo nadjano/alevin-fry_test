@@ -272,7 +272,7 @@ process droplet_qc_plot{
     
     conda "${baseDir}/envs/alevin.yml"
 
-    publishDir "$resultsRoot/qc_plot", mode: 'copy', overwrite: true
+    publishDir "$resultsRoot/qc_plot/", mode: 'copy', overwrite: true
     
     memory { 10.GB * task.attempt }
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
@@ -316,6 +316,7 @@ process remove_empty_drops {
 // // Convert R matrix object with filtered cells back to .mtx
 
 process rds_to_mtx{
+    publishDir "$resultsRoot/mtx/", mode: 'copy', overwrite: true
 
     conda "${baseDir}/envs/dropletutils.yml"
 
@@ -327,7 +328,7 @@ process rds_to_mtx{
         set val(type), file(rds) from NONEMPTY_RDS
 
     output:
-        set val(type), file("${type}_counts_mtx_nonempty") into NONEMPTY_MTX
+        file("${type}_counts_mtx_nonempty") into NONEMPTY_MTX
 
     """ 
         #!/usr/bin/env Rscript
