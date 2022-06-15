@@ -38,7 +38,6 @@ process make_cDNA_from_Genome {
 }
 
 process make_splici {
-    publishDir "t2g_alevin_fry/${species}", mode: 'copy', overwrite: true
 
     cache 'lenient'
    
@@ -280,7 +279,7 @@ process droplet_qc_plot{
         set val(type), path(mtx) from ALEVIN_MTX_FOR_QC.join(ALEVIN_FRY_MTX_FOR_QC)
 
     output:
-        set file("${type}.png") into ALEVIN_QC_PLOTS
+        set val(type), file("${type}.png") into ALEVIN_QC_PLOTS
 
     """
     dropletBarcodePlot.R --mtx-matrix $mtx --output ${type}.png
