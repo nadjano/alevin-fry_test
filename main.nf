@@ -335,6 +335,26 @@ process remove_empty_drops {
         --filter-fdr ${params.emptyDrops.filterFdr} --ignore ${params.minCbFreq} -o ${type}_nonempty.rds -t nonempty.txt
     """
 }
+process remove_empty_drops_fry {
+    
+    conda "${baseDir}/envs/dropletutils.yml"
+
+    memory { 10.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'ignore' }
+    maxRetries 20
+   
+    input:
+        set val(type), file(countsMtx) from ALEVIN_FRY_MTX_FOR_EMPTYDROPS
+
+    output:
+        set val(type), file("${type}_nonempty.rds") into NONEMPTY_RDS_FRY
+
+    """
+        dropletutils-read-10x-counts.R -s test_counts_mtx -c TRUE -o matrix.rds
+        dropletutils-empty-drops.R -i matrix.rds --lower ${params.emptyDrops.lower} --niters ${params.emptyDrops.nIters} --filter-empty ${params.emptyDrops.filterEmpty} \
+        --filter-fdr ${params.emptyDrops.filterFdr} --ignore ${params.minCbFreq} -o ${type}_nonempty.rds -t nonempty.txt
+    """
+}
 
 // // Convert R matrix object with filtered cells back to .mtx
 
@@ -352,6 +372,31 @@ process rds_to_mtx{
 
     output:
         file("${type}_counts_mtx_nonempty") into NONEMPTY_MTX
+
+    """ 
+        #!/usr/bin/env Rscript
+        
+        suppressPackageStartupMessages(require(DropletUtils))
+
+        counts_sce <- readRDS('$rds')
+        write10xCounts(assays(counts_sce)[[1]], path = '${type}_counts_mtx_nonempty', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce), version = '3')
+    """
+}
+
+process rds_to_mtx{
+    publishDir "$resultsRoot/mtx/", mode: 'copy', overwrite: true
+
+    conda "${baseDir}/envs/dropletutils.yml"
+
+    memory { 10.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
+   
+    input:
+        set val(type), file(rds) from NONEMPTY_RDS_FRY
+
+    output:
+        file("${type}_counts_mtx_nonempty") into NONEMPTY_MTX_FRY
 
     """ 
         #!/usr/bin/env Rscript
