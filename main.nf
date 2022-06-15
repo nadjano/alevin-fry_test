@@ -279,7 +279,7 @@ process droplet_qc_plot{
     maxRetries 20
 
     input:
-        set val(type), path(mtx) from ALEVIN_MTX_FOR_QC.join(ALEVIN_FRY_MTX_FOR_QC)
+        set val(type), path(mtx) from ALEVIN_MTX_FOR_QC
 
     output:
         set val(type), file("${type}.png") into ALEVIN_QC_PLOTS
@@ -288,6 +288,29 @@ process droplet_qc_plot{
     dropletBarcodePlot.R --mtx-matrix $mtx --output-plot ${type}.png
     """ 
 }
+
+
+process droplet_qc_plot_fry {
+    
+    conda "${baseDir}/envs/alevin.yml"
+
+    publishDir "$resultsRoot/qc_plot/", mode: 'copy', overwrite: true
+    
+    memory { 10.GB * task.attempt }
+    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+    maxRetries 20
+
+    input:
+        set val(type), path(mtx) from ALEVIN_FRY_MTX_FOR_QC
+
+    output:
+        set val(type), file("${type}.png") into ALEVIN_FRY_QC_PLOTS
+
+    """
+    dropletBarcodePlot.R --mtx-matrix $mtx --output-plot ${type}.png
+    """ 
+}
+
 
 // // Remove empty droplets from Alevin results
 
@@ -301,7 +324,7 @@ process remove_empty_drops {
     maxRetries 20
    
     input:
-        set val(type), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS.join(ALEVIN_FRY_MTX_FOR_EMPTYDROPS)
+        set val(type), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS
 
     output:
         set val(type), file("${type}_nonempty.rds") into NONEMPTY_RDS
