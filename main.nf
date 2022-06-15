@@ -5,8 +5,8 @@ cellsFile = params.cells
 resultsRoot = params.resultsRoot
 referenceFasta = params.referenceFasta
 referenceGtf = params.referenceGtf
-barcode_path = params.barcode_path
-read_path = params.read_path
+fastq_path = params.fastq_path
+
 
 
 REFERENCE_GENOME = Channel.fromPath(referenceFasta, checkIfExists: true ).first()
@@ -143,7 +143,7 @@ process index_for_alevin_fry {
       
 
     """
-    salmon alevin -l ISR --chromiumV3 --sketch -1 ${params.barcode_path} -2 ${params.read_path} \
+    salmon alevin -l ISR --chromiumV3 --sketch -1 \$(ls ${params.fastq_path}/barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls ${params.fastq_path}cdna*.fastq.gz | tr '\\n' ' ') \
         -i alevin_index_splici -p 12 -o test_ALEVIN_fry_map 
    
     alevin-fry generate-permit-list --input test_ALEVIN_fry_map -d fw --output-dir test_ALEVIN_fry_quant  --force-cells 50000
@@ -213,7 +213,7 @@ ALEVIN_FRY_MTX
         set val(runId), file("test"),  file("test/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
 
     """
-    salmon alevin -l ISR --chromiumV3 --sketch -1 ${params.barcode_path} -2 ${params.read_path} \
+    salmon alevin -l ISR --chromiumV3 --sketch -1 \$(ls ${params.fastq_path}/barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls ${params.fastq_path}cdna*.fastq.gz | tr '\\n' ' ') \
         -i ${index} -p 12 -o test_tmp --tgMap ${transcriptToGene} --dumpFeatures --keepCBFraction 1 \
         --freqThreshold 10 --dumpMtx
  
