@@ -208,7 +208,7 @@ ALEVIN_FRY_MTX
         set  file("test"),  file("test/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
 
     """
-    salmon alevin -l ISR --chromiumV3 --sketch -1 \$(ls ${params.fastq_path}/barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls ${params.fastq_path}/cdna*.fastq.gz | tr '\\n' ' ') \
+    salmon alevin -l ISR --chromiumV3  -1 \$(ls ${params.fastq_path}/barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls ${params.fastq_path}/cdna*.fastq.gz | tr '\\n' ' ') \
         -i ${index} -p 12 -o test_tmp --tgMap ${transcriptToGene} --dumpFeatures --keepCBFraction 1 \
         --freqThreshold 10 --dumpMtx
  
