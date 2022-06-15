@@ -202,12 +202,11 @@ ALEVIN_FRY_MTX
     maxRetries 10
 
     input:
-        set val(runId), file("cdna*.fastq.gz"), file("barcodes*.fastq.gz"), val(barcodeLength), val(umiLength), val(end), val(cellCount), val(barcodeConfig) from FINAL_FASTQS_FOR_ALEVIN.join(ALEVIN_CONFIG)
         path(transcriptToGene) from TRANSCRIPT_TO_GENE
         path(index) from ALEVIN_INDEX
 
     output:
-        set val(runId), file("test"),  file("test/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
+        set  file("test"),  file("test/alevin/raw_cb_frequency.txt") into ALEVIN_RESULTS
 
     """
     salmon alevin -l ISR --chromiumV3 --sketch -1 \$(ls ${params.fastq_path}/barcodes*.fastq.gz | tr '\\n' ' ') -2 \$(ls ${params.fastq_path}cdna*.fastq.gz | tr '\\n' ' ') \
