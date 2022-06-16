@@ -263,7 +263,11 @@ ALEVIN_MTX
 
 
 
-MTX_FOR_QC = Channel.from(ALEVIN_MTX_FOR_QC, ALEVIN_FRY_MTX_FOR_QC)
+Channel
+    .from(ALEVIN_MTX_FOR_QC, ALEVIN_FRY_MTX_FOR_QC)
+        .into {
+            MTX_FOR_QC
+        }
 // Make a diagnostic plot
 
 MTX_FOR_QC.view()
