@@ -279,7 +279,7 @@ process droplet_qc_plot{
     maxRetries 20
 
     input:
-        set val(type), path(mtx) from ALEVIN_MTX_FOR_QC
+        set val(type), path(mtx) from ALEVIN_MTX_FOR_QC.cross(ALEVIN_FRY_MTX_FOR_QC)
 
     output:
         set val(type), file("${type}.png") into ALEVIN_QC_PLOTS
@@ -290,26 +290,26 @@ process droplet_qc_plot{
 }
 
 
-process droplet_qc_plot_fry {
+// process droplet_qc_plot_fry {
     
-    conda "${baseDir}/envs/alevin.yml"
+//     conda "${baseDir}/envs/alevin.yml"
 
-    publishDir "$resultsRoot/qc_plot/", mode: 'copy', overwrite: true
+//     publishDir "$resultsRoot/qc_plot/", mode: 'copy', overwrite: true
     
-    memory { 10.GB * task.attempt }
-    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 20
+//     memory { 10.GB * task.attempt }
+//     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+//     maxRetries 20
 
-    input:
-        set val(type), path(mtx) from ALEVIN_FRY_MTX_FOR_QC
+//     input:
+//         set val(type), path(mtx) from ALEVIN_FRY_MTX_FOR_QC
 
-    output:
-        set val(type), file("${type}.png") into ALEVIN_FRY_QC_PLOTS
+//     output:
+//         set val(type), file("${type}.png") into ALEVIN_FRY_QC_PLOTS
 
-    """
-    dropletBarcodePlot.R --mtx-matrix $mtx --output-plot ${type}.png
-    """ 
-}
+//     """
+//     dropletBarcodePlot.R --mtx-matrix $mtx --output-plot ${type}.png
+//     """ 
+// }
 
 
 // // Remove empty droplets from Alevin results
@@ -317,14 +317,14 @@ process droplet_qc_plot_fry {
 
 process remove_empty_drops {
     
-    conda "${baseDir}/envs/dropletutils.yml"
+    conda "${baseDir}/envs/droplet-barcode.yml"
 
     memory { 10.GB * task.attempt }
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'ignore' }
     maxRetries 20
    
     input:
-        set val(type), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS
+        set val(type), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS.cross(ALEVIN_FRY_MTX_FOR_EMPTYDROPS)
 
     output:
         set val(type), file("${type}_nonempty.rds") into NONEMPTY_RDS
@@ -335,26 +335,26 @@ process remove_empty_drops {
         --filter-fdr ${params.emptyDrops.filterFdr} --ignore ${params.minCbFreq} -o ${type}_nonempty.rds -t nonempty.txt
     """
 }
-process remove_empty_drops_fry {
+// process remove_empty_drops_fry {
     
-    conda "${baseDir}/envs/dropletutils.yml"
+//     conda "${baseDir}/envs/dropletutils.yml"
 
-    memory { 10.GB * task.attempt }
-    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'ignore' }
-    maxRetries 20
+//     memory { 10.GB * task.attempt }
+//     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'ignore' }
+//     maxRetries 20
    
-    input:
-        set val(type), file(countsMtx) from ALEVIN_FRY_MTX_FOR_EMPTYDROPS
+//     input:
+//         set val(type), file(countsMtx) from ALEVIN_FRY_MTX_FOR_EMPTYDROPS
 
-    output:
-        set val(type), file("${type}_nonempty.rds") into NONEMPTY_RDS_FRY
+//     output:
+//         set val(type), file("${type}_nonempty.rds") into NONEMPTY_RDS_FRY
 
-    """
-        dropletutils-read-10x-counts.R -s test_counts_mtx -c TRUE -o matrix.rds
-        dropletutils-empty-drops.R -i matrix.rds --lower ${params.emptyDrops.lower} --niters ${params.emptyDrops.nIters} --filter-empty ${params.emptyDrops.filterEmpty} \
-        --filter-fdr ${params.emptyDrops.filterFdr} --ignore ${params.minCbFreq} -o ${type}_nonempty.rds -t nonempty.txt
-    """
-}
+//     """
+//         dropletutils-read-10x-counts.R -s test_counts_mtx -c TRUE -o matrix.rds
+//         dropletutils-empty-drops.R -i matrix.rds --lower ${params.emptyDrops.lower} --niters ${params.emptyDrops.nIters} --filter-empty ${params.emptyDrops.filterEmpty} \
+//         --filter-fdr ${params.emptyDrops.filterFdr} --ignore ${params.minCbFreq} -o ${type}_nonempty.rds -t nonempty.txt
+//     """
+// }
 
 // // Convert R matrix object with filtered cells back to .mtx
 
@@ -383,30 +383,30 @@ process rds_to_mtx{
     """
 }
 
-process rds_to_mtx_fry {
-    publishDir "$resultsRoot/mtx/", mode: 'copy', overwrite: true
+// process rds_to_mtx_fry {
+//     publishDir "$resultsRoot/mtx/", mode: 'copy', overwrite: true
 
-    conda "${baseDir}/envs/dropletutils.yml"
+//     conda "${baseDir}/envs/dropletutils.yml"
 
-    memory { 10.GB * task.attempt }
-    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 20
+//     memory { 10.GB * task.attempt }
+//     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+//     maxRetries 20
    
-    input:
-        set val(type), file(rds) from NONEMPTY_RDS_FRY
+//     input:
+//         set val(type), file(rds) from NONEMPTY_RDS_FRY
 
-    output:
-        file("${type}_counts_mtx_nonempty") into NONEMPTY_MTX_FRY
+//     output:
+//         file("${type}_counts_mtx_nonempty") into NONEMPTY_MTX_FRY
 
-    """ 
-        #!/usr/bin/env Rscript
+//     """ 
+//         #!/usr/bin/env Rscript
         
-        suppressPackageStartupMessages(require(DropletUtils))
+//         suppressPackageStartupMessages(require(DropletUtils))
 
-        counts_sce <- readRDS('$rds')
-        write10xCounts(assays(counts_sce)[[1]], path = '${type}_counts_mtx_nonempty', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce), version = '3')
-    """
-}
+//         counts_sce <- readRDS('$rds')
+//         write10xCounts(assays(counts_sce)[[1]], path = '${type}_counts_mtx_nonempty', barcodes = colData(counts_sce)\$Barcode, gene.id = rownames(counts_sce), version = '3')
+//     """
+// }
 
 
 
