@@ -324,7 +324,7 @@ process remove_empty_drops {
     maxRetries 20
    
     input:
-        set val(type), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS.cross(ALEVIN_FRY_MTX_FOR_EMPTYDROPS)
+        set val(type), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS.combine(ALEVIN_FRY_MTX_FOR_EMPTYDROPS)
 
     output:
         set val(type), file("${type}_nonempty.rds") into NONEMPTY_RDS
