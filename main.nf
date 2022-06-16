@@ -270,7 +270,7 @@ ALEVIN_MTX
 
 process droplet_qc_plot{
     
-    conda "${baseDir}/envs/alevin.yml"
+    conda "${baseDir}/envs/droplet-barcode.yml"
 
     publishDir "$resultsRoot/qc_plot/", mode: 'copy', overwrite: true
     
@@ -317,7 +317,7 @@ process droplet_qc_plot{
 
 process remove_empty_drops {
     
-    conda "${baseDir}/envs/droplet-barcode.yml"
+    conda "${baseDir}/envs/dropletutils.yml"
 
     memory { 10.GB * task.attempt }
     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'ignore' }
