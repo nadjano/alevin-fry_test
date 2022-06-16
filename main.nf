@@ -265,8 +265,8 @@ ALEVIN_MTX
 
 Channel
     .from(ALEVIN_MTX_FOR_QC, ALEVIN_FRY_MTX_FOR_QC)
-        .set {
-            MTX_FOR_QC
+    .set {
+         MTX_FOR_QC
         }
 // Make a diagnostic plot
 
