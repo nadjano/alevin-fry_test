@@ -263,7 +263,7 @@ ALEVIN_MTX
 
 
 
-
+MTX_FOR_QC = channel.from(ALEVIN_MTX_FOR_QC, ALEVIN_FRY_MTX_FOR_QC)
 // Make a diagnostic plot
 
 // ALEVIN_MTX_FOR_QC.cross(ALEVIN_FRY_MTX_FOR_QC).view()
@@ -279,7 +279,7 @@ process droplet_qc_plot{
     maxRetries 20
 
     input:
-        set val(type), path(mtx) from ALEVIN_MTX_FOR_QC.concat(ALEVIN_FRY_MTX_FOR_QC)
+        set val(type), path(mtx) from MTX_FOR_QC 
 
     output:
         set val(type), file("${type}.png") into ALEVIN_QC_PLOTS
