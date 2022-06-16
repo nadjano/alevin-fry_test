@@ -169,7 +169,7 @@ process mtx_alevin_fry_to_mtx {
     set path("test_ALEVIN_fry_quant"), file(rawBarcodeFreq) from ALEVIN_FRY_RESULTS_FOR_PROCESSING
 
     output:
-    set val("alevin-fry"), path("counts_mtx_test") into ALEVIN_FRY_MTX
+    set val("alevin-fry"), path("test_counts_mtx") into ALEVIN_FRY_MTX
     // file("counts_mtx_${protocol}") into PROTOCOL_COUNT_MATRICES
 
 
@@ -284,7 +284,7 @@ process droplet_qc_plot{
 
     
     """
-    dropletBarcodePlot.R --mtx-matrix test_counts_mtx --output-plot ${type}.png
+    dropletBarcodePlot.R --mtx-matrix test_counts_mtx/matrix.mtx --output-plot ${type}.png
     """ 
 }
 
@@ -306,7 +306,7 @@ process droplet_qc_plot_fry {
         set val(type), file("${type}.png") into ALEVIN_FRY_QC_PLOTS
 
     """
-    dropletBarcodePlot.R --mtx-matrix $mtx --output-plot ${type}.png
+    dropletBarcodePlot.R --mtx-matrix test_counts_mtx/matrix.mtx  --output-plot ${type}.png
     """ 
 }
 
@@ -323,7 +323,7 @@ process remove_empty_drops {
     maxRetries 20
    
     input:
-        set val(type), file(countsMtx) from ALEVIN_MTX_FOR_EMPTYDROPS
+        set val(type), file("test_counts_mtx") from ALEVIN_MTX_FOR_EMPTYDROPS
 
     output:
         set val(type), file("${type}_nonempty.rds") into NONEMPTY_RDS
@@ -343,7 +343,7 @@ process remove_empty_drops_fry {
     maxRetries 20
    
     input:
-        set val(type), file(countsMtx) from ALEVIN_FRY_MTX_FOR_EMPTYDROPS
+        set val(type), file("test_counts_mtx") from ALEVIN_FRY_MTX_FOR_EMPTYDROPS
 
     output:
         set val(type), file("${type}_nonempty.rds") into NONEMPTY_RDS_FRY
