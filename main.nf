@@ -174,7 +174,7 @@ process mtx_alevin_fry_to_mtx {
 
 
     """
-    alevinFryMtxTo10x.py --cell_prefix test- test_ALEVIN_fry_quant counts_mtx_test
+    alevinFryMtxTo10x.py --cell_prefix test- test_ALEVIN_fry_quant test_counts_mtx
     """      
 }
 ALEVIN_FRY_MTX
