@@ -167,7 +167,6 @@ process mtx_alevin_fry_to_mtx {
 
     input:
     set path("test_ALEVIN_fry_quant"), file(rawBarcodeFreq) from ALEVIN_FRY_RESULTS_FOR_PROCESSING
-    val("alevin-fry")
 
     output:
     set val("alevin-fry"), path("counts_mtx_test") into ALEVIN_FRY_MTX
@@ -236,10 +235,10 @@ process alevin_to_mtx {
 
     input:
         set file(alevinResult), file(rawBarcodeFreq) from ALEVIN_RESULTS_FOR_PROCESSING
-        val('alevin')
+
 
     output:
-        set val('alevin'), file("test_counts_mtx") into ALEVIN_MTX
+        set val("alevin"), file("test_counts_mtx") into ALEVIN_MTX
 
     """
     alevinMtxTo10x.py --cell_prefix test- $alevinResult test_counts_mtx
