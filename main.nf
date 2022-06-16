@@ -277,7 +277,7 @@ process droplet_qc_plot{
     maxRetries 20
 
     input:
-        set val("type"), file("test_counts_mtx") ALEVIN_MTX_FOR_QC
+        set val("type"), file("test_counts_mtx") from ALEVIN_MTX_FOR_QC
 
     output:
         set val(type), file("${type}.png") into ALEVIN_QC_PLOTS
