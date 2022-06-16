@@ -1,4 +1,4 @@
-name: droplet-utils
+name: droplet-barcode
 channels:
   - conda-forge
   - bioconda

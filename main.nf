@@ -182,7 +182,7 @@ ALEVIN_FRY_MTX
         ALEVIN_FRY_MTX_FOR_QC
         ALEVIN_FRY_MTX_FOR_EMPTYDROPS
         ALEVIN_FRY_MTX_FOR_OUTPUT
-        ALEVIN_FRY_MTX_FOR_MERGE
+        ALEVIN_FRY_MTX_FOR_VENN
 
     }
 
@@ -250,7 +250,7 @@ ALEVIN_MTX
         ALEVIN_MTX_FOR_QC
         ALEVIN_MTX_FOR_EMPTYDROPS
         ALEVIN_MTX_FOR_OUTPUT
-        ALEVIN_MTX_FOR_MERGE
+        ALEVIN_MTX_FOR_VENN
     
     }
 
@@ -282,6 +282,7 @@ process droplet_qc_plot{
     output:
         set val(type), file("${type}.png") into ALEVIN_QC_PLOTS
 
+    
     """
     dropletBarcodePlot.R --mtx-matrix test_counts_mtx --output-plot ${type}.png
     """ 
@@ -290,7 +291,7 @@ process droplet_qc_plot{
 
 process droplet_qc_plot_fry {
     
-    conda "${baseDir}/envs/alevin.yml"
+    conda "${baseDir}/envs/droplet-barcode.yml"
 
     publishDir "$resultsRoot/qc_plot/", mode: 'copy', overwrite: true
     
