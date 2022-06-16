@@ -266,28 +266,29 @@ ALEVIN_MTX
 MTX_FOR_QC = Channel.from(ALEVIN_MTX_FOR_QC, ALEVIN_FRY_MTX_FOR_QC)
 // Make a diagnostic plot
 
+MTX_FOR_QC.view()
 // ALEVIN_MTX_FOR_QC.cross(ALEVIN_FRY_MTX_FOR_QC).view()
 
-process droplet_qc_plot{
+// process droplet_qc_plot{
     
-    conda "${baseDir}/envs/droplet-barcode.yml"
+//     conda "${baseDir}/envs/droplet-barcode.yml"
 
-    publishDir "$resultsRoot/qc_plot/", mode: 'copy', overwrite: true
+//     publishDir "$resultsRoot/qc_plot/", mode: 'copy', overwrite: true
     
-    memory { 10.GB * task.attempt }
-    errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
-    maxRetries 20
+//     memory { 10.GB * task.attempt }
+//     errorStrategy { task.exitStatus == 130 || task.exitStatus == 137 ? 'retry' : 'finish' }
+//     maxRetries 20
 
-    input:
-        set val(type), path(mtx) from MTX_FOR_QC 
+//     input:
+//         set val(type), path(mtx) from MTX_FOR_QC 
 
-    output:
-        set val(type), file("${type}.png") into ALEVIN_QC_PLOTS
+//     output:
+//         set val(type), file("${type}.png") into ALEVIN_QC_PLOTS
 
-    """
-    dropletBarcodePlot.R --mtx-matrix $mtx --output-plot ${type}.png
-    """ 
-}
+//     """
+//     dropletBarcodePlot.R --mtx-matrix $mtx --output-plot ${type}.png
+//     """ 
+// }
 
 
 // process droplet_qc_plot_fry {
